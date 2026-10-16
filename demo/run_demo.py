@@ -1,6 +1,9 @@
 """Run the demo scenarios through the unchanged RADAR pipeline.
 
     python demo/run_demo.py --model claude-sonnet-5-5 --run-tag v1 [--smoke] [--resume]
+    python demo/run_demo.py --base-url openai --model gpt-6-luna --run-tag v1
+
+Keys are read from ../.env (outside the repository): OPENAI_API_KEY and ANTHROPIC_API_KEY.
 
 A thin wrapper around radar.pipeline.run_pipeline_vnext (a frozen policy file,
 so it is not edited). When the endpoint is Anthropic's OpenAI-compatible API,
@@ -12,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -31,6 +35,19 @@ def main():
     ap.add_argument("--workers", default="6")
     a = ap.parse_args()
     base_url = None if a.base_url == "openai" else a.base_url
+
+    # Keys live one level above the repository (P4_RADAR/.env), never inside it:
+    #   OPENAI_API_KEY=...      used when --base-url openai
+    #   ANTHROPIC_API_KEY=...   used for Anthropic's OpenAI-compatible endpoint
+    # The pipeline itself only reads OPENAI_API_KEY, so the right key is copied into it.
+    env_file = HERE.parent.parent / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            if "=" in line and not line.strip().startswith("#"):
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+    if base_url and "anthropic.com" in base_url and os.environ.get("ANTHROPIC_API_KEY"):
+        os.environ["OPENAI_API_KEY"] = os.environ["ANTHROPIC_API_KEY"]
 
     import openai
     from radar.common.provider_compat import needs_prompt_only_json, prompt_only_json

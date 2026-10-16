@@ -1,0 +1,441 @@
+{
+  "agent": "agent3_treatment",
+  "version": "0.2",
+
+  "decision_time": "reassessment checkpoint — after new ordered investigation result information becomes available",
+
+  "guideline": {
+    "name": "Surviving Sepsis Campaign 2026",
+    "citation": "Prescott HC, et al. Crit Care Med 2026;54:725-812",
+    "pmid": "41869847"
+  },
+
+  "design_notes": [
+    "Agent 3 provides initial treatment recommendations at processed reassessment checkpoints.",
+    "Agent 3 uses a sequential accumulation graph rather than a mutually exclusive branching graph.",
+    "Treatment decisions are evaluated in the order antimicrobial timing, fluids, vasopressors, and MAP target.",
+    "Each node has a closed answer set.",
+    "The model may use only patient information available by the current checkpoint cutoff.",
+    "Guideline scopes are frozen offline and injected verbatim at runtime.",
+    "Treatment recommendations accumulate into one final treatment plan.",
+    "The main Agent 3 safety risk is over-treatment, particularly unnecessary fluid or vasopressor treatment in patients with non-septic mimics or limited tolerance of resuscitation.",
+    "The four antimicrobial timing labels in TX1 are provisional because Figure 7 specifies a four-value closed set but does not explicitly list all four labels."
+  ],
+
+  "entry": "TX1",
+
+  "nodes": {
+    "TX1": {
+      "title": "Antimicrobial timing",
+
+      "question": "Based on the current checkpoint patient state and supplied guideline evidence, what is the appropriate antimicrobial timing strategy?",
+
+      "allowed_answers": [
+        "within_1h",
+        "within_3h",
+        "defer_and_monitor",
+        "not_indicated"
+      ],
+
+      "transitions": {
+        "within_1h": "TX2",
+        "within_3h": "TX2",
+        "defer_and_monitor": "TX2",
+        "not_indicated": "TX2"
+      },
+
+      "scope": [
+        "stmt_016",
+        "stmt_017",
+        "stmt_018",
+        "stmt_019",
+        "stmt_020"
+      ],
+
+      "scope_source": "SSC 2026 antimicrobial timing block; stmt_019 retained as contextual support for infectious-versus-noninfectious reassessment",
+
+      "scope_provenance": {
+        "stmt_016": [
+          "possible, probable, or definite septic shock",
+          "antimicrobials immediately",
+          "ideally within 1 hour"
+        ],
+        "stmt_017": [
+          "probable or definite sepsis without shock",
+          "antimicrobials immediately",
+          "ideally within 1 hour"
+        ],
+        "stmt_018": [
+          "possible sepsis without shock",
+          "time-limited rapid investigation",
+          "if concern persists, antimicrobials within 3 hours"
+        ],
+        "stmt_019": [
+          "supports rapid assessment of infectious versus noninfectious causes"
+        ],
+        "stmt_020": [
+          "low likelihood of infection without shock",
+          "defer antimicrobials",
+          "continue close monitoring"
+        ]
+      },
+
+      "decision_mapping": {
+        "within_1h": {
+          "recommend_antimicrobials": true,
+          "timing": "within_1h"
+        },
+
+        "within_3h": {
+          "recommend_antimicrobials": true,
+          "timing": "within_3h"
+        },
+
+        "defer_and_monitor": {
+          "recommend_antimicrobials": false,
+          "timing": "defer_and_monitor"
+        },
+
+        "not_indicated": {
+          "recommend_antimicrobials": false,
+          "timing": null
+        }
+      },
+
+      "rules": [
+        "Use only information available by the current checkpoint cutoff.",
+        "For possible, probable, or definite septic shock, use the within_1h pathway.",
+        "For probable or definite sepsis without shock, use the within_1h pathway.",
+        "For possible sepsis without shock, use the within_3h pathway only after a time-limited rapid investigation if concern for infection persists.",
+        "For low likelihood of infection without shock, defer antimicrobials while monitoring closely.",
+        "Do not infer infection solely from one biomarker or test result.",
+        "Do not use stmt_021 for this ED treatment node because it addresses prehospital antimicrobial administration when transport to in-hospital evaluation is expected to exceed 60 minutes.",
+        "The antimicrobial timing answer labels are provisional and should be confirmed with the team."
+      ]
+    },
+
+    "TX2": {
+      "title": "Initial fluid resuscitation",
+
+      "question": "Based on the current checkpoint patient state and supplied guideline evidence, should IV crystalloid fluid resuscitation be given now?",
+
+      "allowed_answers": [
+        "give",
+        "withhold"
+      ],
+
+      "transitions": {
+        "give": "TX3",
+        "withhold": "TX3"
+      },
+
+      "scope": [
+        "stmt_010",
+        "stmt_011",
+        "stmt_043",
+        "stmt_044",
+        "stmt_045",
+        "stmt_046",
+        "stmt_047",
+        "stmt_049"
+      ],
+
+      "scope_source": "SSC 2026 initial fluid-resuscitation scope",
+
+      "scope_provenance": {
+        "stmt_010": [
+          "sepsis-induced hypoperfusion or septic shock",
+          "at least 30 mL/kg IV crystalloid in first 3 hours"
+        ],
+        "stmt_011": [
+          "sepsis-induced hypotension",
+          "initial IV crystalloid bolus",
+          "vasopressors if hypotension persists"
+        ],
+        "stmt_043": [
+          "crystalloids first-line fluid"
+        ],
+        "stmt_044": [
+          "balanced crystalloids preferred over 0.9% saline during initial resuscitation"
+        ],
+        "stmt_045": [
+          "crystalloids alone preferred over crystalloids plus supplemental albumin"
+        ],
+        "stmt_046": [
+          "starches should not be used"
+        ],
+        "stmt_047": [
+          "gelatin should not be used"
+        ],
+        "stmt_049": [
+          "dynamic measures preferred to guide fluid resuscitation"
+        ]
+      },
+
+      "decision_mapping": {
+        "give": {
+          "give_fluids": true,
+          "fluid_class": "iv_crystalloid"
+        },
+
+        "withhold": {
+          "give_fluids": false,
+          "fluid_class": null
+        }
+      },
+
+      "rules": [
+        "Use only information available by the current checkpoint cutoff.",
+        "The decision is whether initial IV crystalloid resuscitation should be given now.",
+        "Sepsis-induced hypoperfusion, septic shock, or sepsis-induced hypotension support fluid resuscitation.",
+        "Use crystalloids as first-line fluid.",
+        "Balanced crystalloids are preferred over 0.9% saline during initial resuscitation.",
+        "Do not recommend starches or gelatin.",
+        "Use dynamic measures when available to help guide additional fluid resuscitation.",
+        "Do not automatically give fluids solely because sepsis is suspected.",
+        "Consider evidence that argues against additional fluid administration, including an already adequate fluid state or concern for fluid intolerance.",
+        "stmt_048 is intentionally excluded because it addresses fluid strategy after 30 mL/kg has already been given with persistent hypoperfusion."
+      ]
+    },
+
+    "TX3": {
+      "title": "Initial vasopressor treatment",
+
+      "question": "Based on the current checkpoint patient state and supplied guideline evidence, should vasopressor therapy be started now?",
+
+      "allowed_answers": [
+        "start",
+        "hold"
+      ],
+
+      "transitions": {
+        "start": "TX4",
+        "hold": "TX4"
+      },
+
+      "scope": [
+        "stmt_011",
+        "stmt_012",
+        "stmt_053",
+        "stmt_055"
+      ],
+
+      "scope_source": "SSC 2026 initial vasopressor scope",
+
+      "scope_provenance": {
+        "stmt_011": [
+          "vasopressor support if hypotension persists following initial crystalloid resuscitation"
+        ],
+        "stmt_012": [
+          "peripheral vasopressor initiation preferred over delaying for central access"
+        ],
+        "stmt_053": [
+          "norepinephrine first-line over dopamine, epinephrine, or selepressin"
+        ],
+        "stmt_055": [
+          "norepinephrine first-line over vasopressin or angiotensin II"
+        ]
+      },
+
+      "decision_mapping": {
+        "start": {
+          "start_vasopressor": true,
+          "first_line_agent": "norepinephrine"
+        },
+
+        "hold": {
+          "start_vasopressor": false,
+          "first_line_agent": null
+        }
+      },
+
+      "rules": [
+        "Use only information available by the current checkpoint cutoff.",
+        "Start vasopressor therapy when hypotension persists despite appropriate initial fluid resuscitation or when the clinical state otherwise meets the supplied guideline criteria.",
+        "Do not start vasopressors solely because sepsis is suspected.",
+        "If vasopressor therapy is indicated, norepinephrine is the first-line agent.",
+        "Do not delay necessary vasopressor initiation solely to obtain central venous access.",
+        "This node does not decide vasopressor escalation after initial norepinephrine.",
+        "Statements concerning vasopressin addition, epinephrine escalation, inotropes, dobutamine, or levosimendan are intentionally excluded from this initial start/hold decision."
+      ]
+    },
+
+    "TX4": {
+      "title": "Initial MAP target",
+
+      "question": "If vasopressor-supported septic shock is present, what initial MAP target should be used?",
+
+      "allowed_answers": [
+        "target_65",
+        "target_60_65",
+        "not_applicable"
+      ],
+
+      "transitions": {
+        "target_65": "TREATMENT_COMPLETE",
+        "target_60_65": "TREATMENT_COMPLETE",
+        "not_applicable": "TREATMENT_COMPLETE"
+      },
+
+      "scope": [
+        "stmt_013",
+        "stmt_014"
+      ],
+
+      "scope_source": "SSC 2026 MAP target scope",
+
+      "scope_provenance": {
+        "stmt_013": [
+          "septic shock",
+          "initial MAP target 65 mm Hg"
+        ],
+        "stmt_014": [
+          "septic shock age 65 years or older",
+          "initial MAP range 60–65 mm Hg"
+        ]
+      },
+
+      "decision_mapping": {
+        "target_65": {
+          "map_target_mmHg": 65
+        },
+
+        "target_60_65": {
+          "map_target_range_mmHg": [
+            60,
+            65
+          ]
+        },
+
+        "not_applicable": {
+          "map_target_mmHg": null
+        }
+      },
+
+      "rules": [
+        "Use only information available by the current checkpoint cutoff.",
+        "Return not_applicable when septic shock requiring a vasopressor MAP target is not present.",
+        "For adults with septic shock younger than 65 years, use target_65.",
+        "For adults with septic shock age 65 years or older, use target_60_65.",
+        "Do not invent higher MAP targets outside the closed set."
+      ]
+    }
+  },
+
+  "terminals": {
+    "TREATMENT_COMPLETE": {
+      "status": "complete",
+      "description": "All four Agent 3 initial-treatment decisions have been evaluated and accumulated into the final treatment plan."
+    },
+
+    "ABSTAIN": {
+      "status": "abstain",
+      "description": "Agent 3 failed to produce a valid grounded response after the permitted repair attempt."
+    }
+  },
+
+  "node_output_schema": {
+    "answer": "one value from the current node allowed_answers",
+
+    "supporting_evidence": [
+      {
+        "patient_finding": "patient-specific information available at the current checkpoint",
+        "statement_id": "statement id from the current node scope",
+        "quote": "verbatim quote from the injected guideline statement",
+        "implication": "brief explanation connecting the patient finding and guideline to the selected answer"
+      }
+    ],
+
+    "opposing_evidence": [
+      {
+        "patient_finding": "patient-specific information arguing against the selected answer",
+        "statement_id": "statement id from current scope or null",
+        "quote": "verbatim quote when statement_id is provided, otherwise null",
+        "implication": "brief explanation of why this argues against the selected treatment"
+      }
+    ],
+
+    "missing_information": [
+      "clinically relevant information unavailable at the current checkpoint"
+    ],
+
+    "confidence": "low | moderate | high"
+  },
+
+  "final_output_schema": {
+    "agent": "agent3_treatment",
+    "status": "complete or abstain",
+    "decision_time": "checkpoint id",
+
+    "antimicrobial_timing": {
+      "decision": "within_1h | within_3h | defer_and_monitor | not_indicated",
+      "node": "TX1",
+      "basis": [
+        "validated SSC statement ids"
+      ]
+    },
+
+    "fluids": {
+      "decision": "give | withhold",
+      "node": "TX2",
+      "fluid_class": "iv_crystalloid or null",
+      "basis": [
+        "validated SSC statement ids"
+      ]
+    },
+
+    "vasopressors": {
+      "decision": "start | hold",
+      "node": "TX3",
+      "first_line_agent": "norepinephrine or null",
+      "basis": [
+        "validated SSC statement ids"
+      ]
+    },
+
+    "map_target": {
+      "decision": "target_65 | target_60_65 | not_applicable",
+      "node": "TX4",
+      "basis": [
+        "validated SSC statement ids"
+      ]
+    }
+  },
+
+  "validation": {
+    "V1": {
+      "name": "closed_answer_validation",
+      "description": "The answer returned for each node must belong to that node's allowed_answers."
+    },
+
+    "V2": {
+      "name": "citation_scope_validation",
+      "description": "Every cited guideline statement id must belong to the current node's frozen scope."
+    },
+
+    "V3": {
+      "name": "verbatim_quote_validation",
+      "description": "Every quoted guideline passage must appear verbatim in the guideline text injected for the current node."
+    }
+  },
+
+  "accumulation": {
+    "enabled": true,
+
+    "node_order": [
+      "TX1",
+      "TX2",
+      "TX3",
+      "TX4"
+    ],
+
+    "completion_condition": "TX1, TX2, TX3, and TX4 have each produced a valid response."
+  },
+
+  "abstention": {
+    "max_model_attempts_per_node": 2,
+    "repair_attempts_per_node": 1,
+    "on_second_validation_failure": "ABSTAIN",
+    "partial_plan_on_abstain": false
+  }
+}

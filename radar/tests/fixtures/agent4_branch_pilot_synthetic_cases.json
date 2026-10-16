@@ -1,0 +1,102 @@
+{
+  "fixture_type": "synthetic_engineering_only",
+  "clinical_validation": false,
+  "description": "A4-only snapshot contracts, not real patients or a dynamic replay. Upstream states are synthetic stubs, not fresh A1/A2/A3 outputs. Case IDs do not encode expected terminals.",
+  "cases": [
+    {
+      "case_id": "A4_BRANCH_01",
+      "information_cutoff": 4,
+      "decision_time": "synthetic_reassessment",
+      "patient_state": {
+        "vitals": {"sbp": 122, "map": 82, "resp_rate": 18, "spo2": 97},
+        "oxygen_requirement": {"oxygen_therapy_documented": false, "mode": "room_air", "start_time": 0},
+        "vasopressor": {"active": false, "setting": "none", "start_time": null},
+        "ventilation": {"status": "None", "start_time": null, "current_encounter": true},
+        "resuscitation": {"initial_fluid_30ml_per_kg": {"completed": false, "completion_time": null}},
+        "post_resuscitation": {"vital_map_min": 82, "map_time": 4, "vital_o2sat_min": 97, "o2sat_time": 4},
+        "labs": {
+          "lactate_initial": {"status": "resulted", "value": 1.7, "sample_time": 2, "result_time": 3},
+          "lactate_repeat": null,
+          "culture_result": null,
+          "imaging_result": null
+        },
+        "treatment_response": "worsening",
+        "vitals_trend": "stable"
+      },
+      "agent1": {"tier": "possible_sepsis", "shock_concern": false},
+      "agent2": {"workup_recommendation": {}},
+      "workup_state": {"pending_workup": []},
+      "agent3": {"treatment_recommendation": {}},
+      "treatment_state": {"ongoing_treatment": ["antimicrobials", "fluids"], "treatment_response_flag": "worsening"},
+      "evaluation_only": {
+        "expected_mock_terminal": "T_WARD",
+        "expected_mock_nodes": ["D1", "D2"],
+        "provenance": [
+          "tests/fixtures/agent4_dryrun_cases.json:A4_DRY_DISCHARGE baseline measurements",
+          "tests/fixtures/pipeline_synthetic_cases.json:PIPE_WARD ongoing antimicrobials/fluids and worsening response",
+          "03_Agent/test_agent4.py:base_payload possible_sepsis stub"
+        ],
+        "clinical_gold_label": false,
+        "review_focus": "Assess whether ongoing treatment plus worsening response justifies inpatient care rather than observation. This engineering target is not an adjudicated disposition."
+      },
+      "mock_llm_answers": {
+        "D2": {"answer": "yes", "key_reasons": [{"field": "treatment_state.ongoing_treatment", "detail": "Ongoing synthetic treatment."}, {"field": "treatment_state.treatment_response_flag", "detail": "Synthetic worsening response."}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": null, "observation_basis": null, "blocking": []}
+      }
+    },
+    {
+      "case_id": "A4_BRANCH_02",
+      "information_cutoff": 4,
+      "decision_time": "synthetic_reassessment",
+      "patient_state": {
+        "vitals": {"sbp": 122, "map": 82, "resp_rate": 18, "spo2": 97},
+        "oxygen_requirement": {"oxygen_therapy_documented": false, "mode": "room_air", "start_time": 0},
+        "vasopressor": {"active": false, "setting": "none", "start_time": null},
+        "ventilation": {"status": "None", "start_time": null, "current_encounter": true},
+        "resuscitation": {"initial_fluid_30ml_per_kg": {"completed": false, "completion_time": null}},
+        "post_resuscitation": {"vital_map_min": 82, "map_time": 4, "vital_o2sat_min": 97, "o2sat_time": 4},
+        "labs": {
+          "lactate_initial": {"status": "resulted", "value": 1.7, "sample_time": 2, "result_time": 3},
+          "lactate_repeat": {"status": "pending", "value": null, "sample_time": null, "result_time": null},
+          "culture_result": null,
+          "imaging_result": null
+        },
+        "treatment_response": "pending",
+        "vitals_trend": "stable"
+      },
+      "agent1": {"tier": "possible_sepsis", "shock_concern": false},
+      "agent2": {"workup_recommendation": {}},
+      "workup_state": {"pending_workup": ["repeat_lactate"]},
+      "agent3": {"treatment_recommendation": {}},
+      "treatment_state": {"ongoing_treatment": [], "treatment_response_flag": "pending"},
+      "evaluation_only": {
+        "expected_mock_terminal": "T_OBSERVATION",
+        "expected_mock_nodes": ["D1", "D2", "D3"],
+        "provenance": [
+          "tests/fixtures/agent4_dryrun_cases.json:A4_DRY_DISCHARGE baseline measurements",
+          "tests/fixtures/pipeline_synthetic_cases.json:PIPE_OBSERVATION pending response and repeat-lactate mock",
+          "03_Agent/test_agent4.py:TestAgent4OutputAndEvaluation.test_valid_direct_d3_observation_requires_decision_changing_basis"
+        ],
+        "clinical_gold_label": false,
+        "review_focus": "Pending alone is not an observation indication. Review the actual decision-changing counterfactual; a valid insufficient_evidence route at D2 is possible. No pending result or response is fabricated."
+      },
+      "mock_llm_answers": {
+        "D2": {"answer": "no", "key_reasons": [{"field": "patient_state.vitals", "detail": "Synthetic stable measured vitals."}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": null, "observation_basis": null, "blocking": []},
+        "D3": {
+          "answer": "yes",
+          "key_reasons": [{"field": "patient_state.labs.lactate_repeat", "detail": "Pending repeat result may change disposition."}],
+          "unresolved_risks": [{"field": "patient_state.labs.lactate_repeat", "detail": "Result is not available at this cutoff."}],
+          "missing_information": ["repeat lactate"],
+          "escalation_trigger": null,
+          "observation_basis": {
+            "field": "patient_state.labs.lactate_repeat",
+            "counterfactual": {
+              "if_a": {"condition": "reassuring result", "disposition": "discharge"},
+              "if_b": {"condition": "concerning result", "disposition": "ward"}
+            }
+          },
+          "blocking": []
+        }
+      }
+    }
+  ]
+}

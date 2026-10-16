@@ -1,0 +1,501 @@
+{
+  "agent": "agent2_workup",
+  "version": "0.1",
+
+  "decision_time": "T0 — after Agent 1 recognition and before ordered investigation results return",
+
+  "guideline": {
+    "name": "Surviving Sepsis Campaign 2026",
+    "citation": "Prescott HC, et al. Crit Care Med 2026;54:725-812",
+    "pmid": "41869847"
+  },
+
+  "design_notes": [
+    "Agent 2 performs diagnostic workup planning at T0.",
+    "Agent 2 uses a sequential accumulation graph rather than a mutually exclusive branching classification graph.",
+    "All four workup nodes are evaluated for every patient unless the system abstains because of repeated validation failure.",
+    "The model may only return one of the allowed_answers at each node.",
+    "Each node evaluates exactly one closed-set workup category.",
+    "Node decisions accumulate into one final Agent 2 workup plan.",
+    "The model does not invent workup categories outside the closed Agent 2 item set.",
+    "Only information available at T0 may be used.",
+    "Laboratory, microbiology, imaging, or other investigation results that become available after T0 must not be exposed to Agent 2.",
+    "Guideline scopes are frozen and injected verbatim at runtime.",
+    "The primary Agent 2 safety risk is over-ordering."
+  ],
+
+  "allowed_items": [
+    "blood_cultures",
+    "serum_lactate",
+    "source_imaging_or_sampling",
+    "alternative_diagnosis_testing"
+  ],
+
+  "allowed_answers": [
+    "recommend",
+    "already_addressed",
+    "not_indicated",
+    "indeterminate"
+  ],
+
+  "allowed_priorities": [
+    "immediate",
+    "this_visit"
+  ],
+
+  "entry": "W1",
+
+  "nodes": {
+    "W1": {
+      "title": "Blood cultures",
+
+      "question": "Based only on information available at T0 and the current investigation status, should blood cultures be addressed as part of the sepsis diagnostic workup?",
+
+      "item": "blood_cultures",
+
+      "allowed_answers": [
+        "recommend",
+        "already_addressed",
+        "not_indicated",
+        "indeterminate"
+      ],
+
+      "transitions": {
+        "recommend": "W2",
+        "already_addressed": "W2",
+        "not_indicated": "W2",
+        "indeterminate": "W2"
+      },
+
+      "scope": [
+        "stmt_007"
+      ],
+
+      "scope_source": "Agent 2 design-aligned SSC 2026 scope",
+
+      "scope_provenance": {
+        "stmt_007": [
+          "supports blood_cultures",
+          "collect blood cultures as soon as possible",
+          "ideally before antimicrobial therapy"
+        ]
+      },
+
+      "decision_mapping": {
+        "recommend": {
+          "recommended": true,
+          "already_addressed": false,
+          "priority": "immediate"
+        },
+
+        "already_addressed": {
+          "recommended": false,
+          "already_addressed": true,
+          "priority": null
+        },
+
+        "not_indicated": {
+          "recommended": false,
+          "already_addressed": false,
+          "priority": null
+        },
+
+        "indeterminate": {
+          "recommended": null,
+          "already_addressed": null,
+          "priority": null
+        }
+      },
+
+      "rules": [
+        "Use only information available at T0.",
+        "Return recommend when blood cultures are guideline-supported and are not already documented as addressed.",
+        "Return already_addressed when blood cultures are already ordered or collected before or at T0.",
+        "Do not infer that cultures were not performed solely because no record is present.",
+        "If status cannot be determined from available information, return indeterminate.",
+        "Do not recommend delaying antimicrobial treatment in order to obtain blood cultures.",
+        "The blood-culture and antimicrobial sequencing relationship is evaluated separately using deterministic timing logic."
+      ]
+    },
+
+    "W2": {
+      "title": "Blood lactate",
+
+      "question": "Based only on information available at T0 and the current investigation status, should blood lactate be addressed as part of the sepsis diagnostic workup?",
+
+      "item": "serum_lactate",
+
+      "allowed_answers": [
+        "recommend",
+        "already_addressed",
+        "not_indicated",
+        "indeterminate"
+      ],
+
+      "transitions": {
+        "recommend": "W3",
+        "already_addressed": "W3",
+        "not_indicated": "W3",
+        "indeterminate": "W3"
+      },
+
+      "scope": [
+        "stmt_008"
+      ],
+
+      "scope_source": "Agent 2 design-aligned SSC 2026 scope",
+
+      "scope_provenance": {
+        "stmt_008": [
+          "supports serum_lactate",
+          "initial blood lactate measurement"
+        ]
+      },
+
+      "decision_mapping": {
+        "recommend": {
+          "recommended": true,
+          "already_addressed": false,
+          "priority": "immediate"
+        },
+
+        "already_addressed": {
+          "recommended": false,
+          "already_addressed": true,
+          "priority": null
+        },
+
+        "not_indicated": {
+          "recommended": false,
+          "already_addressed": false,
+          "priority": null
+        },
+
+        "indeterminate": {
+          "recommended": null,
+          "already_addressed": null,
+          "priority": null
+        }
+      },
+
+      "rules": [
+        "Use only information available at T0.",
+        "Return recommend when initial blood lactate measurement is guideline-supported and is not already addressed.",
+        "Return already_addressed when blood lactate is already ordered or collected before or at T0.",
+        "Do not use a lactate result that becomes available after T0.",
+        "Do not make serial lactate recommendations in this node.",
+        "Serial lactate measurement and perfusion-guided resuscitation belong to later reassessment or treatment logic.",
+        "If investigation status cannot be determined, return indeterminate."
+      ]
+    },
+
+    "W3": {
+      "title": "Source-directed workup",
+
+      "question": "Based only on information available at T0, is additional source-directed imaging or sampling needed to evaluate for a specific anatomical diagnosis or source of infection that may require emergent source control?",
+
+      "item": "source_imaging_or_sampling",
+
+      "allowed_answers": [
+        "recommend",
+        "already_addressed",
+        "not_indicated",
+        "indeterminate"
+      ],
+
+      "transitions": {
+        "recommend": "W4",
+        "already_addressed": "W4",
+        "not_indicated": "W4",
+        "indeterminate": "W4"
+      },
+
+      "scope": [
+        "stmt_023"
+      ],
+
+      "scope_source": "Agent 2 design-aligned SSC 2026 scope; graph-derived scope manually verified",
+
+      "scope_provenance": {
+        "stmt_023": [
+          "supports source_imaging_or_sampling",
+          "rapid evaluation for a specific anatomical diagnosis or infection source requiring emergent source control"
+        ]
+      },
+
+      "decision_mapping": {
+        "recommend": {
+          "recommended": true,
+          "already_addressed": false,
+          "priority": "this_visit"
+        },
+
+        "already_addressed": {
+          "recommended": false,
+          "already_addressed": true,
+          "priority": null
+        },
+
+        "not_indicated": {
+          "recommended": false,
+          "already_addressed": false,
+          "priority": null
+        },
+
+        "indeterminate": {
+          "recommended": null,
+          "already_addressed": null,
+          "priority": null
+        }
+      },
+
+      "rules": [
+        "Use only information available at T0.",
+        "This node decides whether source-directed diagnostic evaluation should be addressed, not which source-control procedure should be performed.",
+        "Do not invent a specific imaging modality, anatomical study, or microbiological sampling procedure that is not directly supported by an approved source.",
+        "Return recommend when the presentation indicates a need for further source-directed diagnostic evaluation.",
+        "Return already_addressed when appropriate source-directed imaging or sampling is already ordered or performed before or at T0.",
+        "Return not_indicated only when the available T0 information does not support additional source-directed workup.",
+        "If the need for further source-directed workup cannot be determined, return indeterminate."
+      ]
+    },
+
+    "W4": {
+      "title": "Alternative-diagnosis workup",
+
+      "question": "Based only on information available at T0, is additional diagnostic evaluation needed for an important noninfectious alternative to sepsis?",
+
+      "item": "alternative_diagnosis_testing",
+
+      "allowed_answers": [
+        "recommend",
+        "already_addressed",
+        "not_indicated",
+        "indeterminate"
+      ],
+
+      "transitions": {
+        "recommend": "WORKUP_COMPLETE",
+        "already_addressed": "WORKUP_COMPLETE",
+        "not_indicated": "WORKUP_COMPLETE",
+        "indeterminate": "WORKUP_COMPLETE"
+      },
+
+      "scope": [
+        "stmt_005",
+        "stmt_019"
+      ],
+
+      "scope_source": "Agent 2 design-aligned SSC 2026 scope; graph-derived scope manually verified",
+
+      "scope_provenance": {
+        "stmt_005": [
+          "constraint on diagnostic reasoning",
+          "sepsis should not be ruled in or ruled out using a single biomarker or diagnostic test"
+        ],
+
+        "stmt_019": [
+          "supports alternative_diagnosis_testing",
+          "rapid assessment of infectious versus noninfectious causes in possible sepsis without shock"
+        ]
+      },
+
+      "decision_mapping": {
+        "recommend": {
+          "recommended": true,
+          "already_addressed": false,
+          "priority": "this_visit"
+        },
+
+        "already_addressed": {
+          "recommended": false,
+          "already_addressed": true,
+          "priority": null
+        },
+
+        "not_indicated": {
+          "recommended": false,
+          "already_addressed": false,
+          "priority": null
+        },
+
+        "indeterminate": {
+          "recommended": null,
+          "already_addressed": null,
+          "priority": null
+        }
+      },
+
+      "rules": [
+        "Use only information available at T0.",
+        "This node determines whether additional evaluation of a clinically important noninfectious alternative is needed.",
+        "Do not diagnose a specific mimic unless supported by the available patient evidence.",
+        "Do not invent disease-specific testing recommendations that are not supported by an approved guideline source.",
+        "A single biomarker or diagnostic test must not be treated as sufficient to rule sepsis in or out.",
+        "Return recommend when a clinically meaningful noninfectious alternative remains sufficiently plausible to warrant additional evaluation.",
+        "Return already_addressed when relevant alternative-diagnosis evaluation is already ordered or performed before or at T0.",
+        "Return not_indicated when the available T0 information does not support additional alternative-diagnosis evaluation.",
+        "If the need for additional evaluation cannot be determined, return indeterminate."
+      ]
+    }
+  },
+
+  "terminals": {
+    "WORKUP_COMPLETE": {
+      "status": "complete",
+      "description": "All four Agent 2 workup categories have been evaluated. The final workup plan is assembled from the accumulated W1-W4 decisions."
+    },
+
+    "ABSTAIN": {
+      "status": "abstain",
+      "description": "Agent 2 could not produce a valid grounded response after the permitted repair attempt."
+    }
+  },
+
+  "node_output_schema": {
+    "answer": "one value from the current node allowed_answers",
+
+    "supporting_evidence": [
+      {
+        "patient_finding": "patient-specific finding available at T0",
+        "statement_id": "statement id from the current node scope",
+        "quote": "verbatim quote from the injected guideline statement",
+        "implication": "brief explanation connecting the patient finding and guideline to the answer"
+      }
+    ],
+
+    "opposing_evidence": [
+      {
+        "patient_finding": "patient-specific finding available at T0",
+        "statement_id": "statement id from the current node scope or null when no approved source is available",
+        "quote": "verbatim guideline quote when statement_id is not null",
+        "implication": "brief explanation of why this argues against the selected answer"
+      }
+    ],
+
+    "missing_information": [
+      "clinically relevant information unavailable at T0"
+    ],
+
+    "confidence": "low | moderate | high"
+  },
+
+  "final_output_schema": {
+    "agent": "agent2_workup",
+
+    "status": "complete or abstain",
+
+    "decision_time": "T0",
+
+    "recommendations": [
+      {
+        "item": "one value from allowed_items",
+        "priority": "immediate or this_visit",
+        "node": "W1, W2, W3, or W4",
+        "basis": [
+          "statement ids cited by the corresponding node"
+        ],
+        "reason": "patient-specific reason derived from the validated node response"
+      }
+    ],
+
+    "already_addressed": [
+      {
+        "item": "one value from allowed_items",
+        "node": "W1, W2, W3, or W4",
+        "status": "already_addressed"
+      }
+    ],
+
+    "not_indicated": [
+      {
+        "item": "one value from allowed_items",
+        "node": "W1, W2, W3, or W4"
+      }
+    ],
+
+    "indeterminate": [
+      {
+        "item": "one value from allowed_items",
+        "node": "W1, W2, W3, or W4",
+        "missing_information": [
+          "reason the workup decision could not be resolved"
+        ]
+      }
+    ]
+  },
+
+  "validation": {
+    "V1": {
+      "name": "closed_answer_validation",
+      "description": "The answer returned for each node must be one of that node's allowed_answers."
+    },
+
+    "V2": {
+      "name": "citation_scope_validation",
+      "description": "Every cited guideline statement id must belong to the current node's frozen scope."
+    },
+
+    "V3": {
+      "name": "verbatim_quote_validation",
+      "description": "Every quoted guideline passage must appear verbatim in the guideline text injected for the current node."
+    }
+  },
+
+  "deterministic_checks": {
+    "t0_leakage": {
+    "enabled": true,
+    "implementation_status": "pending",
+    "description": "Strip or ignore laboratory, microbiology, imaging, treatment, or investigation results whose availability timestamp is after T0.",
+    "model_may_override": false
+  },
+
+    "blood_culture_antimicrobial_sequence": {
+    "enabled": true,
+    "implementation_status": "pending",
+    "node": "W1",
+    "guideline_basis": "stmt_007",
+    "description": "When structured timestamps are available, determine whether blood cultures were collected before antimicrobial administration. The model does not control this sequencing check.",
+    "model_may_override": false
+  },
+
+    "duplicate_ordering": {
+      "enabled": true,
+      "description": "An item classified as already_addressed must not also appear in the final recommendations list.",
+      "model_may_override": false
+    },
+
+    "closed_item_set": {
+      "enabled": true,
+      "description": "The final workup plan may contain only the four Agent 2 workup categories defined in allowed_items.",
+      "model_may_override": false
+    }
+  },
+
+  "accumulation": {
+    "enabled": true,
+
+    "node_order": [
+      "W1",
+      "W2",
+      "W3",
+      "W4"
+    ],
+
+    "behavior": {
+      "recommend": "Add the node item to final recommendations using the priority defined in decision_mapping.",
+      "already_addressed": "Add the node item to final already_addressed.",
+      "not_indicated": "Add the node item to final not_indicated.",
+      "indeterminate": "Add the node item to final indeterminate together with the node missing_information."
+    },
+
+    "completion_condition": "W1, W2, W3, and W4 have each produced a valid response."
+  },
+
+  "abstention": {
+    "max_model_attempts_per_node": 2,
+    "repair_attempts_per_node": 1,
+    "on_second_validation_failure": "ABSTAIN",
+    "partial_plan_on_abstain": false
+  }
+}

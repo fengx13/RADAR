@@ -1,0 +1,41 @@
+{
+  "id": "table_03",
+  "source": "SSC 2026, TABLE 3. Sepsis Terminology in This Guideline",
+  "citation": "Prescott HC, et al. Crit Care Med 2026;54:725-812, Table 3",
+  "journal_page": 736,
+  "verbatim_intro": "Because the diagnosis of sepsis may be uncertain in clinical practice, we developed standardized language for definite, probable, possible, and unlikely sepsis, which are used throughout the SSC guidelines (Table 3).",
+  "note": "Not one of the 129 numbered statements — a separate definitional table. It is the only place the guideline operationalises the possible/probable/definite ladder on which the antibiotic-timing statements (16, 17, 18) branch.",
+  "axis": "Every tier is defined by how the alternative diagnosis ranks against sepsis, not by how confident one feels about sepsis alone. This is why opposing evidence is a required input to the tier, not an optional extra.",
+  "tiers": [
+    {
+      "tier": "definite_sepsis",
+      "verbatim": "Sepsis is confirmed based on history, clinical examination, and diagnostic testing. An alternative diagnosis is very unlikely.",
+      "alternative_ranks": "very unlikely",
+      "requires_diagnostic_testing": true
+    },
+    {
+      "tier": "probable_sepsis",
+      "verbatim": "High suspicion for sepsis. Sepsis is the most likely diagnosis based on history, clinical examination, and diagnostic testing. An alternative diagnosis is less likely.",
+      "alternative_ranks": "less likely",
+      "requires_diagnostic_testing": false
+    },
+    {
+      "tier": "possible_sepsis",
+      "verbatim": "Moderate suspicion for sepsis. Sepsis is a possible diagnosis; however, an alternative diagnosis is also likely based on history, clinical examination, and diagnostic testing.",
+      "alternative_ranks": "also likely",
+      "requires_diagnostic_testing": false
+    },
+    {
+      "tier": "unlikely_sepsis",
+      "verbatim": "Low suspicion for sepsis. Clinical assessment is not consistent with sepsis, or an alternate diagnosis is more likely based on history, clinical examination, and diagnostic testing.",
+      "alternative_ranks": "more likely",
+      "requires_diagnostic_testing": false
+    }
+  ],
+  "downstream_use": {
+    "stmt_016": "possible / probable / definite septic shock -> antimicrobials within 1 h (strong)",
+    "stmt_017": "probable / definite sepsis without shock -> antimicrobials within 1 h (strong)",
+    "stmt_018": "possible sepsis without shock -> time-limited rapid investigation, antimicrobials within 3 h (conditional)",
+    "stmt_020": "low likelihood of infection without shock -> defer antimicrobials while monitoring closely (conditional)"
+  }
+}

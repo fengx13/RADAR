@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "longitudinal_checkpoint_contract.schema.json",
+  "title": "RADAR vNext longitudinal checkpoint input contract",
+  "description": "Contract for externally assembled EHR state. It defines timing semantics but does not map or fabricate MIMIC columns.",
+  "type": "object",
+  "required": ["case_id", "stay_id", "t0_time", "t0_state", "observed_workup", "longitudinal_events", "observed_treatment"],
+  "properties": {
+    "case_id": {"type": "string"},
+    "stay_id": {"type": "integer"},
+    "t0_time": {"$ref": "#/$defs/time"},
+    "t0_state": {
+      "type": "object",
+      "description": "Only state genuinely available at T0; future outcomes and observed disposition are forbidden."
+    },
+    "checkpoint_boundaries": {
+      "type": "array",
+      "description": "Required only when timestamps are absolute datetimes rather than hours from T0.",
+      "items": {
+        "type": "object",
+        "required": ["checkpoint_id", "cutoff_time"],
+        "properties": {
+          "checkpoint_id": {"enum": ["C0_5", "C1", "C3", "C6"]},
+          "cutoff_time": {"$ref": "#/$defs/time"}
+        }
+      }
+    },
+    "observed_workup": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/workup_item"}
+    },
+    "longitudinal_events": {
+      "type": "object",
+      "properties": {
+        "vitals": {"type": "array", "items": {"$ref": "#/$defs/vital_event"}},
+        "respiratory_support": {"type": "array", "items": {"$ref": "#/$defs/respiratory_event"}},
+        "vasopressors": {"type": "array", "items": {"$ref": "#/$defs/vasopressor_event"}},
+        "fluids": {"type": "array", "items": {"$ref": "#/$defs/fluid_event"}},
+        "post_resuscitation": {"type": "array", "items": {"$ref": "#/$defs/post_resuscitation_event"}},
+        "treatment_response": {"type": "array", "items": {"$ref": "#/$defs/response_event"}}
+      },
+      "additionalProperties": false
+    },
+    "observed_treatment": {
+      "type": "object",
+      "description": "Observed care only. Agent 3 recommendations must not populate this object.",
+      "properties": {
+        "antimicrobials": {"type": "array", "items": {"$ref": "#/$defs/antimicrobial_event"}},
+        "fluids": {"type": "array", "items": {"$ref": "#/$defs/fluid_event"}},
+        "vasopressors": {"type": "array", "items": {"$ref": "#/$defs/vasopressor_event"}},
+        "respiratory_support": {"type": "array", "items": {"$ref": "#/$defs/respiratory_event"}},
+        "treatment_response": {"type": "array", "items": {"$ref": "#/$defs/response_event"}}
+      },
+      "additionalProperties": false
+    },
+    "evaluation_only": {
+      "type": "object",
+      "description": "Retrospective truth/outcomes. The pipeline isolates this object from all inference payloads."
+    }
+  },
+  "$defs": {
+    "time": {
+      "oneOf": [
+        {"type": "number", "description": "Hours relative to T0."},
+        {"type": "string", "format": "date-time", "description": "Absolute timestamp; all timestamps in a case must be comparable."}
+      ]
+    },
+    "nullable_time": {
+      "oneOf": [{"$ref": "#/$defs/time"}, {"type": "null"}]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source_type"],
+      "properties": {
+        "source_type": {"type": "string"},
+        "source_field": {"type": ["string", "null"]},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "workup_item": {
+      "type": "object",
+      "required": ["item", "actual_order_status", "order_time", "sample_time", "result_status", "result_available_time", "result_kind", "disposition_relevant", "checkpoint_eligible", "provenance"],
+      "properties": {
+        "item": {"type": "string"},
+        "actual_order_status": {"enum": ["unavailable", "not_ordered", "ordered", "collected", "pending", "resulted"]},
+        "order_time": {"$ref": "#/$defs/nullable_time"},
+        "sample_time": {"$ref": "#/$defs/nullable_time"},
+        "result_status": {"enum": ["unavailable", "not_ordered", "ordered", "pending", "resulted"]},
+        "result_available_time": {"$ref": "#/$defs/nullable_time"},
+        "result_kind": {
+          "type": ["string", "null"],
+          "description": "Semantic result class. final_culture is not checkpoint eligible; unknown classes remain unresolved."
+        },
+        "disposition_relevant": {
+          "type": ["boolean", "null"],
+          "description": "Whether the pending/resulted item matters to the current disposition decision."
+        },
+        "checkpoint_eligible": {
+          "type": ["boolean", "null"],
+          "description": "Whether newly available information may trigger RADAR reassessment. Null means unresolved, not false."
+        },
+        "value": {},
+        "unit": {"type": ["string", "null"], "description": "Recorded result unit, not inferred from the analyte name."},
+        "result_summary": {"type": ["string", "null"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "vital_event": {
+      "type": "object",
+      "required": ["measurement_time", "provenance"],
+      "properties": {
+        "measurement_time": {"$ref": "#/$defs/time"},
+        "sbp": {"type": ["number", "null"]},
+        "map": {"type": ["number", "null"]},
+        "resp_rate": {"type": ["number", "null"]},
+        "spo2": {"type": ["number", "null"]},
+        "trend": {"type": ["string", "null"]},
+        "disposition_relevant": {"type": ["boolean", "null"]},
+        "checkpoint_eligible": {"type": ["boolean", "null"]},
+        "checkpoint_eligibility_reason": {"type": ["string", "null"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "respiratory_event": {
+      "type": "object",
+      "required": ["start_time", "oxygen_therapy_documented", "ventilation_status", "current_encounter", "provenance"],
+      "properties": {
+        "start_time": {"$ref": "#/$defs/time"},
+        "oxygen_therapy_documented": {"type": ["boolean", "null"]},
+        "mode": {"type": ["string", "null"]},
+        "ventilation_status": {"type": ["string", "null"]},
+        "current_encounter": {"type": ["boolean", "null"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "vasopressor_event": {
+      "type": "object",
+      "required": ["start_time", "active", "setting", "provenance"],
+      "properties": {
+        "start_time": {"$ref": "#/$defs/time"},
+        "active": {"type": ["boolean", "null"]},
+        "setting": {"type": ["string", "null"]},
+        "agent": {"type": ["string", "null"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "fluid_event": {
+      "type": "object",
+      "required": ["event_time", "provenance"],
+      "properties": {
+        "event_time": {"$ref": "#/$defs/time"},
+        "administered": {"type": ["boolean", "null"]},
+        "amount_ml": {"type": ["number", "null"]},
+        "initial_fluid_30ml_per_kg_completed": {"type": ["boolean", "null"]},
+        "completion_time": {"$ref": "#/$defs/nullable_time"},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "post_resuscitation_event": {
+      "type": "object",
+      "required": ["measurement_time", "provenance"],
+      "properties": {
+        "measurement_time": {"$ref": "#/$defs/time"},
+        "vital_map_min": {"type": ["number", "null"]},
+        "map_time": {"$ref": "#/$defs/nullable_time"},
+        "vital_o2sat_min": {"type": ["number", "null"]},
+        "o2sat_time": {"$ref": "#/$defs/nullable_time"},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "response_event": {
+      "type": "object",
+      "required": ["assessment_time", "state", "provenance"],
+      "properties": {
+        "assessment_time": {"$ref": "#/$defs/time"},
+        "state": {"type": "string"},
+        "disposition_relevant": {"type": ["boolean", "null"]},
+        "checkpoint_eligible": {"type": ["boolean", "null"]},
+        "checkpoint_eligibility_reason": {"type": ["string", "null"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "antimicrobial_event": {
+      "type": "object",
+      "required": ["administration_time", "administered", "provenance"],
+      "properties": {
+        "administration_time": {"$ref": "#/$defs/time"},
+        "administered": {"type": ["boolean", "null"]},
+        "status": {"type": ["string", "null"]},
+        "agent": {"type": ["string", "null"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    }
+  },
+  "x-radar-timing-semantics": {
+    "checkpoint_trigger": "At least one new checkpoint-eligible observed investigation result_available_time enters the current window.",
+    "result_visibility": "A result value is visible only when result_available_time is at or before the checkpoint cutoff.",
+    "sample_and_order_times": "Never substitutes for result_available_time.",
+    "event_selection": "Use the latest eligible event timestamp at or before the checkpoint cutoff.",
+    "cfinal": "Optional late ED reassessment only when new checkpoint-eligible information becomes available after C6 while simulated disposition remains unresolved. Final culture alone cannot create Cfinal.",
+    "forbidden_inference_fields": ["truth", "outcomes", "evaluation_only", "observed_disposition", "ed_disposition", "admission_type", "hadm_id", "icu_transfer_*", "mortality_*", "ed_revisit_*", "dsp_*"]
+  }
+}

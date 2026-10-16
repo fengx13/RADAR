@@ -1,0 +1,70 @@
+{
+  "agent": "agent4_t0_disposition",
+  "version": "0.1",
+  "decision_time": "T0",
+  "purpose": "Conservative early disposition or routing to longitudinal workup.",
+  "design_notes": [
+    "continue_workup is a routing/system state, not a clinical disposition.",
+    "No SSC ED-disposition citation scope is asserted.",
+    "D1_T0 uses only active Tier A critical-care support triggers observable at T0 or pre-arrival.",
+    "Tier B candidate criteria remain pending clinical sign-off and inactive at T0.",
+    "vaso_setting=icu and future or post-resuscitation information never trigger prospective T0 routing.",
+    "Laboratory and post-resuscitation triggers cannot fire at T0.",
+    "D3_T0 is deterministic: unresolved Agent 2 recommendations or indeterminate workup items require continued workup before discharge."
+  ],
+  "entry": "D1_T0",
+  "nodes": {
+    "D1_T0": {
+      "title": "Immediately visible critical-care requirement",
+      "type": "deterministic_safety_gate",
+      "question": "Is an existing approved critical-care requirement directly visible from T0 or pre-arrival support?",
+      "allowed_answers": ["yes", "no"],
+      "transitions": {"yes": "T_ICU", "no": "D2_T0"}
+    },
+    "D2_T0": {
+      "title": "Clear inpatient-level need",
+      "type": "llm_closed_set",
+      "question": "Using only T0 evidence and upstream A1/A2 context, is a final inpatient disposition already justified?",
+      "allowed_answers": ["ICU", "ward", "no", "insufficient_evidence"],
+      "transitions": {
+        "ICU": "T_ICU",
+        "ward": "T_WARD",
+        "no": "D3_T0",
+        "insufficient_evidence": "T_CONTINUE_WORKUP"
+      }
+    },
+    "D3_T0": {
+      "title": "Unresolved workup gate",
+      "type": "deterministic_workup_gate",
+      "question": "Does Agent 2 contain unresolved recommended or indeterminate workup?",
+      "allowed_answers": ["yes", "no"],
+      "transitions": {"yes": "T_CONTINUE_WORKUP", "no": "D4_T0"}
+    },
+    "D4_T0": {
+      "title": "Safe early non-inpatient disposition",
+      "type": "llm_closed_set",
+      "question": "Can a final discharge or observation disposition be justified now using only T0 information?",
+      "allowed_answers": ["discharge", "observation", "continue_workup", "insufficient_evidence"],
+      "transitions": {
+        "discharge": "T_DISCHARGE",
+        "observation": "T_OBSERVATION",
+        "continue_workup": "T_CONTINUE_WORKUP",
+        "insufficient_evidence": "T_CONTINUE_WORKUP"
+      }
+    }
+  },
+  "terminals": {
+    "T_DISCHARGE": {"status": "decision", "disposition": "discharge", "continue_workup": false},
+    "T_OBSERVATION": {"status": "decision", "disposition": "observation", "continue_workup": false},
+    "T_WARD": {"status": "decision", "disposition": "ward", "continue_workup": false},
+    "T_ICU": {"status": "decision", "disposition": "ICU", "continue_workup": false},
+    "T_CONTINUE_WORKUP": {"status": "continue_workup", "disposition": null, "continue_workup": true},
+    "T_ABSTAIN": {"status": "abstain", "disposition": null, "continue_workup": false}
+  },
+  "validation": {
+    "closed_set": true,
+    "one_repair_retry": true,
+    "discharge_requires_escalation_trigger": true,
+    "future_information_forbidden": true
+  }
+}

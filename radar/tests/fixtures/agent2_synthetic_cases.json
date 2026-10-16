@@ -1,0 +1,151 @@
+[
+  {
+    "case_id": "A2_case_01",
+    "label": "Nothing addressed yet",
+    "input": {
+      "chief_complaint": "Fever and cough",
+      "age": 67,
+      "sex": "F",
+      "triage_vitals": {
+        "temperature_C": 38.6,
+        "heart_rate": 112,
+        "resp_rate": 24,
+        "spo2": 94,
+        "sbp": 108,
+        "dbp": 64
+      },
+      "investigation_status": {
+        "blood_cultures": "not_ordered",
+        "serum_lactate": "not_ordered",
+        "source_imaging_or_sampling": "no_record_before_T0",
+        "alternative_diagnosis_testing": "no_record_before_T0"
+      },
+      "labs": "no result available before this decision time"
+    }
+  },
+
+  {
+    "case_id": "A2_case_02",
+    "label": "Cultures and source workup already addressed",
+    "input": {
+      "chief_complaint": "Fever, abdominal pain",
+      "age": 72,
+      "sex": "M",
+      "triage_vitals": {
+        "temperature_C": 38.4,
+        "heart_rate": 108,
+        "resp_rate": 22,
+        "spo2": 96,
+        "sbp": 104,
+        "dbp": 60
+      },
+      "investigation_status": {
+        "blood_cultures": "collected",
+        "serum_lactate": "not_ordered",
+        "source_imaging_or_sampling": "ordered",
+        "alternative_diagnosis_testing": "no_record_before_T0"
+      },
+      "labs": "no result available before this decision time"
+    }
+  },
+
+  {
+    "case_id": "A2_case_03",
+    "label": "Everything already addressed",
+    "input": {
+      "chief_complaint": "Fever and hypotension",
+      "age": 81,
+      "sex": "F",
+      "triage_vitals": {
+        "temperature_C": 39.0,
+        "heart_rate": 120,
+        "resp_rate": 26,
+        "spo2": 93,
+        "sbp": 92,
+        "dbp": 54
+      },
+      "investigation_status": {
+        "blood_cultures": "collected",
+        "serum_lactate": "ordered",
+        "source_imaging_or_sampling": "ordered",
+        "alternative_diagnosis_testing": "ordered"
+      },
+      "labs": "no result available before this decision time"
+    }
+  },
+
+  {
+    "case_id": "A2_case_04",
+    "label": "Some workup explicitly not indicated",
+    "input": {
+      "chief_complaint": "Fever and dysuria",
+      "age": 44,
+      "sex": "F",
+      "triage_vitals": {
+        "temperature_C": 38.1,
+        "heart_rate": 102,
+        "resp_rate": 18,
+        "spo2": 99,
+        "sbp": 124,
+        "dbp": 76
+      },
+      "investigation_status": {
+        "blood_cultures": "not_ordered",
+        "serum_lactate": "not_ordered",
+        "source_imaging_or_sampling": "not_indicated",
+        "alternative_diagnosis_testing": "not_indicated"
+      },
+      "labs": "no result available before this decision time"
+    }
+  },
+
+  {
+    "case_id": "A2_case_05",
+    "label": "Unknown investigation status",
+    "input": {
+      "chief_complaint": "Weakness and confusion",
+      "age": 76,
+      "sex": "M",
+      "triage_vitals": {
+        "temperature_C": 37.7,
+        "heart_rate": 98,
+        "resp_rate": 21,
+        "spo2": 95,
+        "sbp": 102,
+        "dbp": 62
+      },
+      "investigation_status": {
+        "blood_cultures": "unknown",
+        "serum_lactate": "unknown",
+        "source_imaging_or_sampling": "unknown",
+        "alternative_diagnosis_testing": "unknown"
+      },
+      "labs": "no result available before this decision time"
+    }
+  },
+
+  {
+    "case_id": "A2_case_06",
+    "label": "Mixed decisions",
+    "input": {
+      "chief_complaint": "Dyspnea, fever, chest discomfort",
+      "age": 63,
+      "sex": "M",
+      "triage_vitals": {
+        "temperature_C": 38.3,
+        "heart_rate": 116,
+        "resp_rate": 28,
+        "spo2": 90,
+        "sbp": 110,
+        "dbp": 66
+      },
+      "investigation_status": {
+        "blood_cultures": "collected",
+        "serum_lactate": "not_ordered",
+        "source_imaging_or_sampling": "ordered",
+        "alternative_diagnosis_testing": "no_record_before_T0"
+      },
+      "labs": "no result available before this decision time"
+    }
+  }
+]

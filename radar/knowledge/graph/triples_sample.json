@@ -1,0 +1,157 @@
+{
+  "_schema": {
+    "purpose": "One record per SSC 2026 statement. This is what the graph is built from.",
+    "fields": {
+      "population": "who the statement is about, as the guideline words it",
+      "applies_when": "{any_of / all_of} of Condition nodes — the APPLIES_WHEN edges",
+      "recommends": "list of {action, polarity, dose, timing, comparator} — the RECOMMENDS edges. polarity: for | against",
+      "preferred_over": "comparators the statement explicitly ranks the action above — a PREFERRED_OVER edge, NOT the same as recommending against the comparator",
+      "equivalent_options": "when the guideline shows no for/against symbol and says 'either A or B' — an EQUIVALENT_OPTIONS edge. Modelling these as RECOMMENDS would make the agent claim a preference the guideline does not state.",
+      "targets": "numeric goals — TARGETS edges",
+      "must_precede": "temporal constraints between actions — MUST_PRECEDE edges",
+      "refined_by": "one entry per remark; `adds_action` marks remarks that carry a directive absent from the statement body (22 of 129 do)",
+      "extraction_confidence": "high | medium | low — drives the human-verification queue"
+    },
+    "conventions": [
+      "Condition and Action ids are snake_case and must be normalised across all 129 before the graph is built.",
+      "'possible / probable / definite sepsis' is kept as a graded condition, not collapsed — SSC 2026 branches antibiotic timing on it.",
+      "A statement with no action (e.g. stmt_005) still produces Condition nodes and a CONSTRAINS edge."
+    ]
+  },
+
+  "samples": [
+    {
+      "id": "stmt_004",
+      "population": "acutely ill patients in hospital",
+      "applies_when": {"any_of": ["acutely_ill", "in_hospital"]},
+      "recommends": [{"action": "screen_for_sepsis_with_tool", "polarity": "for",
+                      "options": ["NEWS", "NEWS2", "MEWS", "SIRS"]}],
+      "preferred_over": ["qSOFA_as_single_screening_tool"],
+      "equivalent_options": null,
+      "targets": [], "must_precede": [], "refined_by": [],
+      "extraction_confidence": "high",
+      "note": "The four listed tools are alternatives to each other; the preference is against qSOFA, not among them."
+    },
+    {
+      "id": "stmt_005",
+      "population": "general",
+      "applies_when": {"any_of": ["suspected_sepsis"]},
+      "recommends": [],
+      "constrains": [{"forbidden": "rule_in_or_out_sepsis_on_single_test",
+                      "targets_of_constraint": ["single_biomarker", "single_diagnostic_test"]}],
+      "preferred_over": [], "equivalent_options": null, "targets": [], "must_precede": [], "refined_by": [],
+      "extraction_confidence": "high",
+      "note": "No action — a constraint on how any node may reason. This is the statement that licenses the 'indeterminate' answer in our decision graph."
+    },
+    {
+      "id": "stmt_007",
+      "population": "adults",
+      "applies_when": {"any_of": ["possible_sepsis", "probable_sepsis", "definite_sepsis", "septic_shock"]},
+      "recommends": [{"action": "collect_blood_cultures", "polarity": "for",
+                      "timing": "as soon as possible"}],
+      "preferred_over": [], "equivalent_options": null, "targets": [],
+      "must_precede": [{"before": "collect_blood_cultures", "after": "administer_antimicrobial_therapy",
+                        "strength": "ideally"}],
+      "refined_by": [],
+      "extraction_confidence": "high",
+      "note": "The MUST_PRECEDE edge is the whole clinical point of this statement and is invisible to any chunk-based retrieval that separates it from the antibiotic-timing statements."
+    },
+    {
+      "id": "stmt_008",
+      "population": "adults",
+      "applies_when": {"any_of": ["possible_sepsis", "probable_sepsis", "definite_sepsis", "septic_shock"]},
+      "recommends": [{"action": "measure_blood_lactate", "polarity": "for"}],
+      "preferred_over": [], "equivalent_options": null, "targets": [], "must_precede": [], "refined_by": [],
+      "extraction_confidence": "high"
+    },
+    {
+      "id": "stmt_010",
+      "population": "adults",
+      "applies_when": {"any_of": ["sepsis_induced_hypoperfusion", "septic_shock"]},
+      "recommends": [{"action": "administer_iv_crystalloid", "polarity": "for",
+                      "dose": ">= 30 mL/kg", "timing": "within first 3 hours"}],
+      "preferred_over": [], "equivalent_options": null, "targets": [], "must_precede": [],
+      "refined_by": [
+        {"remark": 0, "adds_action": false,
+         "adds": "individualise initial volume to patient characteristics and context"},
+        {"remark": 1, "adds_action": true,
+         "action": "reassess_fluid_status_frequently",
+         "adds": "frequent ongoing reassessment and close monitoring to avoid under- or over-resuscitation"},
+        {"remark": 2, "adds_action": true,
+         "action": "calculate_dose_on_actual_body_weight",
+         "modifier_condition": "BMI_gt_30_use_adjusted_or_ideal_body_weight",
+         "adds": "how to compute the weight the 30 mL/kg is applied to"}
+      ],
+      "extraction_confidence": "high",
+      "note": "Two of the three remarks carry actions the statement body does not contain. Drop the remarks and the agent knows the dose but not how to compute it or that it must reassess."
+    },
+    {
+      "id": "stmt_013",
+      "population": "adults",
+      "applies_when": {"any_of": ["septic_shock"]},
+      "recommends": [],
+      "preferred_over": ["higher_MAP_targets"],
+      "equivalent_options": null,
+      "targets": [{"parameter": "MAP", "value": 65, "unit": "mm Hg", "kind": "initial_target"}],
+      "must_precede": [],
+      "refined_by": [
+        {"remark": 0, "adds_action": true,
+         "action": "titrate_vasopressor_to_maintain_MAP",
+         "adds": "an acceptable band of about +/- 5 mm Hg, and that vasopressors are titrated to hold MAP inside it"}
+      ],
+      "extraction_confidence": "high",
+      "note": "The statement states a number; the remark states the action that achieves it. Our worked example for why REFINED_BY must exist."
+    },
+    {
+      "id": "stmt_016",
+      "population": "adults",
+      "applies_when": {"any_of": ["possible_septic_shock", "probable_septic_shock", "definite_septic_shock"]},
+      "recommends": [{"action": "administer_antimicrobial_therapy", "polarity": "for",
+                      "timing": "immediately, ideally within 1 hour of recognition"}],
+      "preferred_over": [], "equivalent_options": null, "targets": [], "must_precede": [], "refined_by": [],
+      "extraction_confidence": "high",
+      "note": "Timing branches on shock and on the possible/probable/definite ladder — compare stmt_017 (no shock, 1 h) and stmt_018 (possible sepsis without shock, 3 h)."
+    },
+    {
+      "id": "stmt_042",
+      "population": "adults",
+      "applies_when": {"any_of": ["septic_shock"]},
+      "recommends": [],
+      "preferred_over": [],
+      "equivalent_options": {"options": ["invasive_blood_pressure_monitoring",
+                                         "noninvasive_blood_pressure_monitoring"],
+                             "guideline_states_no_preference": true},
+      "targets": [], "must_precede": [],
+      "refined_by": [
+        {"remark": 0, "adds_action": false,
+         "adds": "conditions under which invasive monitoring is advised: intermediate-to-high or escalating or multiple vasopressors; frequent arterial sampling; unreliable noninvasive readings",
+         "modifier_condition": "high_or_escalating_vasopressor_requirement"}
+      ],
+      "extraction_confidence": "high",
+      "note": "No for/against symbol in Table 1. If this were modelled as RECOMMENDS(invasive), the agent would assert a preference the guideline does not make — the remark is where the (conditional) preference actually lives."
+    },
+    {
+      "id": "stmt_046",
+      "population": "adults",
+      "applies_when": {"any_of": ["sepsis", "septic_shock"]},
+      "recommends": [{"action": "administer_starches_for_resuscitation", "polarity": "against"}],
+      "preferred_over": [], "equivalent_options": null, "targets": [], "must_precede": [], "refined_by": [],
+      "extraction_confidence": "high"
+    },
+    {
+      "id": "stmt_061",
+      "population": "adults",
+      "applies_when": {"all_of": ["septic_shock", "cardiac_dysfunction", "persistent_hypoperfusion",
+                                  "adequate_fluid_resuscitation", "adequate_arterial_blood_pressure"]},
+      "recommends": [],
+      "preferred_over": [],
+      "equivalent_options": {"options": ["add_dobutamine_to_norepinephrine", "epinephrine_alone"],
+                             "guideline_states_no_preference": true},
+      "targets": [], "must_precede": [],
+      "refined_by": [{"remark": 0, "adds_action": false,
+                      "adds": "evidence insufficient to choose dobutamine vs milrinone"}],
+      "extraction_confidence": "medium",
+      "note": "all_of, not any_of — four conditions must hold together. Phrased as 'A or B alone' rather than 'either A or B', so a keyword rule for equivalence would miss it; found via the missing strength symbol in Table 1."
+    }
+  ]
+}

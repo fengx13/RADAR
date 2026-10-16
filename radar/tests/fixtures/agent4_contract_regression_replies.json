@@ -1,0 +1,86 @@
+{
+  "fixture_type": "captured_synthetic_model_output_regression",
+  "clinical_validation": false,
+  "source_run": "04_Data/api_pilot_runs/1766b7ff9c498ba85eb79ca90d946dce704ddbf67cf695fc48726ad409acda98.json",
+  "source_case_fixture": "radar/tests/fixtures/agent4_branch_pilot_synthetic_cases.json",
+  "case_id": "A4_BRANCH_02",
+  "node": "D2",
+  "model": "gpt-4.1-mini-2025-04-14",
+  "description": "Parsed replies copied exactly from the two real API attempts on the synthetic fixture. Negative regression data only; not model input, clinical gold, or a corrected historical result.",
+  "attempts": [
+    {
+      "attempt": 0,
+      "expected_failures": [
+        "V4a_not_blockable:patient_state.labs.lactate_repeat.status",
+        "V4c_counterfactual_disposition_not_allowed:patient_state.treatment_response"
+      ],
+      "reply": {
+        "answer": "insufficient_evidence",
+        "key_reasons": [
+          {"field": "patient_state.labs.lactate_repeat.status", "detail": "Repeat lactate result is pending, which is important for assessing ongoing severity and treatment response."},
+          {"field": "patient_state.treatment_response", "detail": "Treatment response is pending, so it is unclear if the patient is improving or deteriorating."}
+        ],
+        "unresolved_risks": [
+          {"field": "patient_state.labs.lactate_repeat.status", "detail": "Pending repeat lactate leaves uncertainty about metabolic status and risk."},
+          {"field": "patient_state.treatment_response", "detail": "Pending treatment response leaves uncertainty about clinical trajectory."}
+        ],
+        "missing_information": ["patient_state.labs.lactate_repeat.value", "patient_state.treatment_response"],
+        "escalation_trigger": null,
+        "observation_basis": null,
+        "blocking": [
+          {
+            "field": "patient_state.labs.lactate_repeat.status",
+            "counterfactual": {
+              "if_a": {"condition": "repeat lactate normal or improved", "disposition": "discharge or observation"},
+              "if_b": {"condition": "repeat lactate elevated or worsening", "disposition": "ward or ICU"}
+            }
+          },
+          {
+            "field": "patient_state.treatment_response",
+            "counterfactual": {
+              "if_a": {"condition": "treatment response favorable", "disposition": "discharge or observation"},
+              "if_b": {"condition": "treatment response unfavorable", "disposition": "ward or ICU"}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "attempt": 1,
+      "expected_failures": [
+        "V4a_not_blockable:patient_state.labs.lactate_repeat.status",
+        "V4c_counterfactual_disposition_not_allowed:patient_state.treatment_response"
+      ],
+      "reply": {
+        "answer": "insufficient_evidence",
+        "key_reasons": [
+          {"field": "patient_state.labs.lactate_repeat.status", "detail": "Repeat lactate result is pending, which is critical to assess ongoing severity and treatment response."},
+          {"field": "patient_state.treatment_response", "detail": "Treatment response is pending, so it is unclear if hospital-level treatment is still required."}
+        ],
+        "unresolved_risks": [
+          {"field": "patient_state.labs.lactate_repeat.status", "detail": "Pending repeat lactate may reveal worsening or improving condition affecting disposition."},
+          {"field": "patient_state.treatment_response", "detail": "Pending treatment response leaves uncertainty about clinical stability."}
+        ],
+        "missing_information": ["patient_state.labs.lactate_repeat.status", "patient_state.treatment_response"],
+        "escalation_trigger": null,
+        "observation_basis": null,
+        "blocking": [
+          {
+            "field": "patient_state.labs.lactate_repeat.status",
+            "counterfactual": {
+              "if_a": {"condition": "repeat lactate resulted normal or improved", "disposition": "discharge or observation"},
+              "if_b": {"condition": "repeat lactate elevated or worsened", "disposition": "ward admission"}
+            }
+          },
+          {
+            "field": "patient_state.treatment_response",
+            "counterfactual": {
+              "if_a": {"condition": "treatment response documented as stable or improved", "disposition": "discharge or observation"},
+              "if_b": {"condition": "treatment response documented as poor or worsening", "disposition": "ward admission"}
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

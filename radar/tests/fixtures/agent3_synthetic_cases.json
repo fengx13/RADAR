@@ -1,0 +1,93 @@
+[
+  {
+    "case_id": "A3_case_01",
+    "label": "Shock pathway",
+    "input": {
+      "age": 54,
+      "agent1_result": {
+        "tier": "probable_sepsis"
+      },
+      "T1_state": {
+        "hypotension": true,
+        "persistent_hypotension_after_initial_fluids": true,
+        "suspected_infection": true,
+        "shock": true
+      }
+    },
+    "dry_run_answers": {
+      "TX1": "within_1h",
+      "TX2": "give",
+      "TX3": "start",
+      "TX4": "target_65"
+    }
+  },
+
+  {
+    "case_id": "A3_case_02",
+    "label": "Older adult shock pathway",
+    "input": {
+      "age": 72,
+      "agent1_result": {
+        "tier": "probable_sepsis"
+      },
+      "T1_state": {
+        "hypotension": true,
+        "persistent_hypotension_after_initial_fluids": true,
+        "suspected_infection": true,
+        "shock": true
+      }
+    },
+    "dry_run_answers": {
+      "TX1": "within_1h",
+      "TX2": "give",
+      "TX3": "start",
+      "TX4": "target_60_65"
+    }
+  },
+
+  {
+    "case_id": "A3_case_03",
+    "label": "Possible sepsis without shock",
+    "input": {
+      "age": 48,
+      "agent1_result": {
+        "tier": "possible_sepsis"
+      },
+      "T1_state": {
+        "hypotension": false,
+        "persistent_hypotension_after_initial_fluids": false,
+        "suspected_infection": true,
+        "shock": false
+      }
+    },
+    "dry_run_answers": {
+      "TX1": "within_3h",
+      "TX2": "withhold",
+      "TX3": "hold",
+      "TX4": "not_applicable"
+    }
+  },
+
+  {
+    "case_id": "A3_case_04",
+    "label": "Low likelihood of infection",
+    "input": {
+      "age": 65,
+      "agent1_result": {
+        "tier": "unlikely_sepsis"
+      },
+      "T1_state": {
+        "hypotension": false,
+        "persistent_hypotension_after_initial_fluids": false,
+        "suspected_infection": false,
+        "shock": false
+      }
+    },
+    "dry_run_answers": {
+      "TX1": "defer_and_monitor",
+      "TX2": "withhold",
+      "TX3": "hold",
+      "TX4": "not_applicable"
+    }
+  }
+]

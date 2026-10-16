@@ -1,0 +1,116 @@
+{
+  "fixture_type": "synthetic_t0_disposition_engineering_only",
+  "clinical_validation": false,
+  "cases": [
+    {
+      "case_id": "A4_T0_CONTINUE_WORKUP",
+      "t0_time": 0.0,
+      "information_cutoff": 0.0,
+      "t0_state": {
+        "chief_complaint": "Synthetic fever fixture",
+        "age": 60,
+        "triage_vitals": {"sbp": 118, "resp_rate": 20, "spo2": 97},
+        "active_support": {
+          "vasopressor": {"active": false, "setting": "none", "start_time": null},
+          "ventilation": {"status": "None", "start_time": null, "current_encounter": true}
+        }
+      },
+      "agent1_context": {
+        "tier": "possible_sepsis",
+        "shock_concern": false,
+        "decision_time": "T0",
+        "provenance": "synthetic_fixture"
+      },
+      "agent2": {
+        "workup_recommendation": {
+          "recommendations": [{"item": "serum_lactate"}],
+          "already_addressed": [],
+          "not_indicated": [],
+          "indeterminate": []
+        }
+      },
+      "mock_llm_answers": {
+        "D2_T0": {
+          "answer": "no",
+          "key_reasons": [{"field": "t0_state.triage_vitals.sbp", "detail": "synthetic stable pressure"}],
+          "unresolved_risks": [],
+          "missing_information": [],
+          "escalation_trigger": null
+        }
+      }
+    },
+    {
+      "case_id": "A4_T0_ICU_VISIBLE_SUPPORT",
+      "t0_time": 0.0,
+      "information_cutoff": 0.0,
+      "t0_state": {
+        "chief_complaint": "Synthetic critical-support fixture",
+        "age": 70,
+        "triage_vitals": {"sbp": 90, "resp_rate": 28, "spo2": 93},
+        "active_support": {
+          "vasopressor": {"active": true, "setting": "pre_arrival", "start_time": -0.1},
+          "ventilation": {"status": "None", "start_time": null, "current_encounter": true}
+        }
+      },
+      "agent1_context": {
+        "tier": "possible_sepsis",
+        "shock_concern": true,
+        "decision_time": "T0",
+        "provenance": "synthetic_fixture"
+      },
+      "agent2": {
+        "workup_recommendation": {
+          "recommendations": [{"item": "serum_lactate"}],
+          "already_addressed": [],
+          "not_indicated": [],
+          "indeterminate": []
+        }
+      },
+      "mock_llm_answers": {}
+    },
+    {
+      "case_id": "A4_T0_DISCHARGE",
+      "t0_time": 0.0,
+      "information_cutoff": 0.0,
+      "t0_state": {
+        "chief_complaint": "Synthetic low-acuity fixture",
+        "age": 40,
+        "triage_vitals": {"sbp": 124, "resp_rate": 17, "spo2": 99},
+        "active_support": {
+          "vasopressor": {"active": false, "setting": "none", "start_time": null},
+          "ventilation": {"status": "None", "start_time": null, "current_encounter": true}
+        }
+      },
+      "agent1_context": {
+        "tier": "unlikely_sepsis",
+        "shock_concern": false,
+        "decision_time": "T0",
+        "provenance": "synthetic_fixture"
+      },
+      "agent2": {
+        "workup_recommendation": {
+          "recommendations": [],
+          "already_addressed": [],
+          "not_indicated": [{"item": "serum_lactate"}],
+          "indeterminate": []
+        }
+      },
+      "mock_llm_answers": {
+        "D2_T0": {
+          "answer": "no",
+          "key_reasons": [{"field": "agent1_context.tier", "detail": "synthetic low tier"}],
+          "unresolved_risks": [],
+          "missing_information": [],
+          "escalation_trigger": null
+        },
+        "D4_T0": {
+          "answer": "discharge",
+          "key_reasons": [{"field": "t0_state.triage_vitals.sbp", "detail": "synthetic stable pressure"}],
+          "unresolved_risks": [],
+          "missing_information": [],
+          "escalation_trigger": "Return for worsening symptoms or clinician-specified concern."
+        }
+      }
+    }
+  ]
+}

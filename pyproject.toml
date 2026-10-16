@@ -1,0 +1,15 @@
+[project]
+name = "radar"
+version = "0.1.0"
+description = "RADAR: guideline-grounded multi-agent decision support for the emergency-department sepsis pathway"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+include = ["radar*"]
+
+[tool.setuptools.package-data]
+# parsed guideline statements, decision graphs, scripts and test fixtures travel with the package
+radar = ["knowledge/parsed/*", "knowledge/graph/*", "knowledge/policy_snapshot.json", "scripts/*", "tests/fixtures/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["radar/tests"]

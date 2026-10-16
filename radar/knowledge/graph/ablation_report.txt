@@ -1,0 +1,130 @@
+================================================================================================
+四臂对比 · Agent 1 的五个决策节点
+================================================================================================
+
+[R1] 感染证据
+   A 手写             6 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   B 运行时游走          6 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   C 离线∩主题          6 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   D 相似度 k=8        8 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+
+[R2] 器官功能障碍
+   A 手写             4 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   B 运行时游走        106 条   分支对 完整3/半0   覆盖对 完整2/半0   时序对 完整1/半1
+   C 离线∩主题          4 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   D 相似度 k=8        8 条   分支对 完整0/半1   覆盖对 完整0/半0   时序对 完整0/半1
+
+[R3a] 替代诊断排序（器官功能障碍已确立）
+   A 手写             2 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   B 运行时游走         71 条   分支对 完整2/半0   覆盖对 完整2/半0   时序对 完整1/半1
+   C 离线∩主题          3 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   D 相似度 k=8        8 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+
+[R3b] 替代诊断排序（无明确器官功能障碍）
+   A 手写             2 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   B 运行时游走         71 条   分支对 完整2/半0   覆盖对 完整2/半0   时序对 完整1/半1
+   C 离线∩主题          3 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+   D 相似度 k=8        8 条   分支对 完整0/半0   覆盖对 完整0/半0   时序对 完整0/半0
+
+[R4] 休克 / 低灌注
+   A 手写             4 条   分支对 完整0/半0   覆盖对 完整0/半1   时序对 完整0/半0
+   B 运行时游走        103 条   分支对 完整3/半0   覆盖对 完整2/半0   时序对 完整1/半1
+   C 离线∩主题          6 条   分支对 完整0/半0   覆盖对 完整1/半0   时序对 完整0/半0
+   D 相似度 k=8        8 条   分支对 完整0/半1   覆盖对 完整0/半1   时序对 完整0/半0
+
+================================================================================================
+汇总（五个节点合计）
+================================================================================================
+臂                  注入条数     注入字符     分支完整      分支半     覆盖完整      覆盖半     时序完整      时序半
+A 手写                 18     3758        0        0        0        1        0        0
+B 运行时游走             357    81497       10        0        8        0        4        4
+C 离线∩主题              22     5063        0        0        1        0        0        0
+D 相似度 k=8            40    10605        0        2        0        1        0        1
+全给（天花板）           645   152465        3        0        2        0        1        1   ← 每个节点都把 129 条全塞进去
+
+  这三列怎么读（重要，别读反了）：
+  · B 的「完整」列全满，不是因为它聪明，是因为它几乎把整本指南拉了进来。
+    对比最后一行「全给」：B 每节点 71-106 条，天花板是 129 条 —— B ≈ 全给。
+    在一个「返回全部就满分」的指标上得满分，说明不了检索质量，只说明它没在筛。
+  · A 和 C 的「完整」数低，主要是因为 Agent 1 的五个节点都是诊断性问题
+    （有没有感染 / 有没有器官功能障碍 / 有没有休克），本来就不涉及抗生素、
+    碳酸氢钠这类有正反两面的治疗动作。分支对这一项要到 Agent 2 才真正吃劲。
+  · 因此在 Agent 1 这一层，唯一非空的结构检验是 R4 的覆盖对 stmt_013 / stmt_014
+    （MAP 65 vs 老年人 60-65）—— 见下。
+
+================================================================================================
+R4 覆盖对：stmt_013（MAP≥65）与 stmt_014（≥65 岁可放宽到 60-65）
+================================================================================================
+   A 手写             4 条   只给 stmt_013 → 对 ≥65 岁患者会按 MAP 65 过度升压
+   B 运行时游走        103 条   两条都给
+   C 离线∩主题          6 条   两条都给
+   D 相似度 k=8        8 条   两条都没给
+
+================================================================================================
+三对「同一动作、方向相反」在相似度检索下的排名距离
+================================================================================================
+若两条排名相邻，top-k 有机会都取回；相隔越远越不可能。
+
+  administer_antimicrobial_therapy
+     stmt_016 [for    ] 排名   0   For adults with possible, probable, or definite septic shock, we “recommen
+     stmt_017 [for    ] 排名   1   For adults with probable or definite sepsis without shock, we “recommend” 
+     stmt_018 [for    ] 排名   7   For adults with possible sepsis without shock, we “suggest” a time-limited
+     stmt_020 [defer  ] 排名  18   For adults with a low likelihood of infection and without shock, we “sugge
+     stmt_021 [for    ] 排名   5   For adults with definite or probable sepsis and hypotension (i.e., septic 
+     → 排名相距 18 位（k=8 取不全）
+
+  use_empirical_therapy_covering_that_MDR_pathogen
+     stmt_025 [for    ] 排名   1   For adults with sepsis or septic shock at high risk of infection with a sp
+     stmt_026 [against] 排名   0   For adults with sepsis or septic shock at low risk of infection with a spe
+     → 排名相距 1 位
+
+  use_sodium_bicarbonate
+     stmt_095 [against] 排名   0   For adults with septic shock and hypoperfusion-induced lactic acidemia, we
+     stmt_096 [for    ] 排名   1   For adults with septic shock, severe metabolic acidemia (pH ≤7 .2), and ac
+     → 排名相距 1 位
+
+================================================================================================
+分块检索下 remark 的存活情况
+================================================================================================
+129 条里 41 条带 remark，共 46 条 remark，全部已分类：
+     implementation_note     27  （纯背景，丢了不影响处置）
+     adds_action             11  （丢了会改变处置）
+     restricts_population     3  （丢了会改变处置）
+     adds_target              2  （丢了会改变处置）
+     defines_term             2  （丢了会改变处置）
+     adds_preference          1  （丢了会改变处置）
+
+  会改变处置的 remark 分布在 17 条条款上。
+  下面用条文正文本身做查询、k=5 分块检索，看这 17 条的 remark 还在不在。
+
+  ✗ stmt_010  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：Consideration should be given to individual patient characteristics and context when selecting i…
+  ✗ stmt_011  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：In patients with unstable septic shock, immediate concurrent administration of vasopressors toge…
+  ✗ stmt_044  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：For patients with sepsis and traumatic brain injury, we suggest using 0.9% saline.…
+  ✗ stmt_051  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：Fluid administration should be individualized after initial fluid bolus and monitoring of lactat…
+  ✗ stmt_060  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：For patients requiring vasopressors to maintain mean arterial pressure at target, inotropes shou…
+  ✗ stmt_066  [adds_target]  正文命中，remark 未进 top-5
+      丢掉的是：Although there was variability across trials informing this recommendation, most used a lower ta…
+  ✗ stmt_067  [restricts_population]  正文命中，remark 未进 top-5
+      丢掉的是：This recommendation pertains to patients with a Pa o2/Fio2 ratio <200 or Sp o2/Fio2 ratio <235.…
+  ✗ stmt_070  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：The duration and frequency of proning will depend on patient tolerance. Sedation should not be u…
+  ✗ stmt_072  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：Patients should be screened regularly for development of ARDS, as ARDS diagnosis is often missed…
+  ✗ stmt_080  [restricts_population]  正文命中，remark 未进 top-5
+      丢掉的是：This recommendation does not apply to using antipyretic therapy for pain control, patient sympto…
+  ✗ stmt_085  [restricts_population]  正文命中，remark 未进 top-5
+      丢掉的是：This recommendation does not pertain to patients who are on lower doses of Vitamin D supplement …
+  ✗ stmt_105  [defines_term]  正文命中，remark 未进 top-5
+      丢掉的是：A TLT is a collaborative plan to use life-sustaining therapy for a defined duration, after which…
+  ✗ stmt_129  [adds_action]  正文命中，remark 未进 top-5
+      丢掉的是：Where cognitive-targeted therapies are being used, it is reasonable to continue using them as th…
+
+  17 条中：remark 一并取回 4 条，remark 丢失 13 条（76%）。
+
+  （2026-08-07：第 65-129 条此前 refined_by 全空，remark 统计只覆盖了前半本。
+   已补齐，上面 46 条 remark 是全量。）

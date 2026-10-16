@@ -1,0 +1,6 @@
+numpy
+pandas
+openai
+pypdf          # knowledge layer: parse guideline PDFs (scripts/2_build_knowledge.sh --rebuild)
+scikit-learn   # evaluation: knowledge-layer retrieval ablation
+pytest         # tests

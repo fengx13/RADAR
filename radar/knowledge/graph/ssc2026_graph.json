@@ -1,0 +1,5912 @@
+{
+ "meta": {
+  "built_from": "SSC 2026 (Prescott et al. Crit Care Med 2026;54:725-812)",
+  "statements": 129,
+  "traversal": "offline only — scope tables are frozen before inference"
+ },
+ "nodes": [
+  {
+   "id": "stmt_001",
+   "type": "Statement",
+   "number": 1,
+   "domain": "screening_early_management",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 737
+  },
+  {
+   "id": "acutely_ill_high_risk_patients",
+   "type": "Condition"
+  },
+  {
+   "id": "run_sepsis_performance_improvement_program",
+   "type": "Action"
+  },
+  {
+   "id": "screen_for_sepsis",
+   "type": "Action"
+  },
+  {
+   "id": "use_standard_operating_procedures_for_treatment",
+   "type": "Action"
+  },
+  {
+   "id": "implement_sepsis_quality_improvement_strategies",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_002",
+   "type": "Statement",
+   "number": 2,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 738
+  },
+  {
+   "id": "positive_sepsis_screen",
+   "type": "Condition"
+  },
+  {
+   "id": "use_code_sepsis_or_sepsis_huddle_protocol",
+   "type": "Action"
+  },
+  {
+   "id": "no_such_protocol",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_003",
+   "type": "Statement",
+   "number": 3,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 738
+  },
+  {
+   "id": "prehospital_ambulance_or_flight",
+   "type": "Condition"
+  },
+  {
+   "id": "use_standard_sepsis_screening_tool",
+   "type": "Action"
+  },
+  {
+   "id": "no_screening_tool",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_004",
+   "type": "Statement",
+   "number": 4,
+   "domain": "screening_early_management",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 739
+  },
+  {
+   "id": "acutely_ill",
+   "type": "Condition"
+  },
+  {
+   "id": "in_hospital",
+   "type": "Condition"
+  },
+  {
+   "id": "screen_for_sepsis_with_tool",
+   "type": "Action"
+  },
+  {
+   "id": "qSOFA_as_single_screening_tool",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_005",
+   "type": "Statement",
+   "number": 5,
+   "domain": "screening_early_management",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 740
+  },
+  {
+   "id": "suspected_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "constraint::rule_in_or_out_sepsis_on_single_test",
+   "type": "Constraint",
+   "kind": "forbidden"
+  },
+  {
+   "id": "stmt_006",
+   "type": "Statement",
+   "number": 6,
+   "domain": "screening_early_management",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 740
+  },
+  {
+   "id": "constraint::novel_rapid_host_response_diagnostics",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_007",
+   "type": "Statement",
+   "number": 7,
+   "domain": "screening_early_management",
+   "strength": "strong_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 740
+  },
+  {
+   "id": "possible_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "probable_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "definite_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "collect_blood_cultures",
+   "type": "Action"
+  },
+  {
+   "id": "administer_antimicrobial_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_008",
+   "type": "Statement",
+   "number": 8,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 741
+  },
+  {
+   "id": "measure_blood_lactate",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_009",
+   "type": "Statement",
+   "number": 9,
+   "domain": "screening_early_management",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 741
+  },
+  {
+   "id": "sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "begin_treatment_and_resuscitation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_010",
+   "type": "Statement",
+   "number": 10,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 742
+  },
+  {
+   "id": "sepsis_induced_hypoperfusion",
+   "type": "Condition"
+  },
+  {
+   "id": "administer_iv_crystalloid",
+   "type": "Action"
+  },
+  {
+   "id": "reassess_fluid_status_frequently",
+   "type": "Action"
+  },
+  {
+   "id": "calculate_dose_on_actual_body_weight",
+   "type": "Action"
+  },
+  {
+   "id": "BMI_gt_30_use_adjusted_or_ideal_body_weight",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_011",
+   "type": "Statement",
+   "number": 11,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 743
+  },
+  {
+   "id": "sepsis_induced_hypotension",
+   "type": "Condition"
+  },
+  {
+   "id": "administer_iv_crystalloid_bolus",
+   "type": "Action"
+  },
+  {
+   "id": "start_vasopressor",
+   "type": "Action"
+  },
+  {
+   "id": "start_vasopressor_concurrently_with_fluid",
+   "type": "Action"
+  },
+  {
+   "id": "unstable_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_012",
+   "type": "Statement",
+   "number": 12,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 744
+  },
+  {
+   "id": "start_vasopressor_peripherally",
+   "type": "Action"
+  },
+  {
+   "id": "delay_until_central_access_secured",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_013",
+   "type": "Statement",
+   "number": 13,
+   "domain": "screening_early_management",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover_with_new_remark",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 745
+  },
+  {
+   "id": "higher_MAP_targets",
+   "type": "Action"
+  },
+  {
+   "id": "target::MAP",
+   "type": "Target",
+   "parameter": "MAP"
+  },
+  {
+   "id": "titrate_vasopressor_to_maintain_MAP",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_014",
+   "type": "Statement",
+   "number": 14,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 745
+  },
+  {
+   "id": "age_ge_65",
+   "type": "Condition"
+  },
+  {
+   "id": "higher_MAP_ranges",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_015",
+   "type": "Statement",
+   "number": 15,
+   "domain": "screening_early_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 745
+  },
+  {
+   "id": "sepsis_or_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "requires_icu_admission",
+   "type": "Condition"
+  },
+  {
+   "id": "admit_to_icu",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_016",
+   "type": "Statement",
+   "number": 16,
+   "domain": "infection",
+   "strength": "strong_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 746
+  },
+  {
+   "id": "possible_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "probable_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "definite_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_017",
+   "type": "Statement",
+   "number": 17,
+   "domain": "infection",
+   "strength": "strong_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 746
+  },
+  {
+   "id": "probable_or_definite_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "no_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_018",
+   "type": "Statement",
+   "number": 18,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 746
+  },
+  {
+   "id": "perform_time_limited_rapid_investigation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_019",
+   "type": "Statement",
+   "number": 19,
+   "domain": "infection",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 746
+  },
+  {
+   "id": "assess_likelihood_infectious_vs_noninfectious",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_020",
+   "type": "Statement",
+   "number": 20,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 746
+  },
+  {
+   "id": "low_likelihood_of_infection",
+   "type": "Condition"
+  },
+  {
+   "id": "monitor_patient_closely",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_021",
+   "type": "Statement",
+   "number": 21,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 748
+  },
+  {
+   "id": "hypotension",
+   "type": "Condition"
+  },
+  {
+   "id": "anticipated_time_to_in_hospital_evaluation_gt_60_min",
+   "type": "Condition"
+  },
+  {
+   "id": "structured_prehospital_screening_in_place",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_022",
+   "type": "Statement",
+   "number": 22,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 748
+  },
+  {
+   "id": "use_clinical_evaluation_alone_to_start_antimicrobials",
+   "type": "Action"
+  },
+  {
+   "id": "procalcitonin_plus_clinical_evaluation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_023",
+   "type": "Statement",
+   "number": 23,
+   "domain": "infection",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 749
+  },
+  {
+   "id": "evaluate_for_source_requiring_emergent_source_control",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_024",
+   "type": "Statement",
+   "number": 24,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 749
+  },
+  {
+   "id": "source_requiring_source_control",
+   "type": "Condition"
+  },
+  {
+   "id": "perform_source_control",
+   "type": "Action"
+  },
+  {
+   "id": "late_source_control",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_025",
+   "type": "Statement",
+   "number": 25,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 749
+  },
+  {
+   "id": "high_risk_of_specific_MDR_pathogen",
+   "type": "Condition"
+  },
+  {
+   "id": "use_empirical_therapy_covering_that_MDR_pathogen",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_026",
+   "type": "Statement",
+   "number": 26,
+   "domain": "infection",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 749
+  },
+  {
+   "id": "low_risk_of_specific_MDR_pathogen",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_027",
+   "type": "Statement",
+   "number": 27,
+   "domain": "infection",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 750
+  },
+  {
+   "id": "use_empirical_antifungal_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "risk_factors_for_fungal_infection",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_028",
+   "type": "Statement",
+   "number": 28,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 751
+  },
+  {
+   "id": "no_risk_factors_for_anaerobic_infection",
+   "type": "Condition"
+  },
+  {
+   "id": "use_empiric_regimen_without_anaerobic_coverage",
+   "type": "Action"
+  },
+  {
+   "id": "MDR_coverage_required",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_029",
+   "type": "Statement",
+   "number": 29,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 751
+  },
+  {
+   "id": "risk_factors_for_anaerobic_infection",
+   "type": "Condition"
+  },
+  {
+   "id": "use_empiric_regimen_with_anaerobic_coverage",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_030",
+   "type": "Statement",
+   "number": 30,
+   "domain": "infection",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 752
+  },
+  {
+   "id": "constraint::departmental_upper_respiratory_surveillance_cultures",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_031",
+   "type": "Statement",
+   "number": 31,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "medium",
+   "journal_page": 752
+  },
+  {
+   "id": "use_pathogen_specific_rapid_diagnostic_tests",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_032",
+   "type": "Statement",
+   "number": 32,
+   "domain": "infection",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 753
+  },
+  {
+   "id": "use_candida_biomarkers_to_start_antifungals",
+   "type": "Action"
+  },
+  {
+   "id": "high_risk_of_candida_infection",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_033",
+   "type": "Statement",
+   "number": 33,
+   "domain": "infection",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 754
+  },
+  {
+   "id": "use_prolonged_infusion_of_beta_lactams",
+   "type": "Action"
+  },
+  {
+   "id": "bolus_administration",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_034",
+   "type": "Statement",
+   "number": 34,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "medium",
+   "journal_page": 754
+  },
+  {
+   "id": "use_antimicrobial_therapeutic_drug_monitoring",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_035",
+   "type": "Statement",
+   "number": 35,
+   "domain": "infection",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 755
+  },
+  {
+   "id": "suspected_sepsis_or_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "unconfirmed_infection",
+   "type": "Condition"
+  },
+  {
+   "id": "reevaluate_continuously",
+   "type": "Action"
+  },
+  {
+   "id": "search_for_alternative_diagnoses",
+   "type": "Action"
+  },
+  {
+   "id": "discontinue_empiric_antimicrobial_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_036",
+   "type": "Statement",
+   "number": 36,
+   "domain": "infection",
+   "strength": "strong_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 755
+  },
+  {
+   "id": "confirmed_microbiological_diagnosis_and_susceptibility",
+   "type": "Condition"
+  },
+  {
+   "id": "de_escalate_antimicrobial_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "no_de_escalation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_037",
+   "type": "Statement",
+   "number": 37,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 755
+  },
+  {
+   "id": "no_pathogen_on_final_cultures",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_038",
+   "type": "Statement",
+   "number": 38,
+   "domain": "infection",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 756
+  },
+  {
+   "id": "receiving_empiric_antifungal_therapy",
+   "type": "Condition"
+  },
+  {
+   "id": "use_candida_biomarkers_to_stop_antifungals",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_039",
+   "type": "Statement",
+   "number": 39,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 756
+  },
+  {
+   "id": "initial_diagnosis_of_sepsis_or_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "adequate_source_control",
+   "type": "Condition"
+  },
+  {
+   "id": "use_shorter_antimicrobial_duration",
+   "type": "Action"
+  },
+  {
+   "id": "longer_duration",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_040",
+   "type": "Statement",
+   "number": 40,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 757
+  },
+  {
+   "id": "optimal_duration_unclear",
+   "type": "Condition"
+  },
+  {
+   "id": "use_procalcitonin_and_clinical_evaluation_to_stop_antimicrobials",
+   "type": "Action"
+  },
+  {
+   "id": "clinical_evaluation_alone",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_041",
+   "type": "Statement",
+   "number": 41,
+   "domain": "infection",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 757
+  },
+  {
+   "id": "mechanically_ventilated",
+   "type": "Condition"
+  },
+  {
+   "id": "unit_with_low_antimicrobial_resistance_prevalence",
+   "type": "Condition"
+  },
+  {
+   "id": "use_selective_digestive_decontamination",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_042",
+   "type": "Statement",
+   "number": 42,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 759
+  },
+  {
+   "id": "invasive_blood_pressure_monitoring",
+   "type": "Action"
+  },
+  {
+   "id": "noninvasive_blood_pressure_monitoring",
+   "type": "Action"
+  },
+  {
+   "id": "high_or_escalating_vasopressor_requirement",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_043",
+   "type": "Statement",
+   "number": 43,
+   "domain": "hemodynamic_management",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 760
+  },
+  {
+   "id": "use_crystalloids_as_first_line_fluid",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_044",
+   "type": "Statement",
+   "number": 44,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 760
+  },
+  {
+   "id": "undergoing_initial_resuscitation",
+   "type": "Condition"
+  },
+  {
+   "id": "use_balanced_crystalloids",
+   "type": "Action"
+  },
+  {
+   "id": "saline_0_9_percent",
+   "type": "Action"
+  },
+  {
+   "id": "use_saline_0_9_percent",
+   "type": "Action"
+  },
+  {
+   "id": "traumatic_brain_injury",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_045",
+   "type": "Statement",
+   "number": 45,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 760
+  },
+  {
+   "id": "use_crystalloids_alone",
+   "type": "Action"
+  },
+  {
+   "id": "crystalloids_plus_supplemental_albumin",
+   "type": "Action"
+  },
+  {
+   "id": "use_supplemental_albumin",
+   "type": "Action"
+  },
+  {
+   "id": "large_crystalloid_volume_already_given_or_cirrhosis",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_046",
+   "type": "Statement",
+   "number": 46,
+   "domain": "hemodynamic_management",
+   "strength": "strong_against",
+   "certainty": "high",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 760
+  },
+  {
+   "id": "use_starches_for_resuscitation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_047",
+   "type": "Statement",
+   "number": 47,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_against",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 760
+  },
+  {
+   "id": "use_gelatin_for_resuscitation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_048",
+   "type": "Statement",
+   "number": 48,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 761
+  },
+  {
+   "id": "already_received_30ml_per_kg",
+   "type": "Condition"
+  },
+  {
+   "id": "persistent_hypoperfusion",
+   "type": "Condition"
+  },
+  {
+   "id": "liberal_fluid_resuscitation_strategy",
+   "type": "Action"
+  },
+  {
+   "id": "restrictive_fluid_resuscitation_strategy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_049",
+   "type": "Statement",
+   "number": 49,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 762
+  },
+  {
+   "id": "use_dynamic_measures_to_guide_fluid_resuscitation",
+   "type": "Action"
+  },
+  {
+   "id": "physical_examination_alone",
+   "type": "Action"
+  },
+  {
+   "id": "static_measures_alone",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_050",
+   "type": "Statement",
+   "number": 50,
+   "domain": "hemodynamic_management",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 763
+  },
+  {
+   "id": "constraint::minimally_invasive_or_noninvasive_cardiac_output_monitoring",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_051",
+   "type": "Statement",
+   "number": 51,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 763
+  },
+  {
+   "id": "sepsis_with_elevated_lactate",
+   "type": "Condition"
+  },
+  {
+   "id": "use_serial_lactate_measurements_to_guide_resuscitation",
+   "type": "Action"
+  },
+  {
+   "id": "individualise_fluid_after_initial_bolus",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_052",
+   "type": "Statement",
+   "number": 52,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 764
+  },
+  {
+   "id": "use_capillary_refill_time_to_guide_resuscitation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_053",
+   "type": "Statement",
+   "number": 53,
+   "domain": "hemodynamic_management",
+   "strength": "strong_for",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 765
+  },
+  {
+   "id": "use_norepinephrine_as_first_line_vasopressor",
+   "type": "Action"
+  },
+  {
+   "id": "dopamine",
+   "type": "Action"
+  },
+  {
+   "id": "epinephrine",
+   "type": "Action"
+  },
+  {
+   "id": "selepressin",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_054",
+   "type": "Statement",
+   "number": 54,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 765
+  },
+  {
+   "id": "use_terlipressin",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_055",
+   "type": "Statement",
+   "number": 55,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 765
+  },
+  {
+   "id": "vasopressin",
+   "type": "Action"
+  },
+  {
+   "id": "angiotensin_II",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_056",
+   "type": "Statement",
+   "number": 56,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 765
+  },
+  {
+   "id": "escalating_norepinephrine_dose",
+   "type": "Condition"
+  },
+  {
+   "id": "add_vasopressin",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_057",
+   "type": "Statement",
+   "number": 57,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 765
+  },
+  {
+   "id": "inadequate_MAP_despite_norepinephrine_and_vasopressin",
+   "type": "Condition"
+  },
+  {
+   "id": "add_epinephrine",
+   "type": "Action"
+  },
+  {
+   "id": "vasopressin_unavailable",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_058",
+   "type": "Statement",
+   "number": 58,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 765
+  },
+  {
+   "id": "concomitant_cardiac_dysfunction",
+   "type": "Condition"
+  },
+  {
+   "id": "norepinephrine_first_line",
+   "type": "Action"
+  },
+  {
+   "id": "epinephrine_first_line",
+   "type": "Action"
+  },
+  {
+   "id": "tachyarrhythmia_vs_bradyarrhythmia",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_059",
+   "type": "Statement",
+   "number": 59,
+   "domain": "hemodynamic_management",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 767
+  },
+  {
+   "id": "refractory_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "escalating_vasopressor_requirement",
+   "type": "Condition"
+  },
+  {
+   "id": "constraint::iv_methylene_blue",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_060",
+   "type": "Statement",
+   "number": 60,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "medium",
+   "journal_page": 767
+  },
+  {
+   "id": "cardiac_dysfunction",
+   "type": "Condition"
+  },
+  {
+   "id": "adequate_fluid_status",
+   "type": "Condition"
+  },
+  {
+   "id": "adequate_arterial_blood_pressure",
+   "type": "Condition"
+  },
+  {
+   "id": "use_inotropes",
+   "type": "Action"
+  },
+  {
+   "id": "no_inotropes",
+   "type": "Action"
+  },
+  {
+   "id": "use_inotropes_in_addition_to_vasopressors",
+   "type": "Action"
+  },
+  {
+   "id": "vasopressors_required_to_maintain_MAP",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_061",
+   "type": "Statement",
+   "number": 61,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "medium",
+   "journal_page": 767
+  },
+  {
+   "id": "add_dobutamine_to_norepinephrine",
+   "type": "Action"
+  },
+  {
+   "id": "epinephrine_alone",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_062",
+   "type": "Statement",
+   "number": 62,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "medium",
+   "journal_page": 768
+  },
+  {
+   "id": "use_levosimendan",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_063",
+   "type": "Statement",
+   "number": 63,
+   "domain": "hemodynamic_management",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 768
+  },
+  {
+   "id": "ongoing_vasopressor_requirement",
+   "type": "Condition"
+  },
+  {
+   "id": "constraint::oral_midodrine",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_064",
+   "type": "Statement",
+   "number": 64,
+   "domain": "hemodynamic_management",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 769
+  },
+  {
+   "id": "use_beta_blockers_for_septic_shock",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_065",
+   "type": "Statement",
+   "number": 65,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 770
+  },
+  {
+   "id": "pulse_oximetry_SpO2",
+   "type": "Action"
+  },
+  {
+   "id": "arterial_blood_gas_SaO2",
+   "type": "Action"
+  },
+  {
+   "id": "prefer_arterial_blood_gas_when_available",
+   "type": "Action"
+  },
+  {
+   "id": "spo2_substitution_unreliable_setting",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_066",
+   "type": "Statement",
+   "number": 66,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 771
+  },
+  {
+   "id": "acute_hypoxemic_respiratory_failure",
+   "type": "Condition"
+  },
+  {
+   "id": "liberal_oxygen_target",
+   "type": "Action"
+  },
+  {
+   "id": "conservative_oxygen_target",
+   "type": "Action"
+  },
+  {
+   "id": "target::SpO2",
+   "type": "Target",
+   "parameter": "SpO2"
+  },
+  {
+   "id": "stmt_067",
+   "type": "Statement",
+   "number": 67,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 771
+  },
+  {
+   "id": "use_high_flow_nasal_cannula",
+   "type": "Action"
+  },
+  {
+   "id": "conventional_oxygen_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "pf_ratio_lt_200_or_sf_ratio_lt_235",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_068",
+   "type": "Statement",
+   "number": 68,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 772
+  },
+  {
+   "id": "noninvasive_positive_pressure_ventilation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_069",
+   "type": "Statement",
+   "number": 69,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 772
+  },
+  {
+   "id": "hfnc_alternating_with_nippv",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_070",
+   "type": "Statement",
+   "number": 70,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 773
+  },
+  {
+   "id": "not_intubated",
+   "type": "Condition"
+  },
+  {
+   "id": "trial_awake_proning",
+   "type": "Action"
+  },
+  {
+   "id": "use_sedation_to_promote_proning_tolerance",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_071",
+   "type": "Statement",
+   "number": 71,
+   "domain": "respiratory_support",
+   "strength": "strong_for",
+   "certainty": "high",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 773
+  },
+  {
+   "id": "ards",
+   "type": "Condition"
+  },
+  {
+   "id": "use_low_tidal_volume_ventilation",
+   "type": "Action"
+  },
+  {
+   "id": "high_tidal_volume_gt_10_ml_per_kg",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_072",
+   "type": "Statement",
+   "number": 72,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 773
+  },
+  {
+   "id": "sepsis_associated_hypoxemic_respiratory_failure",
+   "type": "Condition"
+  },
+  {
+   "id": "no_ards",
+   "type": "Condition"
+  },
+  {
+   "id": "use_tidal_volume_6_to_8_ml_per_kg_IBW",
+   "type": "Action"
+  },
+  {
+   "id": "screen_regularly_for_ARDS",
+   "type": "Action"
+  },
+  {
+   "id": "tidal_volume_4_to_lt_6_ml_per_kg_IBW",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_073",
+   "type": "Statement",
+   "number": 73,
+   "domain": "respiratory_support",
+   "strength": "strong_for",
+   "certainty": "high",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 774
+  },
+  {
+   "id": "higher_plateau_pressures",
+   "type": "Action"
+  },
+  {
+   "id": "target::plateau_pressure",
+   "type": "Target",
+   "parameter": "plateau_pressure"
+  },
+  {
+   "id": "stmt_074",
+   "type": "Statement",
+   "number": 74,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 774
+  },
+  {
+   "id": "moderate_severe_ards",
+   "type": "Condition"
+  },
+  {
+   "id": "use_higher_PEEP",
+   "type": "Action"
+  },
+  {
+   "id": "lower_PEEP",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_075",
+   "type": "Statement",
+   "number": 75,
+   "domain": "respiratory_support",
+   "strength": "strong_against",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 774
+  },
+  {
+   "id": "use_incremental_PEEP_titration_strategy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_076",
+   "type": "Statement",
+   "number": 76,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 774
+  },
+  {
+   "id": "use_prone_ventilation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_077",
+   "type": "Statement",
+   "number": 77,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 774
+  },
+  {
+   "id": "use_intermittent_NMBA_boluses",
+   "type": "Action"
+  },
+  {
+   "id": "continuous_NMBA_infusion",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_078",
+   "type": "Statement",
+   "number": 78,
+   "domain": "respiratory_support",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 774
+  },
+  {
+   "id": "severe_ards_due_to_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "conventional_ventilation_failed",
+   "type": "Condition"
+  },
+  {
+   "id": "experienced_centre_with_infrastructure",
+   "type": "Condition"
+  },
+  {
+   "id": "use_veno_venous_ECMO",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_079",
+   "type": "Statement",
+   "number": 79,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 775
+  },
+  {
+   "id": "use_iv_corticosteroids",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_080",
+   "type": "Statement",
+   "number": 80,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 775
+  },
+  {
+   "id": "use_antipyretic_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "antipyretic_for_symptom_control_or_other_temperature_indication",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_081",
+   "type": "Statement",
+   "number": 81,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 776
+  },
+  {
+   "id": "use_iv_vitamin_c",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_082",
+   "type": "Statement",
+   "number": 82,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 776
+  },
+  {
+   "id": "use_iv_immunoglobulins",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_083",
+   "type": "Statement",
+   "number": 83,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 776
+  },
+  {
+   "id": "use_blood_purification",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_084",
+   "type": "Statement",
+   "number": 84,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 776
+  },
+  {
+   "id": "use_polymyxin_B_hemoperfusion",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_085",
+   "type": "Statement",
+   "number": 85,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 777
+  },
+  {
+   "id": "use_vitamin_D_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "vitamin_D_for_other_indication_or_standard_nutrition",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_086",
+   "type": "Statement",
+   "number": 86,
+   "domain": "adjunctive_therapies",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 778
+  },
+  {
+   "id": "use_xuebijing_injection",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_087",
+   "type": "Statement",
+   "number": 87,
+   "domain": "additional_supportive",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 778
+  },
+  {
+   "id": "risk_factors_for_gi_bleeding",
+   "type": "Condition"
+  },
+  {
+   "id": "use_stress_ulcer_prophylaxis_with_ppi",
+   "type": "Action"
+  },
+  {
+   "id": "no_stress_ulcer_prophylaxis",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_088",
+   "type": "Statement",
+   "number": 88,
+   "domain": "additional_supportive",
+   "strength": "conditional_against",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 779
+  },
+  {
+   "id": "use_probiotics",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_089",
+   "type": "Statement",
+   "number": 89,
+   "domain": "additional_supportive",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 779
+  },
+  {
+   "id": "after_acute_resuscitation_phase",
+   "type": "Condition"
+  },
+  {
+   "id": "use_active_fluid_removal",
+   "type": "Action"
+  },
+  {
+   "id": "administer_diuretics",
+   "type": "Action"
+  },
+  {
+   "id": "use_ultrafiltration_or_extracorporeal_fluid_removal",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_090",
+   "type": "Statement",
+   "number": 90,
+   "domain": "additional_supportive",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "use_restrictive_transfusion_strategy",
+   "type": "Action"
+  },
+  {
+   "id": "liberal_transfusion_strategy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_091",
+   "type": "Statement",
+   "number": 91,
+   "domain": "additional_supportive",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "initiate_enteral_nutrition",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_092",
+   "type": "Statement",
+   "number": 92,
+   "domain": "additional_supportive",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "initiate_insulin_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "target::glucose_threshold_to_start_insulin",
+   "type": "Target",
+   "parameter": "glucose_threshold_to_start_insulin"
+  },
+  {
+   "id": "stmt_093",
+   "type": "Statement",
+   "number": 93,
+   "domain": "additional_supportive",
+   "strength": "conditional_against",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "acute_kidney_injury",
+   "type": "Condition"
+  },
+  {
+   "id": "no_definitive_indication_for_rrt",
+   "type": "Condition"
+  },
+  {
+   "id": "use_renal_replacement_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_094",
+   "type": "Statement",
+   "number": 94,
+   "domain": "additional_supportive",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "rrt_warranted",
+   "type": "Condition"
+  },
+  {
+   "id": "continuous_renal_replacement_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "intermittent_renal_replacement_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_095",
+   "type": "Statement",
+   "number": 95,
+   "domain": "additional_supportive",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "hypoperfusion_induced_lactic_acidemia",
+   "type": "Condition"
+  },
+  {
+   "id": "use_sodium_bicarbonate",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_096",
+   "type": "Statement",
+   "number": 96,
+   "domain": "additional_supportive",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 780
+  },
+  {
+   "id": "severe_metabolic_acidemia_pH_le_7_2",
+   "type": "Condition"
+  },
+  {
+   "id": "acute_kidney_injury_AKIN_2_or_3",
+   "type": "Condition"
+  },
+  {
+   "id": "stmt_097",
+   "type": "Statement",
+   "number": 97,
+   "domain": "additional_supportive",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "use_pharmacologic_vte_prophylaxis",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_098",
+   "type": "Statement",
+   "number": 98,
+   "domain": "additional_supportive",
+   "strength": "strong_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "use_low_molecular_weight_heparin_for_vte_prophylaxis",
+   "type": "Action"
+  },
+  {
+   "id": "unfractionated_heparin",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_099",
+   "type": "Statement",
+   "number": 99,
+   "domain": "additional_supportive",
+   "strength": "conditional_for",
+   "certainty": "moderate",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "use_pharmacologic_vte_prophylaxis_alone",
+   "type": "Action"
+  },
+  {
+   "id": "pharmacologic_plus_mechanical_vte_prophylaxis",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_100",
+   "type": "Statement",
+   "number": 100,
+   "domain": "goals_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "discuss_goals_of_care_and_prognosis_with_patient_or_family",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_101",
+   "type": "Statement",
+   "number": 101,
+   "domain": "goals_of_care",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "address_goals_of_care",
+   "type": "Action"
+  },
+  {
+   "id": "late_72h_or_later",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_102",
+   "type": "Statement",
+   "number": 102,
+   "domain": "goals_of_care",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "constraint::standardized_criterion_to_identify_patients_for_goals_of_care_discussion",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_103",
+   "type": "Statement",
+   "number": 103,
+   "domain": "goals_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "discharged_after_sepsis_or_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "ensure_opportunity_to_execute_advance_directives",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_104",
+   "type": "Statement",
+   "number": 104,
+   "domain": "goals_of_care",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 781
+  },
+  {
+   "id": "constraint::systematic_establishment_of_advance_directives_before_discharge",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_105",
+   "type": "Statement",
+   "number": 105,
+   "domain": "goals_of_care",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 782
+  },
+  {
+   "id": "constraint::formal_time_limited_trials_of_critical_care",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_106",
+   "type": "Statement",
+   "number": 106,
+   "domain": "goals_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "integrate_palliative_care_principles_into_treatment_plan",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_107",
+   "type": "Statement",
+   "number": 107,
+   "domain": "goals_of_care",
+   "strength": "conditional_against",
+   "certainty": "low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "routine_formal_palliative_care_consultation_for_all",
+   "type": "Action"
+  },
+  {
+   "id": "palliative_care_consultation_based_on_clinician_judgement",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_108",
+   "type": "Statement",
+   "number": 108,
+   "domain": "transitions_of_care",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "admitted_to_icu",
+   "type": "Condition"
+  },
+  {
+   "id": "transfer_to_floor",
+   "type": "Condition"
+  },
+  {
+   "id": "use_critical_care_transition_program",
+   "type": "Action"
+  },
+  {
+   "id": "usual_care",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_109",
+   "type": "Statement",
+   "number": 109,
+   "domain": "transitions_of_care",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "use_structured_handoff_process_at_transitions",
+   "type": "Action"
+  },
+  {
+   "id": "no_handoff_process",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_110",
+   "type": "Statement",
+   "number": 110,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "screen_for_economic_and_social_support_needs",
+   "type": "Action"
+  },
+  {
+   "id": "refer_to_available_support_services",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_111",
+   "type": "Statement",
+   "number": 111,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "transition_in_care",
+   "type": "Condition"
+  },
+  {
+   "id": "icu_discharge",
+   "type": "Condition"
+  },
+  {
+   "id": "hospital_discharge",
+   "type": "Condition"
+  },
+  {
+   "id": "perform_comprehensive_medication_reconciliation",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_112",
+   "type": "Statement",
+   "number": 112,
+   "domain": "transitions_of_care",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 783
+  },
+  {
+   "id": "perform_medication_reconciliation_pharmacist_based",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_113",
+   "type": "Statement",
+   "number": 113,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "post_icu_planning",
+   "type": "Condition"
+  },
+  {
+   "id": "hospital_discharge_planning",
+   "type": "Condition"
+  },
+  {
+   "id": "involve_patient_and_family_in_shared_decision_making",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_114",
+   "type": "Statement",
+   "number": 114,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "provide_written_and_verbal_discharge_summary_information",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_115",
+   "type": "Statement",
+   "number": 115,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "new_impairments",
+   "type": "Condition"
+  },
+  {
+   "id": "include_followup_with_clinicians_for_sequelae_in_discharge_plan",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_116",
+   "type": "Statement",
+   "number": 116,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "ensure_information_for_patients_families_and_primary_care_to_navigate_transition",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_117",
+   "type": "Statement",
+   "number": 117,
+   "domain": "transitions_of_care",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "survived_hospitalization_for_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "constraint::specific_structured_multicomponent_discharge_planning_process",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_118",
+   "type": "Statement",
+   "number": 118,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "stmt_119",
+   "type": "Statement",
+   "number": 119,
+   "domain": "transitions_of_care",
+   "strength": "conditional_for",
+   "certainty": "very_low",
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "before_hospital_discharge",
+   "type": "Condition"
+  },
+  {
+   "id": "followup_setting",
+   "type": "Condition"
+  },
+  {
+   "id": "offer_written_and_verbal_sepsis_education",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_120",
+   "type": "Statement",
+   "number": 120,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 784
+  },
+  {
+   "id": "post_hospital_recovery",
+   "type": "Condition"
+  },
+  {
+   "id": "ensure_clinician_knowledge_and_competency_to_support_survivors",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_121",
+   "type": "Statement",
+   "number": 121,
+   "domain": "transitions_of_care",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 785
+  },
+  {
+   "id": "constraint::sepsis_focused_educational_material_for_primary_care_providers",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_122",
+   "type": "Statement",
+   "number": 122,
+   "domain": "transitions_of_care",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 785
+  },
+  {
+   "id": "implement_strategies_to_support_survivors_and_families",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_123",
+   "type": "Statement",
+   "number": 123,
+   "domain": "transitions_of_care",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 785
+  },
+  {
+   "id": "post_hospital_discharge",
+   "type": "Condition"
+  },
+  {
+   "id": "constraint::early_vs_routine_post_discharge_followup",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "stmt_124",
+   "type": "Statement",
+   "number": 124,
+   "domain": "long_term_outcomes",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "carryover",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 785
+  },
+  {
+   "id": "after_hospital_discharge_for_sepsis",
+   "type": "Condition"
+  },
+  {
+   "id": "facilitate_assessment_and_followup_for_physical_cognitive_emotional_problems",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_125",
+   "type": "Statement",
+   "number": 125,
+   "domain": "long_term_outcomes",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 785
+  },
+  {
+   "id": "hospitalization_for_sepsis_or_septic_shock",
+   "type": "Condition"
+  },
+  {
+   "id": "offer_post_critical_illness_followup_services",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_126",
+   "type": "Statement",
+   "number": 126,
+   "domain": "long_term_outcomes",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 786
+  },
+  {
+   "id": "invasive_mechanical_ventilation_gt_48h",
+   "type": "Condition"
+  },
+  {
+   "id": "offer_physical_rehabilitation_after_discharge",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_127",
+   "type": "Statement",
+   "number": 127,
+   "domain": "long_term_outcomes",
+   "strength": "conditional_for",
+   "certainty": "low",
+   "stmt_type": "revisited",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 786
+  },
+  {
+   "id": "offer_mental_health_support_services_after_discharge",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_128",
+   "type": "Statement",
+   "number": 128,
+   "domain": "long_term_outcomes",
+   "strength": "good_practice",
+   "certainty": null,
+   "stmt_type": "revisited",
+   "depth": "light",
+   "extraction_confidence": "high",
+   "journal_page": 786
+  },
+  {
+   "id": "clinical_symptoms_of_mental_health_disorder",
+   "type": "Condition"
+  },
+  {
+   "id": "refer_to_appropriate_healthcare_professionals",
+   "type": "Action"
+  },
+  {
+   "id": "stmt_129",
+   "type": "Statement",
+   "number": 129,
+   "domain": "long_term_outcomes",
+   "strength": "insufficient_evidence",
+   "certainty": null,
+   "stmt_type": "new",
+   "depth": "full",
+   "extraction_confidence": "high",
+   "journal_page": 787
+  },
+  {
+   "id": "continue_cognition_targeted_therapy",
+   "type": "Action"
+  },
+  {
+   "id": "constraint::cognition_targeted_therapies_vs_usual_care",
+   "type": "Constraint",
+   "kind": "insufficient_evidence"
+  },
+  {
+   "id": "already_receiving_cognition_targeted_therapy",
+   "type": "Condition"
+  },
+  {
+   "id": "elevated_lactate",
+   "type": "Condition"
+  },
+  {
+   "id": "severe_ards",
+   "type": "Condition"
+  }
+ ],
+ "edges": [
+  {
+   "src": "stmt_001",
+   "rel": "APPLIES_WHEN",
+   "dst": "acutely_ill_high_risk_patients",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_001",
+   "rel": "RECOMMENDS",
+   "dst": "run_sepsis_performance_improvement_program",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_001",
+   "rel": "RECOMMENDS",
+   "dst": "screen_for_sepsis",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_001",
+   "rel": "RECOMMENDS",
+   "dst": "use_standard_operating_procedures_for_treatment",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_001",
+   "rel": "RECOMMENDS",
+   "dst": "implement_sepsis_quality_improvement_strategies",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_002",
+   "rel": "APPLIES_WHEN",
+   "dst": "positive_sepsis_screen",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_002",
+   "rel": "RECOMMENDS",
+   "dst": "use_code_sepsis_or_sepsis_huddle_protocol",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_002",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_such_protocol"
+  },
+  {
+   "src": "stmt_003",
+   "rel": "APPLIES_WHEN",
+   "dst": "prehospital_ambulance_or_flight",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_003",
+   "rel": "RECOMMENDS",
+   "dst": "use_standard_sepsis_screening_tool",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_003",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_screening_tool"
+  },
+  {
+   "src": "stmt_004",
+   "rel": "APPLIES_WHEN",
+   "dst": "acutely_ill",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_004",
+   "rel": "APPLIES_WHEN",
+   "dst": "in_hospital",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_004",
+   "rel": "RECOMMENDS",
+   "dst": "screen_for_sepsis_with_tool",
+   "polarity": "for",
+   "options": [
+    "NEWS",
+    "NEWS2",
+    "MEWS",
+    "SIRS"
+   ]
+  },
+  {
+   "src": "stmt_004",
+   "rel": "PREFERRED_OVER",
+   "dst": "qSOFA_as_single_screening_tool"
+  },
+  {
+   "src": "stmt_005",
+   "rel": "APPLIES_WHEN",
+   "dst": "suspected_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_005",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::rule_in_or_out_sepsis_on_single_test"
+  },
+  {
+   "src": "stmt_006",
+   "rel": "APPLIES_WHEN",
+   "dst": "suspected_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_006",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::novel_rapid_host_response_diagnostics"
+  },
+  {
+   "src": "stmt_007",
+   "rel": "APPLIES_WHEN",
+   "dst": "possible_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_007",
+   "rel": "APPLIES_WHEN",
+   "dst": "probable_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_007",
+   "rel": "APPLIES_WHEN",
+   "dst": "definite_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_007",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_007",
+   "rel": "RECOMMENDS",
+   "dst": "collect_blood_cultures",
+   "polarity": "for",
+   "timing": "as soon as possible"
+  },
+  {
+   "src": "collect_blood_cultures",
+   "rel": "MUST_PRECEDE",
+   "dst": "administer_antimicrobial_therapy",
+   "via": "stmt_007",
+   "strength": "ideally"
+  },
+  {
+   "src": "stmt_008",
+   "rel": "APPLIES_WHEN",
+   "dst": "possible_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_008",
+   "rel": "APPLIES_WHEN",
+   "dst": "probable_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_008",
+   "rel": "APPLIES_WHEN",
+   "dst": "definite_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_008",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_008",
+   "rel": "RECOMMENDS",
+   "dst": "measure_blood_lactate",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_009",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_009",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_009",
+   "rel": "RECOMMENDS",
+   "dst": "begin_treatment_and_resuscitation",
+   "polarity": "for",
+   "timing": "immediately"
+  },
+  {
+   "src": "stmt_010",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_induced_hypoperfusion",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_010",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_010",
+   "rel": "RECOMMENDS",
+   "dst": "administer_iv_crystalloid",
+   "polarity": "for",
+   "dose": ">= 30 mL/kg",
+   "timing": "within first 3 hours"
+  },
+  {
+   "src": "stmt_010",
+   "rel": "REFINED_BY",
+   "dst": "reassess_fluid_status_frequently",
+   "remark": 1,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": null,
+   "carries_action": true
+  },
+  {
+   "src": "stmt_010",
+   "rel": "REFINED_BY",
+   "dst": "calculate_dose_on_actual_body_weight",
+   "remark": 2,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": "BMI_gt_30_use_adjusted_or_ideal_body_weight",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_010",
+   "rel": "MODIFIED_BY",
+   "dst": "BMI_gt_30_use_adjusted_or_ideal_body_weight",
+   "remark": 2
+  },
+  {
+   "src": "stmt_011",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_induced_hypotension",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_011",
+   "rel": "RECOMMENDS",
+   "dst": "administer_iv_crystalloid_bolus",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_011",
+   "rel": "RECOMMENDS",
+   "dst": "start_vasopressor",
+   "polarity": "for",
+   "timing": "after fluid bolus if hypotension persists"
+  },
+  {
+   "src": "stmt_011",
+   "rel": "REFINED_BY",
+   "dst": "start_vasopressor_concurrently_with_fluid",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": "unstable_septic_shock",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_011",
+   "rel": "MODIFIED_BY",
+   "dst": "unstable_septic_shock",
+   "remark": 0
+  },
+  {
+   "src": "stmt_012",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_012",
+   "rel": "RECOMMENDS",
+   "dst": "start_vasopressor_peripherally",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_012",
+   "rel": "PREFERRED_OVER",
+   "dst": "delay_until_central_access_secured"
+  },
+  {
+   "src": "stmt_013",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_013",
+   "rel": "PREFERRED_OVER",
+   "dst": "higher_MAP_targets"
+  },
+  {
+   "src": "stmt_013",
+   "rel": "TARGETS",
+   "dst": "target::MAP",
+   "value": 65,
+   "unit": "mm Hg",
+   "kind": "initial_target"
+  },
+  {
+   "src": "stmt_013",
+   "rel": "REFINED_BY",
+   "dst": "titrate_vasopressor_to_maintain_MAP",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": null,
+   "carries_action": true
+  },
+  {
+   "src": "stmt_014",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_014",
+   "rel": "APPLIES_WHEN",
+   "dst": "age_ge_65",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_014",
+   "rel": "PREFERRED_OVER",
+   "dst": "higher_MAP_ranges"
+  },
+  {
+   "src": "stmt_014",
+   "rel": "TARGETS",
+   "dst": "target::MAP",
+   "value": [
+    60,
+    65
+   ],
+   "unit": "mm Hg",
+   "kind": "initial_target_range"
+  },
+  {
+   "src": "stmt_015",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_015",
+   "rel": "APPLIES_WHEN",
+   "dst": "requires_icu_admission",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_015",
+   "rel": "RECOMMENDS",
+   "dst": "admit_to_icu",
+   "polarity": "for",
+   "timing": "within 6 hours"
+  },
+  {
+   "src": "stmt_016",
+   "rel": "APPLIES_WHEN",
+   "dst": "possible_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_016",
+   "rel": "APPLIES_WHEN",
+   "dst": "probable_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_016",
+   "rel": "APPLIES_WHEN",
+   "dst": "definite_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_016",
+   "rel": "RECOMMENDS",
+   "dst": "administer_antimicrobial_therapy",
+   "polarity": "for",
+   "timing": "immediately, ideally within 1 hour of recognition"
+  },
+  {
+   "src": "stmt_017",
+   "rel": "APPLIES_WHEN",
+   "dst": "probable_or_definite_sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_017",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_017",
+   "rel": "RECOMMENDS",
+   "dst": "administer_antimicrobial_therapy",
+   "polarity": "for",
+   "timing": "immediately, ideally within 1 hour of recognition"
+  },
+  {
+   "src": "stmt_018",
+   "rel": "APPLIES_WHEN",
+   "dst": "possible_sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_018",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_018",
+   "rel": "RECOMMENDS",
+   "dst": "perform_time_limited_rapid_investigation",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_018",
+   "rel": "RECOMMENDS",
+   "dst": "administer_antimicrobial_therapy",
+   "polarity": "for",
+   "timing": "within 3 hours from first suspicion",
+   "condition": "if concern for infection persists"
+  },
+  {
+   "src": "stmt_019",
+   "rel": "APPLIES_WHEN",
+   "dst": "possible_sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_019",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_019",
+   "rel": "RECOMMENDS",
+   "dst": "assess_likelihood_infectious_vs_noninfectious",
+   "polarity": "for",
+   "timing": "rapid"
+  },
+  {
+   "src": "stmt_020",
+   "rel": "APPLIES_WHEN",
+   "dst": "low_likelihood_of_infection",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_020",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_020",
+   "rel": "RECOMMENDS",
+   "dst": "administer_antimicrobial_therapy",
+   "polarity": "defer"
+  },
+  {
+   "src": "stmt_020",
+   "rel": "RECOMMENDS",
+   "dst": "monitor_patient_closely",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_021",
+   "rel": "APPLIES_WHEN",
+   "dst": "probable_or_definite_sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_021",
+   "rel": "APPLIES_WHEN",
+   "dst": "hypotension",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_021",
+   "rel": "APPLIES_WHEN",
+   "dst": "anticipated_time_to_in_hospital_evaluation_gt_60_min",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_021",
+   "rel": "RECOMMENDS",
+   "dst": "administer_antimicrobial_therapy",
+   "polarity": "for",
+   "setting": "ambulance or flight"
+  },
+  {
+   "src": "stmt_021",
+   "rel": "MODIFIED_BY",
+   "dst": "structured_prehospital_screening_in_place",
+   "remark": 0
+  },
+  {
+   "src": "stmt_022",
+   "rel": "APPLIES_WHEN",
+   "dst": "possible_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_022",
+   "rel": "APPLIES_WHEN",
+   "dst": "probable_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_022",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_022",
+   "rel": "RECOMMENDS",
+   "dst": "use_clinical_evaluation_alone_to_start_antimicrobials",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_022",
+   "rel": "PREFERRED_OVER",
+   "dst": "procalcitonin_plus_clinical_evaluation"
+  },
+  {
+   "src": "stmt_023",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_023",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_023",
+   "rel": "RECOMMENDS",
+   "dst": "evaluate_for_source_requiring_emergent_source_control",
+   "polarity": "for",
+   "timing": "rapidly"
+  },
+  {
+   "src": "stmt_024",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_024",
+   "rel": "APPLIES_WHEN",
+   "dst": "source_requiring_source_control",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_024",
+   "rel": "RECOMMENDS",
+   "dst": "perform_source_control",
+   "polarity": "for",
+   "timing": "ideally within 6 hours of diagnosis"
+  },
+  {
+   "src": "stmt_024",
+   "rel": "PREFERRED_OVER",
+   "dst": "late_source_control"
+  },
+  {
+   "src": "stmt_025",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_025",
+   "rel": "APPLIES_WHEN",
+   "dst": "high_risk_of_specific_MDR_pathogen",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_025",
+   "rel": "RECOMMENDS",
+   "dst": "use_empirical_therapy_covering_that_MDR_pathogen",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_026",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_026",
+   "rel": "APPLIES_WHEN",
+   "dst": "low_risk_of_specific_MDR_pathogen",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_026",
+   "rel": "RECOMMENDS",
+   "dst": "use_empirical_therapy_covering_that_MDR_pathogen",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_027",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_027",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_027",
+   "rel": "RECOMMENDS",
+   "dst": "use_empirical_antifungal_therapy",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_027",
+   "rel": "MODIFIED_BY",
+   "dst": "risk_factors_for_fungal_infection",
+   "remark": 0
+  },
+  {
+   "src": "stmt_028",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_028",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_risk_factors_for_anaerobic_infection",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_028",
+   "rel": "RECOMMENDS",
+   "dst": "use_empiric_regimen_without_anaerobic_coverage",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_028",
+   "rel": "MODIFIED_BY",
+   "dst": "MDR_coverage_required",
+   "remark": 0
+  },
+  {
+   "src": "stmt_029",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_029",
+   "rel": "APPLIES_WHEN",
+   "dst": "risk_factors_for_anaerobic_infection",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_029",
+   "rel": "RECOMMENDS",
+   "dst": "use_empiric_regimen_with_anaerobic_coverage",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_030",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_030",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_030",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::departmental_upper_respiratory_surveillance_cultures"
+  },
+  {
+   "src": "stmt_031",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_031",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_031",
+   "rel": "RECOMMENDS",
+   "dst": "use_pathogen_specific_rapid_diagnostic_tests",
+   "polarity": "for",
+   "condition": "case-by-case in selected patients"
+  },
+  {
+   "src": "stmt_032",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_032",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_032",
+   "rel": "RECOMMENDS",
+   "dst": "use_candida_biomarkers_to_start_antifungals",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_032",
+   "rel": "MODIFIED_BY",
+   "dst": "high_risk_of_candida_infection",
+   "remark": 0
+  },
+  {
+   "src": "stmt_033",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_033",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_033",
+   "rel": "RECOMMENDS",
+   "dst": "use_prolonged_infusion_of_beta_lactams",
+   "polarity": "for",
+   "condition": "for maintenance, after a loading dose"
+  },
+  {
+   "src": "stmt_033",
+   "rel": "PREFERRED_OVER",
+   "dst": "bolus_administration"
+  },
+  {
+   "src": "stmt_034",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_034",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_034",
+   "rel": "RECOMMENDS",
+   "dst": "use_antimicrobial_therapeutic_drug_monitoring",
+   "polarity": "for",
+   "condition": "case-by-case in selected patients"
+  },
+  {
+   "src": "stmt_035",
+   "rel": "APPLIES_WHEN",
+   "dst": "suspected_sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_035",
+   "rel": "APPLIES_WHEN",
+   "dst": "unconfirmed_infection",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_035",
+   "rel": "RECOMMENDS",
+   "dst": "reevaluate_continuously",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_035",
+   "rel": "RECOMMENDS",
+   "dst": "search_for_alternative_diagnoses",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_035",
+   "rel": "RECOMMENDS",
+   "dst": "discontinue_empiric_antimicrobial_therapy",
+   "polarity": "for",
+   "condition": "if an alternative cause is demonstrated or strongly suspected"
+  },
+  {
+   "src": "stmt_036",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_036",
+   "rel": "APPLIES_WHEN",
+   "dst": "confirmed_microbiological_diagnosis_and_susceptibility",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_036",
+   "rel": "RECOMMENDS",
+   "dst": "de_escalate_antimicrobial_therapy",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_036",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_de_escalation"
+  },
+  {
+   "src": "stmt_037",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_037",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_pathogen_on_final_cultures",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_037",
+   "rel": "RECOMMENDS",
+   "dst": "de_escalate_antimicrobial_therapy",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_037",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_de_escalation"
+  },
+  {
+   "src": "stmt_038",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_038",
+   "rel": "APPLIES_WHEN",
+   "dst": "receiving_empiric_antifungal_therapy",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_038",
+   "rel": "RECOMMENDS",
+   "dst": "use_candida_biomarkers_to_stop_antifungals",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_038",
+   "rel": "MODIFIED_BY",
+   "dst": "high_risk_of_candida_infection",
+   "remark": 0
+  },
+  {
+   "src": "stmt_039",
+   "rel": "APPLIES_WHEN",
+   "dst": "initial_diagnosis_of_sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_039",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_source_control",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_039",
+   "rel": "RECOMMENDS",
+   "dst": "use_shorter_antimicrobial_duration",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_039",
+   "rel": "PREFERRED_OVER",
+   "dst": "longer_duration"
+  },
+  {
+   "src": "stmt_040",
+   "rel": "APPLIES_WHEN",
+   "dst": "initial_diagnosis_of_sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_040",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_source_control",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_040",
+   "rel": "APPLIES_WHEN",
+   "dst": "optimal_duration_unclear",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_040",
+   "rel": "RECOMMENDS",
+   "dst": "use_procalcitonin_and_clinical_evaluation_to_stop_antimicrobials",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_040",
+   "rel": "PREFERRED_OVER",
+   "dst": "clinical_evaluation_alone"
+  },
+  {
+   "src": "stmt_041",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_041",
+   "rel": "APPLIES_WHEN",
+   "dst": "mechanically_ventilated",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_041",
+   "rel": "APPLIES_WHEN",
+   "dst": "unit_with_low_antimicrobial_resistance_prevalence",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_041",
+   "rel": "RECOMMENDS",
+   "dst": "use_selective_digestive_decontamination",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_042",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_042",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "invasive_blood_pressure_monitoring"
+  },
+  {
+   "src": "stmt_042",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "noninvasive_blood_pressure_monitoring"
+  },
+  {
+   "src": "stmt_042",
+   "rel": "MODIFIED_BY",
+   "dst": "high_or_escalating_vasopressor_requirement",
+   "remark": 0
+  },
+  {
+   "src": "stmt_043",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_043",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_043",
+   "rel": "RECOMMENDS",
+   "dst": "use_crystalloids_as_first_line_fluid",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_044",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_044",
+   "rel": "APPLIES_WHEN",
+   "dst": "undergoing_initial_resuscitation",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_044",
+   "rel": "RECOMMENDS",
+   "dst": "use_balanced_crystalloids",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_044",
+   "rel": "PREFERRED_OVER",
+   "dst": "saline_0_9_percent"
+  },
+  {
+   "src": "stmt_044",
+   "rel": "REFINED_BY",
+   "dst": "use_saline_0_9_percent",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": "traumatic_brain_injury",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_044",
+   "rel": "MODIFIED_BY",
+   "dst": "traumatic_brain_injury",
+   "remark": 0
+  },
+  {
+   "src": "stmt_045",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_045",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_045",
+   "rel": "RECOMMENDS",
+   "dst": "use_crystalloids_alone",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_045",
+   "rel": "PREFERRED_OVER",
+   "dst": "crystalloids_plus_supplemental_albumin"
+  },
+  {
+   "src": "stmt_045",
+   "rel": "REFINED_BY",
+   "dst": "use_supplemental_albumin",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": "large_crystalloid_volume_already_given_or_cirrhosis",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_045",
+   "rel": "MODIFIED_BY",
+   "dst": "large_crystalloid_volume_already_given_or_cirrhosis",
+   "remark": 0
+  },
+  {
+   "src": "stmt_046",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_046",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_046",
+   "rel": "RECOMMENDS",
+   "dst": "use_starches_for_resuscitation",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_047",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_047",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_047",
+   "rel": "RECOMMENDS",
+   "dst": "use_gelatin_for_resuscitation",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_048",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_048",
+   "rel": "APPLIES_WHEN",
+   "dst": "already_received_30ml_per_kg",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_048",
+   "rel": "APPLIES_WHEN",
+   "dst": "persistent_hypoperfusion",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_048",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "liberal_fluid_resuscitation_strategy"
+  },
+  {
+   "src": "stmt_048",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "restrictive_fluid_resuscitation_strategy"
+  },
+  {
+   "src": "stmt_049",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_049",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_049",
+   "rel": "RECOMMENDS",
+   "dst": "use_dynamic_measures_to_guide_fluid_resuscitation",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_049",
+   "rel": "PREFERRED_OVER",
+   "dst": "physical_examination_alone"
+  },
+  {
+   "src": "stmt_049",
+   "rel": "PREFERRED_OVER",
+   "dst": "static_measures_alone"
+  },
+  {
+   "src": "stmt_050",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_050",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::minimally_invasive_or_noninvasive_cardiac_output_monitoring"
+  },
+  {
+   "src": "stmt_051",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_with_elevated_lactate",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_051",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_051",
+   "rel": "RECOMMENDS",
+   "dst": "use_serial_lactate_measurements_to_guide_resuscitation",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_051",
+   "rel": "REFINED_BY",
+   "dst": "individualise_fluid_after_initial_bolus",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": null,
+   "carries_action": true
+  },
+  {
+   "src": "stmt_052",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_052",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_052",
+   "rel": "RECOMMENDS",
+   "dst": "use_capillary_refill_time_to_guide_resuscitation",
+   "polarity": "for",
+   "condition": "as an adjunct to other perfusion measures"
+  },
+  {
+   "src": "stmt_053",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_053",
+   "rel": "RECOMMENDS",
+   "dst": "use_norepinephrine_as_first_line_vasopressor",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_053",
+   "rel": "PREFERRED_OVER",
+   "dst": "dopamine"
+  },
+  {
+   "src": "stmt_053",
+   "rel": "PREFERRED_OVER",
+   "dst": "epinephrine"
+  },
+  {
+   "src": "stmt_053",
+   "rel": "PREFERRED_OVER",
+   "dst": "selepressin"
+  },
+  {
+   "src": "stmt_054",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_054",
+   "rel": "RECOMMENDS",
+   "dst": "use_terlipressin",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_055",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_055",
+   "rel": "RECOMMENDS",
+   "dst": "use_norepinephrine_as_first_line_vasopressor",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_055",
+   "rel": "PREFERRED_OVER",
+   "dst": "vasopressin"
+  },
+  {
+   "src": "stmt_055",
+   "rel": "PREFERRED_OVER",
+   "dst": "angiotensin_II"
+  },
+  {
+   "src": "stmt_056",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_056",
+   "rel": "APPLIES_WHEN",
+   "dst": "escalating_norepinephrine_dose",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_056",
+   "rel": "RECOMMENDS",
+   "dst": "add_vasopressin",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_057",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_057",
+   "rel": "APPLIES_WHEN",
+   "dst": "inadequate_MAP_despite_norepinephrine_and_vasopressin",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_057",
+   "rel": "RECOMMENDS",
+   "dst": "add_epinephrine",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_057",
+   "rel": "MODIFIED_BY",
+   "dst": "vasopressin_unavailable",
+   "remark": 0
+  },
+  {
+   "src": "stmt_058",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_058",
+   "rel": "APPLIES_WHEN",
+   "dst": "concomitant_cardiac_dysfunction",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_058",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "norepinephrine_first_line"
+  },
+  {
+   "src": "stmt_058",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "epinephrine_first_line"
+  },
+  {
+   "src": "stmt_058",
+   "rel": "MODIFIED_BY",
+   "dst": "tachyarrhythmia_vs_bradyarrhythmia",
+   "remark": 0
+  },
+  {
+   "src": "stmt_059",
+   "rel": "APPLIES_WHEN",
+   "dst": "refractory_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_059",
+   "rel": "APPLIES_WHEN",
+   "dst": "escalating_vasopressor_requirement",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_059",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::iv_methylene_blue"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "APPLIES_WHEN",
+   "dst": "cardiac_dysfunction",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "APPLIES_WHEN",
+   "dst": "persistent_hypoperfusion",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_fluid_status",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_arterial_blood_pressure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "RECOMMENDS",
+   "dst": "use_inotropes",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_inotropes"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "REFINED_BY",
+   "dst": "use_inotropes_in_addition_to_vasopressors",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": "vasopressors_required_to_maintain_MAP",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_060",
+   "rel": "MODIFIED_BY",
+   "dst": "vasopressors_required_to_maintain_MAP",
+   "remark": 0
+  },
+  {
+   "src": "stmt_061",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "APPLIES_WHEN",
+   "dst": "persistent_hypoperfusion",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "APPLIES_WHEN",
+   "dst": "cardiac_dysfunction",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_fluid_status",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_arterial_blood_pressure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "add_dobutamine_to_norepinephrine"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "epinephrine_alone"
+  },
+  {
+   "src": "stmt_062",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_062",
+   "rel": "APPLIES_WHEN",
+   "dst": "cardiac_dysfunction",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_062",
+   "rel": "APPLIES_WHEN",
+   "dst": "persistent_hypoperfusion",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_062",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_fluid_status",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_062",
+   "rel": "APPLIES_WHEN",
+   "dst": "adequate_arterial_blood_pressure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_062",
+   "rel": "RECOMMENDS",
+   "dst": "use_levosimendan",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_063",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_063",
+   "rel": "APPLIES_WHEN",
+   "dst": "ongoing_vasopressor_requirement",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_063",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::oral_midodrine"
+  },
+  {
+   "src": "stmt_064",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_064",
+   "rel": "RECOMMENDS",
+   "dst": "use_beta_blockers_for_septic_shock",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_065",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_065",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "pulse_oximetry_SpO2"
+  },
+  {
+   "src": "stmt_065",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "arterial_blood_gas_SaO2"
+  },
+  {
+   "src": "stmt_065",
+   "rel": "REFINED_BY",
+   "dst": "prefer_arterial_blood_gas_when_available",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_preference",
+   "modifier_condition": "spo2_substitution_unreliable_setting",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_065",
+   "rel": "MODIFIED_BY",
+   "dst": "spo2_substitution_unreliable_setting",
+   "remark": 0
+  },
+  {
+   "src": "stmt_066",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_066",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_hypoxemic_respiratory_failure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_066",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "liberal_oxygen_target"
+  },
+  {
+   "src": "stmt_066",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "conservative_oxygen_target"
+  },
+  {
+   "src": "stmt_066",
+   "rel": "TARGETS",
+   "dst": "target::SpO2",
+   "conservative": "90-93%",
+   "liberal": ">=96%",
+   "source": "remark_0_trial_targets"
+  },
+  {
+   "src": "stmt_066",
+   "rel": "TARGETS",
+   "dst": "target::SpO2",
+   "conservative": "90% (IQR 90-92%)",
+   "liberal": "96% (IQR 94-98%)",
+   "source": "remark_1_in_our_practice"
+  },
+  {
+   "src": "stmt_067",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_067",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_hypoxemic_respiratory_failure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_067",
+   "rel": "RECOMMENDS",
+   "dst": "use_high_flow_nasal_cannula",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_067",
+   "rel": "PREFERRED_OVER",
+   "dst": "conventional_oxygen_therapy"
+  },
+  {
+   "src": "stmt_067",
+   "rel": "MODIFIED_BY",
+   "dst": "pf_ratio_lt_200_or_sf_ratio_lt_235",
+   "remark": 0
+  },
+  {
+   "src": "stmt_068",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_068",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_hypoxemic_respiratory_failure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_068",
+   "rel": "RECOMMENDS",
+   "dst": "use_high_flow_nasal_cannula",
+   "polarity": "for",
+   "condition": "as initial therapy"
+  },
+  {
+   "src": "stmt_068",
+   "rel": "PREFERRED_OVER",
+   "dst": "noninvasive_positive_pressure_ventilation"
+  },
+  {
+   "src": "stmt_069",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_069",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_hypoxemic_respiratory_failure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_069",
+   "rel": "RECOMMENDS",
+   "dst": "use_high_flow_nasal_cannula",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_069",
+   "rel": "PREFERRED_OVER",
+   "dst": "hfnc_alternating_with_nippv"
+  },
+  {
+   "src": "stmt_070",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_070",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_hypoxemic_respiratory_failure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_070",
+   "rel": "APPLIES_WHEN",
+   "dst": "not_intubated",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_070",
+   "rel": "RECOMMENDS",
+   "dst": "trial_awake_proning",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_070",
+   "rel": "RECOMMENDS",
+   "dst": "use_sedation_to_promote_proning_tolerance",
+   "polarity": "against",
+   "source": "remark"
+  },
+  {
+   "src": "stmt_070",
+   "rel": "REFINED_BY",
+   "dst": "use_sedation_to_promote_proning_tolerance",
+   "remark": 0,
+   "polarity": "against",
+   "kind": "adds_action",
+   "modifier_condition": null,
+   "carries_action": true
+  },
+  {
+   "src": "stmt_071",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_071",
+   "rel": "APPLIES_WHEN",
+   "dst": "ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_071",
+   "rel": "RECOMMENDS",
+   "dst": "use_low_tidal_volume_ventilation",
+   "polarity": "for",
+   "dose": "6 mL/kg"
+  },
+  {
+   "src": "stmt_071",
+   "rel": "PREFERRED_OVER",
+   "dst": "high_tidal_volume_gt_10_ml_per_kg"
+  },
+  {
+   "src": "stmt_072",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_associated_hypoxemic_respiratory_failure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_072",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_072",
+   "rel": "RECOMMENDS",
+   "dst": "use_tidal_volume_6_to_8_ml_per_kg_IBW",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_072",
+   "rel": "RECOMMENDS",
+   "dst": "screen_regularly_for_ARDS",
+   "polarity": "for",
+   "source": "remark"
+  },
+  {
+   "src": "stmt_072",
+   "rel": "PREFERRED_OVER",
+   "dst": "tidal_volume_4_to_lt_6_ml_per_kg_IBW"
+  },
+  {
+   "src": "stmt_072",
+   "rel": "REFINED_BY",
+   "dst": "screen_regularly_for_ARDS",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": null,
+   "carries_action": true
+  },
+  {
+   "src": "stmt_073",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_073",
+   "rel": "APPLIES_WHEN",
+   "dst": "ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_073",
+   "rel": "PREFERRED_OVER",
+   "dst": "higher_plateau_pressures"
+  },
+  {
+   "src": "stmt_073",
+   "rel": "TARGETS",
+   "dst": "target::plateau_pressure",
+   "value": 30,
+   "unit": "cm H2O",
+   "kind": "upper_limit"
+  },
+  {
+   "src": "stmt_074",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_074",
+   "rel": "APPLIES_WHEN",
+   "dst": "moderate_severe_ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_074",
+   "rel": "RECOMMENDS",
+   "dst": "use_higher_PEEP",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_074",
+   "rel": "PREFERRED_OVER",
+   "dst": "lower_PEEP"
+  },
+  {
+   "src": "stmt_075",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_075",
+   "rel": "APPLIES_WHEN",
+   "dst": "moderate_severe_ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_075",
+   "rel": "RECOMMENDS",
+   "dst": "use_incremental_PEEP_titration_strategy",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_076",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_076",
+   "rel": "APPLIES_WHEN",
+   "dst": "moderate_severe_ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_076",
+   "rel": "RECOMMENDS",
+   "dst": "use_prone_ventilation",
+   "polarity": "for",
+   "timing": "greater than 12 hours daily"
+  },
+  {
+   "src": "stmt_077",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_077",
+   "rel": "APPLIES_WHEN",
+   "dst": "moderate_severe_ards",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_077",
+   "rel": "RECOMMENDS",
+   "dst": "use_intermittent_NMBA_boluses",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_077",
+   "rel": "PREFERRED_OVER",
+   "dst": "continuous_NMBA_infusion"
+  },
+  {
+   "src": "stmt_078",
+   "rel": "APPLIES_WHEN",
+   "dst": "severe_ards_due_to_sepsis",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_078",
+   "rel": "APPLIES_WHEN",
+   "dst": "conventional_ventilation_failed",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_078",
+   "rel": "APPLIES_WHEN",
+   "dst": "experienced_centre_with_infrastructure",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_078",
+   "rel": "RECOMMENDS",
+   "dst": "use_veno_venous_ECMO",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_079",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_079",
+   "rel": "RECOMMENDS",
+   "dst": "use_iv_corticosteroids",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_080",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_080",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_080",
+   "rel": "RECOMMENDS",
+   "dst": "use_antipyretic_therapy",
+   "polarity": "against",
+   "options": [
+    "pharmacologic",
+    "surface_cooling"
+   ],
+   "purpose": "improving clinical outcomes"
+  },
+  {
+   "src": "stmt_080",
+   "rel": "MODIFIED_BY",
+   "dst": "antipyretic_for_symptom_control_or_other_temperature_indication",
+   "remark": 0
+  },
+  {
+   "src": "stmt_081",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_081",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_081",
+   "rel": "RECOMMENDS",
+   "dst": "use_iv_vitamin_c",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_082",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_082",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_082",
+   "rel": "RECOMMENDS",
+   "dst": "use_iv_immunoglobulins",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_083",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_083",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_083",
+   "rel": "RECOMMENDS",
+   "dst": "use_blood_purification",
+   "polarity": "against",
+   "options": [
+    "hemoperfusion",
+    "high_dose_hemofiltration",
+    "plasma_exchange"
+   ]
+  },
+  {
+   "src": "stmt_084",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_084",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_084",
+   "rel": "RECOMMENDS",
+   "dst": "use_polymyxin_B_hemoperfusion",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_085",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_085",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_085",
+   "rel": "RECOMMENDS",
+   "dst": "use_vitamin_D_therapy",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_085",
+   "rel": "MODIFIED_BY",
+   "dst": "vitamin_D_for_other_indication_or_standard_nutrition",
+   "remark": 0
+  },
+  {
+   "src": "stmt_086",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_086",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_086",
+   "rel": "RECOMMENDS",
+   "dst": "use_xuebijing_injection",
+   "polarity": "against",
+   "condition": "outside jurisdictions with regulatory approval"
+  },
+  {
+   "src": "stmt_087",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_087",
+   "rel": "APPLIES_WHEN",
+   "dst": "risk_factors_for_gi_bleeding",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_087",
+   "rel": "RECOMMENDS",
+   "dst": "use_stress_ulcer_prophylaxis_with_ppi",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_087",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_stress_ulcer_prophylaxis"
+  },
+  {
+   "src": "stmt_088",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_088",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_088",
+   "rel": "RECOMMENDS",
+   "dst": "use_probiotics",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_089",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_089",
+   "rel": "APPLIES_WHEN",
+   "dst": "after_acute_resuscitation_phase",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_089",
+   "rel": "RECOMMENDS",
+   "dst": "use_active_fluid_removal",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_089",
+   "rel": "RECOMMENDS",
+   "dst": "administer_diuretics",
+   "polarity": "for",
+   "source": "remark"
+  },
+  {
+   "src": "administer_diuretics",
+   "rel": "MUST_PRECEDE",
+   "dst": "use_ultrafiltration_or_extracorporeal_fluid_removal",
+   "via": "stmt_089",
+   "strength": "conditional"
+  },
+  {
+   "src": "stmt_089",
+   "rel": "REFINED_BY",
+   "dst": "administer_diuretics",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "defines_term",
+   "modifier_condition": null,
+   "carries_action": true
+  },
+  {
+   "src": "stmt_090",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_090",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_090",
+   "rel": "RECOMMENDS",
+   "dst": "use_restrictive_transfusion_strategy",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_090",
+   "rel": "PREFERRED_OVER",
+   "dst": "liberal_transfusion_strategy"
+  },
+  {
+   "src": "stmt_091",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_091",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_091",
+   "rel": "RECOMMENDS",
+   "dst": "initiate_enteral_nutrition",
+   "polarity": "for",
+   "timing": "early, within 72 hours"
+  },
+  {
+   "src": "stmt_092",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_092",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_092",
+   "rel": "RECOMMENDS",
+   "dst": "initiate_insulin_therapy",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_092",
+   "rel": "TARGETS",
+   "dst": "target::glucose_threshold_to_start_insulin",
+   "value": 180,
+   "unit": "mg/dL",
+   "alt_unit": "10 mmol/L",
+   "kind": "trigger"
+  },
+  {
+   "src": "stmt_093",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_093",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_kidney_injury",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_093",
+   "rel": "APPLIES_WHEN",
+   "dst": "no_definitive_indication_for_rrt",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_093",
+   "rel": "RECOMMENDS",
+   "dst": "use_renal_replacement_therapy",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_094",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_094",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_kidney_injury",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_094",
+   "rel": "APPLIES_WHEN",
+   "dst": "rrt_warranted",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_094",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "continuous_renal_replacement_therapy"
+  },
+  {
+   "src": "stmt_094",
+   "rel": "EQUIVALENT_OPTIONS",
+   "dst": "intermittent_renal_replacement_therapy"
+  },
+  {
+   "src": "stmt_095",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_095",
+   "rel": "APPLIES_WHEN",
+   "dst": "hypoperfusion_induced_lactic_acidemia",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_095",
+   "rel": "RECOMMENDS",
+   "dst": "use_sodium_bicarbonate",
+   "polarity": "against",
+   "purpose": "improve haemodynamics or reduce vasopressor requirement"
+  },
+  {
+   "src": "stmt_096",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_096",
+   "rel": "APPLIES_WHEN",
+   "dst": "severe_metabolic_acidemia_pH_le_7_2",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_096",
+   "rel": "APPLIES_WHEN",
+   "dst": "acute_kidney_injury_AKIN_2_or_3",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_096",
+   "rel": "RECOMMENDS",
+   "dst": "use_sodium_bicarbonate",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_097",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_097",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_097",
+   "rel": "RECOMMENDS",
+   "dst": "use_pharmacologic_vte_prophylaxis",
+   "polarity": "for",
+   "condition": "unless a contraindication exists"
+  },
+  {
+   "src": "stmt_098",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_098",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_098",
+   "rel": "RECOMMENDS",
+   "dst": "use_low_molecular_weight_heparin_for_vte_prophylaxis",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_098",
+   "rel": "PREFERRED_OVER",
+   "dst": "unfractionated_heparin"
+  },
+  {
+   "src": "stmt_099",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_099",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_099",
+   "rel": "RECOMMENDS",
+   "dst": "use_pharmacologic_vte_prophylaxis_alone",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_099",
+   "rel": "PREFERRED_OVER",
+   "dst": "pharmacologic_plus_mechanical_vte_prophylaxis"
+  },
+  {
+   "src": "stmt_100",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_100",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_100",
+   "rel": "RECOMMENDS",
+   "dst": "discuss_goals_of_care_and_prognosis_with_patient_or_family",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_101",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_101",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_101",
+   "rel": "RECOMMENDS",
+   "dst": "address_goals_of_care",
+   "polarity": "for",
+   "timing": "early, within 72 hours"
+  },
+  {
+   "src": "stmt_101",
+   "rel": "PREFERRED_OVER",
+   "dst": "late_72h_or_later"
+  },
+  {
+   "src": "stmt_102",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_102",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_102",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::standardized_criterion_to_identify_patients_for_goals_of_care_discussion"
+  },
+  {
+   "src": "stmt_103",
+   "rel": "APPLIES_WHEN",
+   "dst": "discharged_after_sepsis_or_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_103",
+   "rel": "RECOMMENDS",
+   "dst": "ensure_opportunity_to_execute_advance_directives",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_104",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_104",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_104",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::systematic_establishment_of_advance_directives_before_discharge"
+  },
+  {
+   "src": "stmt_105",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_105",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_105",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::formal_time_limited_trials_of_critical_care"
+  },
+  {
+   "src": "stmt_106",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_106",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_106",
+   "rel": "RECOMMENDS",
+   "dst": "integrate_palliative_care_principles_into_treatment_plan",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_107",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_107",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_107",
+   "rel": "RECOMMENDS",
+   "dst": "routine_formal_palliative_care_consultation_for_all",
+   "polarity": "against"
+  },
+  {
+   "src": "stmt_107",
+   "rel": "PREFERRED_OVER",
+   "dst": "palliative_care_consultation_based_on_clinician_judgement"
+  },
+  {
+   "src": "stmt_108",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_108",
+   "rel": "APPLIES_WHEN",
+   "dst": "admitted_to_icu",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_108",
+   "rel": "APPLIES_WHEN",
+   "dst": "transfer_to_floor",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_108",
+   "rel": "RECOMMENDS",
+   "dst": "use_critical_care_transition_program",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_108",
+   "rel": "PREFERRED_OVER",
+   "dst": "usual_care"
+  },
+  {
+   "src": "stmt_109",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_109",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_109",
+   "rel": "RECOMMENDS",
+   "dst": "use_structured_handoff_process_at_transitions",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_109",
+   "rel": "PREFERRED_OVER",
+   "dst": "no_handoff_process"
+  },
+  {
+   "src": "stmt_110",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_110",
+   "rel": "APPLIES_WHEN",
+   "dst": "septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_110",
+   "rel": "RECOMMENDS",
+   "dst": "screen_for_economic_and_social_support_needs",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_110",
+   "rel": "RECOMMENDS",
+   "dst": "refer_to_available_support_services",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_111",
+   "rel": "APPLIES_WHEN",
+   "dst": "transition_in_care",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_111",
+   "rel": "APPLIES_WHEN",
+   "dst": "icu_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_111",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospital_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_111",
+   "rel": "RECOMMENDS",
+   "dst": "perform_comprehensive_medication_reconciliation",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_112",
+   "rel": "APPLIES_WHEN",
+   "dst": "transition_in_care",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_112",
+   "rel": "RECOMMENDS",
+   "dst": "perform_medication_reconciliation_pharmacist_based",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_113",
+   "rel": "APPLIES_WHEN",
+   "dst": "post_icu_planning",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_113",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospital_discharge_planning",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_113",
+   "rel": "RECOMMENDS",
+   "dst": "involve_patient_and_family_in_shared_decision_making",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_114",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospital_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_114",
+   "rel": "RECOMMENDS",
+   "dst": "provide_written_and_verbal_discharge_summary_information",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_115",
+   "rel": "APPLIES_WHEN",
+   "dst": "sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_115",
+   "rel": "APPLIES_WHEN",
+   "dst": "new_impairments",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_115",
+   "rel": "RECOMMENDS",
+   "dst": "include_followup_with_clinicians_for_sequelae_in_discharge_plan",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_116",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospital_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_116",
+   "rel": "RECOMMENDS",
+   "dst": "ensure_information_for_patients_families_and_primary_care_to_navigate_transition",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_117",
+   "rel": "APPLIES_WHEN",
+   "dst": "survived_hospitalization_for_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_117",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::specific_structured_multicomponent_discharge_planning_process"
+  },
+  {
+   "src": "stmt_118",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospital_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_118",
+   "rel": "RECOMMENDS",
+   "dst": "provide_written_and_verbal_discharge_summary_information",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_119",
+   "rel": "APPLIES_WHEN",
+   "dst": "before_hospital_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_119",
+   "rel": "APPLIES_WHEN",
+   "dst": "followup_setting",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_119",
+   "rel": "RECOMMENDS",
+   "dst": "offer_written_and_verbal_sepsis_education",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_120",
+   "rel": "APPLIES_WHEN",
+   "dst": "post_hospital_recovery",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_120",
+   "rel": "RECOMMENDS",
+   "dst": "ensure_clinician_knowledge_and_competency_to_support_survivors",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_121",
+   "rel": "APPLIES_WHEN",
+   "dst": "post_hospital_recovery",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_121",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::sepsis_focused_educational_material_for_primary_care_providers"
+  },
+  {
+   "src": "stmt_122",
+   "rel": "APPLIES_WHEN",
+   "dst": "post_hospital_recovery",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_122",
+   "rel": "RECOMMENDS",
+   "dst": "implement_strategies_to_support_survivors_and_families",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_123",
+   "rel": "APPLIES_WHEN",
+   "dst": "post_hospital_discharge",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_123",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::early_vs_routine_post_discharge_followup"
+  },
+  {
+   "src": "stmt_124",
+   "rel": "APPLIES_WHEN",
+   "dst": "after_hospital_discharge_for_sepsis",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_124",
+   "rel": "RECOMMENDS",
+   "dst": "facilitate_assessment_and_followup_for_physical_cognitive_emotional_problems",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_125",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospitalization_for_sepsis_or_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_125",
+   "rel": "RECOMMENDS",
+   "dst": "offer_post_critical_illness_followup_services",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_126",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospitalization_for_sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_126",
+   "rel": "APPLIES_WHEN",
+   "dst": "invasive_mechanical_ventilation_gt_48h",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_126",
+   "rel": "RECOMMENDS",
+   "dst": "offer_physical_rehabilitation_after_discharge",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_127",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospitalization_for_sepsis_or_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_127",
+   "rel": "RECOMMENDS",
+   "dst": "offer_mental_health_support_services_after_discharge",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_128",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospitalization_for_sepsis_or_septic_shock",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_128",
+   "rel": "APPLIES_WHEN",
+   "dst": "clinical_symptoms_of_mental_health_disorder",
+   "mode": "all_of"
+  },
+  {
+   "src": "stmt_128",
+   "rel": "RECOMMENDS",
+   "dst": "refer_to_appropriate_healthcare_professionals",
+   "polarity": "for"
+  },
+  {
+   "src": "stmt_129",
+   "rel": "APPLIES_WHEN",
+   "dst": "hospitalization_for_sepsis_or_septic_shock",
+   "mode": "any_of"
+  },
+  {
+   "src": "stmt_129",
+   "rel": "RECOMMENDS",
+   "dst": "continue_cognition_targeted_therapy",
+   "polarity": "for",
+   "source": "remark",
+   "qualifier": "'reasonable to continue' — deliberately not graded"
+  },
+  {
+   "src": "stmt_129",
+   "rel": "CONSTRAINS",
+   "dst": "constraint::cognition_targeted_therapies_vs_usual_care"
+  },
+  {
+   "src": "stmt_129",
+   "rel": "REFINED_BY",
+   "dst": "continue_cognition_targeted_therapy",
+   "remark": 0,
+   "polarity": "for",
+   "kind": "adds_action",
+   "modifier_condition": "already_receiving_cognition_targeted_therapy",
+   "carries_action": true
+  },
+  {
+   "src": "stmt_129",
+   "rel": "MODIFIED_BY",
+   "dst": "already_receiving_cognition_targeted_therapy",
+   "remark": 0
+  },
+  {
+   "src": "sepsis_or_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "sepsis"
+  },
+  {
+   "src": "sepsis_or_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "septic_shock"
+  },
+  {
+   "src": "probable_or_definite_sepsis",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "probable_sepsis"
+  },
+  {
+   "src": "probable_or_definite_sepsis",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "definite_sepsis"
+  },
+  {
+   "src": "probable_or_definite_sepsis",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "probable_sepsis"
+  },
+  {
+   "src": "probable_or_definite_sepsis",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "definite_sepsis"
+  },
+  {
+   "src": "sepsis_with_elevated_lactate",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "sepsis"
+  },
+  {
+   "src": "sepsis_with_elevated_lactate",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "elevated_lactate"
+  },
+  {
+   "src": "sepsis_associated_hypoxemic_respiratory_failure",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "sepsis"
+  },
+  {
+   "src": "sepsis_associated_hypoxemic_respiratory_failure",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "acute_hypoxemic_respiratory_failure"
+  },
+  {
+   "src": "severe_ards_due_to_sepsis",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "sepsis"
+  },
+  {
+   "src": "severe_ards_due_to_sepsis",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "severe_ards"
+  },
+  {
+   "src": "hospitalization_for_sepsis_or_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "sepsis"
+  },
+  {
+   "src": "hospitalization_for_sepsis_or_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "septic_shock"
+  },
+  {
+   "src": "possible_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "possible_sepsis"
+  },
+  {
+   "src": "possible_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "septic_shock"
+  },
+  {
+   "src": "probable_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "probable_sepsis"
+  },
+  {
+   "src": "probable_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "septic_shock"
+  },
+  {
+   "src": "definite_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "definite_sepsis"
+  },
+  {
+   "src": "definite_septic_shock",
+   "rel": "IS_DISJUNCTION_OF",
+   "dst": "septic_shock"
+  },
+  {
+   "src": "stmt_001",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_001",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_024",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_024",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_027",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_027",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_033",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_033",
+   "change": "upgraded"
+  },
+  {
+   "src": "stmt_034",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_034",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_036",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_036",
+   "change": "upgraded"
+  },
+  {
+   "src": "stmt_037",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_037",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_042",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_042",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_044",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_044",
+   "change": "upgraded"
+  },
+  {
+   "src": "stmt_045",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_045",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_048",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_048",
+   "change": "upgraded"
+  },
+  {
+   "src": "stmt_049",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_049",
+   "change": "upgraded"
+  },
+  {
+   "src": "stmt_051",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_051",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_055",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_055",
+   "change": "downgraded"
+  },
+  {
+   "src": "stmt_057",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_057",
+   "change": "downgraded"
+  },
+  {
+   "src": "stmt_060",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_060",
+   "change": "downgraded"
+  },
+  {
+   "src": "stmt_061",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_061",
+   "change": "downgraded"
+  },
+  {
+   "src": "stmt_079",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_079",
+   "change": "downgraded"
+  },
+  {
+   "src": "stmt_083",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_083",
+   "change": "downgraded"
+  },
+  {
+   "src": "stmt_087",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_087",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_125",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_125",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_126",
+   "rel": "SUPERSEDES",
+   "dst": "ssc2021::stmt_126",
+   "change": "unchanged"
+  },
+  {
+   "src": "stmt_013",
+   "rel": "OVERRIDDEN_BY",
+   "dst": "stmt_014",
+   "reason": "adds age_ge_65 to the same MAP target"
+  },
+  {
+   "src": "stmt_095",
+   "rel": "OVERRIDDEN_BY",
+   "dst": "stmt_096",
+   "reason": "adds pH<=7.2 and AKIN 2-3 to the same drug, opposite direction"
+  }
+ ]
+}

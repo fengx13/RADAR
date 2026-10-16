@@ -1,0 +1,27 @@
+{
+  "artifact": "synthetic_esrp_mapping",
+  "fixture_type": "synthetic_engineering_only",
+  "clinical_validation": false,
+  "source_esrp_table": "synthetic_fixture",
+  "esrp_column": "score_ESRP",
+  "records": [
+    {
+      "case_id": "ESRP_SYN_A",
+      "stay_id": 900000101,
+      "esrp_value": 33,
+      "source": "synthetic_fixture",
+      "computed_or_existing": "synthetic",
+      "t0_safe": true,
+      "usable": true
+    },
+    {
+      "case_id": "ESRP_SYN_B",
+      "stay_id": 900000102,
+      "esrp_value": 67,
+      "source": "synthetic_fixture",
+      "computed_or_existing": "synthetic",
+      "t0_safe": true,
+      "usable": true
+    }
+  ]
+}

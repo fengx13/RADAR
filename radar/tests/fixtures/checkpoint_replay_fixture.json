@@ -1,0 +1,136 @@
+{
+  "fixture_type": "synthetic_checkpoint_replay_engineering_only",
+  "clinical_validation": false,
+  "cases": [
+    {
+      "case_id": "CHECKPOINT_SEQUENCE",
+      "stay_id": 900000001,
+      "t0_time": 0.0,
+      "t0_state": {
+        "chief_complaint": "Synthetic fever fixture",
+        "age": 60,
+        "sex": "F",
+        "triage_vitals": {
+          "temperature_C": 38.0,
+          "heart_rate": 100,
+          "resp_rate": 20,
+          "spo2": 97,
+          "sbp": 118,
+          "dbp": 70
+        },
+        "investigation_status": {
+          "blood_cultures": "ordered",
+          "serum_lactate": "ordered",
+          "source_imaging_or_sampling": "ordered",
+          "alternative_diagnosis_testing": "not_indicated"
+        }
+      },
+      "observed_workup": [
+        {
+          "item": "blood_cultures",
+          "actual_order_status": "resulted",
+          "order_time": 0.05,
+          "sample_time": 0.1,
+          "result_status": "resulted",
+          "result_kind": "diagnostic_laboratory",
+          "disposition_relevant": true,
+          "checkpoint_eligible": true,
+          "result_available_time": 0.2,
+          "value": null,
+          "result_summary": "synthetic current-checkpoint result",
+          "provenance": {"source_type": "synthetic_fixture", "source_field": "checkpoint.blood_cultures"}
+        },
+        {
+          "item": "serum_lactate",
+          "actual_order_status": "resulted",
+          "order_time": 0.1,
+          "sample_time": 0.3,
+          "result_status": "resulted",
+          "result_kind": "diagnostic_laboratory",
+          "disposition_relevant": true,
+          "checkpoint_eligible": true,
+          "result_available_time": 0.8,
+          "value": 2.2,
+          "result_summary": "synthetic lactate",
+          "provenance": {"source_type": "synthetic_fixture", "source_field": "checkpoint.lactate"}
+        },
+        {
+          "item": "lactate_repeat",
+          "actual_order_status": "resulted",
+          "order_time": 1.0,
+          "sample_time": 1.5,
+          "result_status": "resulted",
+          "result_kind": "repeat_lactate",
+          "disposition_relevant": true,
+          "checkpoint_eligible": true,
+          "result_available_time": 2.0,
+          "value": 1.7,
+          "result_summary": "synthetic repeat lactate",
+          "provenance": {"source_type": "synthetic_fixture", "source_field": "checkpoint.lactate_repeat"}
+        },
+        {
+          "item": "source_imaging_or_sampling",
+          "actual_order_status": "resulted",
+          "order_time": 0.2,
+          "sample_time": 0.4,
+          "result_status": "resulted",
+          "result_kind": "imaging",
+          "disposition_relevant": true,
+          "checkpoint_eligible": true,
+          "result_available_time": 7.4,
+          "value": null,
+          "result_summary": "synthetic later imaging result",
+          "provenance": {"source_type": "synthetic_fixture", "source_field": "checkpoint.imaging"}
+        }
+      ],
+      "longitudinal_events": {
+        "vitals": [
+          {"measurement_time": 0.2, "sbp": 116, "map": 82, "resp_rate": 20, "spo2": 97, "trend": "stable", "provenance": {"source_type": "synthetic_fixture"}},
+          {"measurement_time": 0.8, "sbp": 114, "map": 80, "resp_rate": 21, "spo2": 96, "trend": "stable", "provenance": {"source_type": "synthetic_fixture"}},
+          {"measurement_time": 2.0, "sbp": 112, "map": 79, "resp_rate": 20, "spo2": 97, "trend": "stable", "provenance": {"source_type": "synthetic_fixture"}},
+          {"measurement_time": 7.4, "sbp": 115, "map": 81, "resp_rate": 18, "spo2": 98, "trend": "stable", "provenance": {"source_type": "synthetic_fixture"}}
+        ],
+        "respiratory_support": [
+          {"start_time": 0.0, "oxygen_therapy_documented": false, "mode": "room_air", "ventilation_status": "None", "current_encounter": true, "provenance": {"source_type": "synthetic_fixture"}}
+        ],
+        "vasopressors": [
+          {"start_time": 0.0, "active": false, "setting": "none", "agent": null, "provenance": {"source_type": "synthetic_fixture"}}
+        ],
+        "fluids": [
+          {"event_time": 0.4, "administered": false, "amount_ml": 0, "initial_fluid_30ml_per_kg_completed": false, "completion_time": null, "provenance": {"source_type": "synthetic_fixture"}}
+        ],
+        "post_resuscitation": [
+          {"measurement_time": 0.4, "vital_map_min": 82, "map_time": 0.4, "vital_o2sat_min": 97, "o2sat_time": 0.4, "provenance": {"source_type": "synthetic_fixture"}}
+        ],
+        "treatment_response": [
+          {"assessment_time": 0.4, "state": "stable", "provenance": {"source_type": "synthetic_fixture"}}
+        ]
+      },
+      "observed_treatment": {
+        "antimicrobials": [],
+        "fluids": [],
+        "vasopressors": [],
+        "respiratory_support": [],
+        "treatment_response": [
+          {"assessment_time": 0.4, "state": "stable", "provenance": {"source_type": "synthetic_fixture"}}
+        ]
+      },
+      "engineering_mocks": {
+        "agent1_t0": {"R1": "yes", "R2": "no", "R3b": "alternative_also_likely", "R4": "no"},
+        "checkpoints": {
+          "C0_5": {"agent1": {"R1": "yes", "R2": "no", "R3b": "alternative_also_likely", "R4": "no"}},
+          "C1": {"agent1": {"R1": "yes", "R2": "yes", "R3a": "alternative_also_likely", "R4": "no"}},
+          "C3": {"agent1": {"R1": "yes", "R2": "yes", "R3a": "alternative_less_likely", "R4": "no"}},
+          "Cfinal": {"agent1": {"R1": "yes", "R2": "no", "R3b": "alternative_also_likely", "R4": "no"}}
+        },
+        "agent3": {"TX1": "within_3h", "TX2": "withhold", "TX3": "hold", "TX4": "not_applicable"},
+        "agent4": {
+          "D2": {"answer": "no", "key_reasons": [{"field": "agent1.tier", "detail": "synthetic checkpoint context"}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": null, "observation_basis": null, "blocking": []},
+          "D3": {"answer": "no", "key_reasons": [{"field": "patient_state.vitals_trend", "detail": "synthetic stable trend"}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": null, "observation_basis": null, "blocking": []},
+          "D4": {"answer": "yes", "key_reasons": [{"field": "patient_state.vitals.sbp", "detail": "synthetic stable pressure"}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": "Return for worsening symptoms or clinician-specified concern.", "observation_basis": null, "blocking": []}
+        }
+      },
+      "evaluation_only": {"observed_disposition": "ward", "dsp_mortality_inhospital": 0}
+    }
+  ]
+}

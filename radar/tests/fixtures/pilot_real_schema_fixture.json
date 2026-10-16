@@ -1,0 +1,204 @@
+{
+  "fixture_type": "synthetic_real_input_schema_only",
+  "clinical_validation": false,
+  "cases": [
+    {
+      "case_id": "PILOT_SCHEMA_READY",
+      "stay_id": 999000001,
+      "t0_state": {
+        "age": 67,
+        "sex": "F",
+        "chief_complaint": "Synthetic fever presentation",
+        "comorbidities": ["synthetic comorbidity"],
+        "triage_vitals": {
+          "sbp": 112,
+          "map": 82,
+          "resp_rate": 22,
+          "spo2": 96
+        },
+        "investigation_status": {
+          "blood_cultures": "collected",
+          "serum_lactate": "ordered",
+          "source_imaging_or_sampling": "not_indicated",
+          "alternative_diagnosis_testing": "not_indicated"
+        }
+      },
+      "observed_workup": [
+        {
+          "item": "serum_lactate",
+          "actual_order_status": "ordered",
+          "order_time": 0.4,
+          "sample_time": 0.8,
+          "result_status": "resulted",
+          "result_kind": "diagnostic_laboratory",
+          "disposition_relevant": true,
+          "checkpoint_eligible": true,
+          "result_available_time": 1.2,
+          "value": 1.7,
+          "result_summary": "synthetic schema value",
+          "provenance": {
+            "source_type": "synthetic_fixture",
+            "source_field": "pilot_fixture.observed_workup.serum_lactate"
+          }
+        },
+        {
+          "item": "blood_cultures",
+          "actual_order_status": "collected",
+          "order_time": 0.3,
+          "sample_time": 0.7,
+          "result_status": "pending",
+          "result_kind": "final_culture",
+          "disposition_relevant": true,
+          "checkpoint_eligible": false,
+          "result_available_time": null,
+          "value": null,
+          "result_summary": null,
+          "provenance": {
+            "source_type": "synthetic_fixture",
+            "source_field": "pilot_fixture.observed_workup.blood_cultures"
+          }
+        }
+      ],
+      "longitudinal_events": {
+        "vitals": [
+          {
+            "measurement_time": 0.5,
+            "sbp": 112,
+            "map": 82,
+            "resp_rate": 22,
+            "spo2": 96,
+            "trend": "synthetic stable",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.vitals[0]"}
+          },
+          {
+            "measurement_time": 1.2,
+            "sbp": 118,
+            "map": 84,
+            "resp_rate": 20,
+            "spo2": 97,
+            "trend": "synthetic stable",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.vitals[1]"}
+          },
+          {
+            "measurement_time": 2.0,
+            "sbp": 70,
+            "map": 55,
+            "resp_rate": 30,
+            "spo2": 85,
+            "trend": "synthetic post-T1 event",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.vitals[2]"}
+          }
+        ],
+        "respiratory_support": [
+          {
+            "start_time": 0.0,
+            "oxygen_therapy_documented": false,
+            "mode": "room_air",
+            "ventilation_status": "None",
+            "current_encounter": true,
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.respiratory_support[0]"}
+          }
+        ],
+        "vasopressors": [
+          {
+            "start_time": 0.0,
+            "active": false,
+            "setting": "none",
+            "agent": null,
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.vasopressors[0]"}
+          }
+        ],
+        "fluids": [
+          {
+            "event_time": 0.9,
+            "administered": true,
+            "amount_ml": 500,
+            "initial_fluid_30ml_per_kg_completed": false,
+            "completion_time": 1.0,
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.fluids[0]"}
+          }
+        ],
+        "post_resuscitation": [
+          {
+            "measurement_time": 1.1,
+            "vital_map_min": 84,
+            "map_time": 1.1,
+            "vital_o2sat_min": 97,
+            "o2sat_time": 1.1,
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.post_resuscitation[0]"}
+          }
+        ],
+        "treatment_response": [
+          {
+            "assessment_time": 1.1,
+            "state": "stable",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.response[0]"}
+          },
+          {
+            "assessment_time": 2.5,
+            "state": "worsening",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.response[1]"}
+          }
+        ]
+      },
+      "observed_treatment": {
+        "antimicrobials": [
+          {
+            "administration_time": 0.8,
+            "administered": true,
+            "status": "completed",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.antimicrobials[0]"}
+          }
+        ],
+        "fluids": [
+          {
+            "event_time": 0.9,
+            "administered": true,
+            "status": "completed",
+            "amount_ml": 500,
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.observed_fluids[0]"}
+          }
+        ],
+        "vasopressors": [
+          {
+            "start_time": 0.0,
+            "administered": false,
+            "active": false,
+            "status": "not_administered",
+            "setting": "none",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.observed_vasopressors[0]"}
+          }
+        ],
+        "respiratory_support": [
+          {
+            "start_time": 0.0,
+            "active": false,
+            "status": "room_air",
+            "mode": "room_air",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.observed_respiratory[0]"}
+          }
+        ],
+        "treatment_response": [
+          {
+            "assessment_time": 1.1,
+            "state": "stable",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.observed_response[0]"}
+          },
+          {
+            "assessment_time": 2.5,
+            "state": "worsening",
+            "provenance": {"source_type": "synthetic_fixture", "source_field": "pilot_fixture.observed_response[1]"}
+          }
+        ]
+      },
+      "evaluation_only": {
+        "observed_disposition": "observation",
+        "admission_type": "EU OBSERVATION",
+        "icu_transfer_time": 10.0,
+        "dsp_mortality_inhospital": 0,
+        "dsp_mortality_30d": 0,
+        "dsp_ed_revisit_3d": 0
+      }
+    }
+  ]
+}

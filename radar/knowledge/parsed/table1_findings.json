@@ -1,0 +1,60 @@
+{
+  "source": "SSC 2026 CCM version, TABLE 1 'Table of Statements', pdf p3-10 / journal p727-734",
+  "extraction_method": "visual reading — Table 1 is embedded as page images, not extractable text",
+  "confidence_note": "Section boundaries and 2021-STATEMENT blocks are large and unambiguous. The small ⊕ certainty symbols and ↖/↘ arrows were read at limited resolution and should be spot-checked.",
+
+  "domain_boundaries": {
+    "_comment": "Taken from the coloured section headers inside Table 1. These differ from the Executive Summary's per-domain counts at one boundary — see discrepancies below.",
+    "screening_early_management": [1, 15],
+    "infection": [16, 41],
+    "hemodynamic_management": [42, 64],
+    "respiratory_support": [65, 78],
+    "additional_and_adjunctive_therapies": [79, 99],
+    "goals_of_care": [100, 107],
+    "transitions_of_care": [108, 123],
+    "long_term_outcomes": [124, 129]
+  },
+
+  "discrepancies_vs_executive_summary": [
+    {
+      "item": "screening vs infection boundary",
+      "table1": "screening 1-15 (15 statements), infection 16-41 (26)",
+      "executive_summary": "screening 16, infection 25",
+      "effect_on_our_table": "statement 16 (antimicrobials within 1 h for septic shock) had been labelled screening; Table 1 places it in INFECTION. Corrected.",
+      "reading": "Both are defensible — 'give antibiotics within 1 h' is arguably early management. Table 1's section header is what we follow, because that is what a reader of the guideline sees."
+    },
+    {
+      "item": "adjunctive vs additional supportive",
+      "table1": "merged into one section 'ADDITIONAL AND ADJUNCTIVE THERAPIES', statements 79-99 (21)",
+      "executive_summary": "adjunctive therapies 8 + additional supportive management 13 = 21",
+      "effect_on_our_table": "totals agree; the internal boundary (we assumed 79-86 / 87-99) cannot be verified from Table 1 and is marked unverified."
+    }
+  ],
+
+  "has_2021_statement": [1, 24, 27, 33, 34, 36, 37, 42, 44, 45, 48, 49, 51, 55, 57, 60, 61, 79, 83, 87, 125, 126],
+  "strength_upgraded_from_2021": [33, 36, 44, 48, 49],
+  "strength_downgraded_from_2021": [55, 57, 60, 61, 79, 83],
+
+  "multi_grading_statements": {
+    "_comment": "Statements the panel counts once but which carry more than one strength/certainty pair. This is the source of the +/-1 differences against the Executive Summary tallies.",
+    "1": ["Screening (strong, moderate)", "Standard operating procedures (strong, very low)", "Quality improvement strategies (strong, very low)"],
+    "53": ["Dopamine (strong, high)", "Epinephrine (strong, see conflict)", "Selepressin (strong, see conflict)"],
+    "55": ["Vasopressin (conditional, low)", "Angiotensin II (conditional, very low)"],
+    "27": ["2021 version split into a high-risk and a low-risk statement"]
+  },
+
+  "open_conflict": {
+    "statement_53_certainty": {
+      "narrative_text": "Dopamine. High-certainty evidence / Epinephrine. Low certainty evidence / Selepressin. Low certainty evidence",
+      "table1_symbols_as_read": "Dopamine ⊕⊕⊕⊕ high / Epinephrine ⊕○○○ very low / Selepressin ⊕○○○ very low",
+      "kept_in_table": "the narrative text values (high / low / low)",
+      "action": "needs a human to look at journal p730 and settle it"
+    }
+  },
+
+  "notable": [
+    "Statement 41 (selective digestive decontamination) is the only conditional recommendation at HIGH certainty (⊕⊕⊕⊕).",
+    "Statement 48's 2021 counterpart was itself an 'insufficient evidence' statement — the 2026 version upgrades it to a graded recommendation.",
+    "Statement 59 carries an 'In our practice' remark reporting panel behaviour (69% never use methylene blue) — a statement type with no evidence grade at all."
+  ]
+}

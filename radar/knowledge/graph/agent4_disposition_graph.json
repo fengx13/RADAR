@@ -1,0 +1,205 @@
+{
+ "agent": "agent4_disposition",
+ "version": "0.3.1",
+ "decision_time": "reassessment checkpoint — after current result/state/treatment updates",
+ "purpose": "Minimum safe level of care at the current reassessment checkpoint.",
+ "design_notes": [
+  "Agent 4 does not re-diagnose sepsis, repeat workup decisions, or re-decide initial treatment.",
+  "Disposition terminals are exactly discharge, observation, ward, ICU.",
+  "cannot_determine is not a disposition; it is represented as status=abstain with disposition=null.",
+  "SSC 2026 has no ED disposition scope for Agent 4. Reasons must be grounded in current checkpoint/upstream fields, not fabricated guideline citations.",
+  "D1 Tier A ICU hard safety triggers are deterministic and cannot be overridden by the model.",
+  "Tier B ICU candidate criteria are pending clinical sign-off and inactive as hard gates by default.",
+  "Supplemental oxygen alone, chronic pre-encounter tracheostomy, sep3, SOFA >= 2, high NEWS, and derived sep3_shock are not independent deterministic ICU triggers.",
+  "insufficient_evidence is routed only through Yana's V4 insufficiency logic; there is no generic insufficient_evidence -> observation fallback.",
+  "Any valid carried insufficient-evidence state prevents final discharge through the uncertainty ceiling.",
+  "JSON graph controls ordinary D2/D3/D4 transitions. Deterministic code intentionally controls D0 data validation, D1 ICU hard safety gate, V4 insufficiency routing, and the uncertainty ceiling.",
+  "D4 answer=yes requires a non-null, non-empty escalation_trigger; this dependency is explicit in the node prompt and remains validator-enforced.",
+  "In current v0.2 routing, valid insufficiency usually terminates immediately as observation or abstain; the uncertainty ceiling is retained as a secondary/future-proof safeguard."
+ ],
+ "entry": "D1",
+ "terminals": {
+  "T_DISCHARGE": {
+   "status": "decision",
+   "disposition": "discharge",
+   "requires": [
+    "escalation_trigger_non_null"
+   ]
+  },
+  "T_OBSERVATION": {
+   "status": "decision",
+   "disposition": "observation"
+  },
+  "T_WARD": {
+   "status": "decision",
+   "disposition": "ward"
+  },
+  "T_ICU": {
+   "status": "decision",
+   "disposition": "ICU"
+  },
+  "T_ABSTAIN": {
+   "status": "abstain",
+   "disposition": null
+  }
+ },
+ "icu_hard_triggers": [
+  {
+   "id": "ICU1_vasopressor_active",
+   "description": "Vasopressor already in use: setting in {ed, pre_arrival} and observed start_time <= checkpoint cutoff."
+  },
+  {
+   "id": "ICU2_invasive_ventilation",
+   "description": "Invasive ventilation during the current encounter with starttime <= checkpoint cutoff."
+  },
+  {
+   "id": "ICU3_niv_or_hfnc",
+   "description": "Non-invasive ventilation or HFNC during the current encounter with starttime <= checkpoint cutoff."
+  }
+ ],
+ "icu_candidate_triggers_tier_b": [
+  {
+   "id": "ICU4_post_resuscitation_hypotension",
+   "description": "30 mL/kg initial resuscitation completed and post-resuscitation vital_map_min < 65.",
+   "governance_status": "pending_clinical_signoff",
+   "active_by_default": false
+  },
+  {
+   "id": "ICU5_post_resuscitation_lactate",
+   "description": "Lactate value >= 4 mmol/L with sample time after initial resuscitation.",
+   "governance_status": "pending_clinical_signoff",
+   "active_by_default": false
+  },
+  {
+   "id": "ICU6_hypoxemia_despite_oxygen",
+   "description": "vital_o2sat_min < 90 and oxygen therapy documented.",
+   "governance_status": "pending_clinical_signoff",
+   "active_by_default": false
+  }
+ ],
+ "icu_gate_governance": {
+  "source": "Yana agent4_disposition_graph v0.3-draft; semantically ported into RADAR vNext",
+  "tier_a_status": "active",
+  "tier_b_status": "pending_clinical_signoff",
+  "tier_b_active_by_default": false,
+  "vaso_setting_icu_allowed": false,
+  "explicit_non_criteria": [
+   "supplemental_oxygen_alone",
+   "chronic_tracheostomy_predating_encounter",
+   "sep3",
+   "sofa_ge_2",
+   "high_news",
+   "sep3_shock_derived_label"
+  ]
+ },
+ "nodes": {
+  "D1": {
+   "title": "ICU hard safety gate",
+   "type": "deterministic",
+   "question": "Does the patient meet any hard ICU safety trigger by the current checkpoint cutoff?",
+   "allowed_answers": [
+    "yes",
+    "no"
+   ],
+   "transitions": {
+    "yes": "T_ICU",
+    "no": "D2"
+   }
+  },
+  "D2": {
+   "title": "Continued inpatient-level need",
+   "type": "llm_closed_set",
+   "question": "Does the patient still require hospital-level treatment or monitoring that cannot be safely provided through observation or discharge?",
+   "allowed_answers": [
+    "yes",
+    "no",
+    "insufficient_evidence"
+   ],
+   "blockable_fields": [
+    "patient_state.vitals.sbp",
+    "patient_state.vitals.map",
+    "patient_state.vitals.resp_rate",
+    "patient_state.vitals.spo2",
+    "patient_state.oxygen_requirement",
+    "patient_state.labs.lactate_initial",
+    "patient_state.labs.lactate_repeat",
+    "patient_state.labs.imaging_result",
+    "patient_state.treatment_response",
+    "patient_state.vitals_trend",
+    "agent1.tier",
+    "agent1.shock_concern",
+    "workup_state.pending_workup",
+    "treatment_state.ongoing_treatment",
+    "treatment_state.treatment_response_flag"
+   ],
+   "transitions": {
+    "yes": "T_WARD",
+    "no": "D3",
+    "insufficient_evidence": "V4_ROUTE"
+   }
+  },
+  "D3": {
+   "title": "Observation-specific need",
+   "type": "llm_closed_set",
+   "question": "Is there a genuine short-term, resolvable uncertainty or monitoring need that prevents discharge but does not require ward or ICU care?",
+   "allowed_answers": [
+    "yes",
+    "no",
+    "insufficient_evidence"
+   ],
+   "blockable_fields": [
+    "patient_state.labs.culture_result",
+    "patient_state.labs.lactate_repeat",
+    "patient_state.labs.imaging_result",
+    "patient_state.treatment_response",
+    "patient_state.vitals_trend",
+    "workup_state.pending_workup",
+    "treatment_state.treatment_response_flag"
+   ],
+   "transitions": {
+    "yes": "T_OBSERVATION",
+    "no": "D4",
+    "insufficient_evidence": "V4_ROUTE"
+   }
+  },
+  "D4": {
+   "title": "Discharge safety",
+   "type": "llm_closed_set",
+   "question": "Is discharge currently safe based on the available checkpoint and upstream information?",
+   "allowed_answers": [
+    "yes",
+    "no",
+    "insufficient_evidence"
+   ],
+   "conditional_output_contract": {
+    "when": {"answer": "yes"},
+    "requires": {"escalation_trigger": "non-null, non-empty string"},
+    "validation_failure": "V3_discharge_requires_escalation_trigger"
+   },
+   "blockable_fields": [
+    "patient_state.vitals.sbp",
+    "patient_state.vitals.map",
+    "patient_state.vitals.resp_rate",
+    "patient_state.vitals.spo2",
+    "patient_state.oxygen_requirement",
+    "patient_state.labs.lactate_initial",
+    "patient_state.labs.lactate_repeat",
+    "patient_state.labs.culture_result",
+    "patient_state.labs.imaging_result",
+    "patient_state.treatment_response",
+    "patient_state.vitals_trend",
+    "agent1.tier",
+    "agent1.shock_concern",
+    "workup_state.pending_workup",
+    "treatment_state.ongoing_treatment",
+    "treatment_state.treatment_response_flag"
+   ],
+   "transitions": {
+    "yes": "T_DISCHARGE",
+    "no": "T_ABSTAIN",
+    "insufficient_evidence": "V4_ROUTE"
+   },
+   "transition_note": "A no answer at D4 means discharge is not supported after the graph has already rejected ward and observation pathways. It does not authorize a free-form fallback disposition; the system abstains unless a prior node has established a non-discharge terminal."
+  }
+ }
+}

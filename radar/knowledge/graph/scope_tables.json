@@ -1,0 +1,695 @@
+{
+ "meta": {
+  "generated_from": "ssc2026_graph.json",
+  "frozen": true,
+  "note": "runtime injects these ids verbatim; no traversal at inference"
+ },
+ "scope": {
+  "agent1_recognition": {
+   "R1": {
+    "condition_seeds": [
+     "suspected_sepsis",
+     "acutely_ill",
+     "in_hospital",
+     "positive_sepsis_screen",
+     "prehospital_ambulance_or_flight",
+     "acutely_ill_high_risk_patients"
+    ],
+    "topic_seeds": [
+     "screen_for_sepsis",
+     "screen_for_sepsis_with_tool",
+     "use_standard_sepsis_screening_tool",
+     "use_code_sepsis_or_sepsis_huddle_protocol",
+     "constraint::rule_in_or_out_sepsis_on_single_test",
+     "constraint::novel_rapid_host_response_diagnostics"
+    ],
+    "statements": [
+     "stmt_001",
+     "stmt_002",
+     "stmt_003",
+     "stmt_004",
+     "stmt_005",
+     "stmt_006"
+    ],
+    "provenance": {
+     "stmt_001": [
+      "pulled_by_expansion",
+      "state:acutely_ill_high_risk_patients",
+      "topic:screen_for_sepsis"
+     ],
+     "stmt_002": [
+      "pulled_by_expansion",
+      "state:positive_sepsis_screen",
+      "topic:use_code_sepsis_or_sepsis_huddle_protocol"
+     ],
+     "stmt_003": [
+      "pulled_by_expansion",
+      "state:prehospital_ambulance_or_flight",
+      "topic:use_standard_sepsis_screening_tool"
+     ],
+     "stmt_004": [
+      "pulled_by_expansion",
+      "state:acutely_ill",
+      "state:in_hospital",
+      "topic:screen_for_sepsis_with_tool"
+     ],
+     "stmt_005": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis",
+      "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+     ],
+     "stmt_006": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis",
+      "topic:constraint::novel_rapid_host_response_diagnostics"
+     ]
+    }
+   },
+   "R2": {
+    "condition_seeds": [
+     "suspected_sepsis",
+     "sepsis",
+     "septic_shock",
+     "possible_sepsis",
+     "probable_sepsis",
+     "definite_sepsis"
+    ],
+    "topic_seeds": [
+     "begin_treatment_and_resuscitation",
+     "measure_blood_lactate",
+     "use_serial_lactate_measurements_to_guide_resuscitation",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "statements": [
+     "stmt_005",
+     "stmt_008",
+     "stmt_009",
+     "stmt_051"
+    ],
+    "provenance": {
+     "stmt_005": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis",
+      "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+     ],
+     "stmt_008": [
+      "pulled_by_expansion",
+      "state:definite_sepsis",
+      "state:possible_sepsis",
+      "state:probable_sepsis",
+      "state:septic_shock",
+      "topic:measure_blood_lactate"
+     ],
+     "stmt_009": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:begin_treatment_and_resuscitation"
+     ],
+     "stmt_051": [
+      "pulled_by_expansion",
+      "state:sepsis_with_elevated_lactate",
+      "state:septic_shock",
+      "topic:use_serial_lactate_measurements_to_guide_resuscitation"
+     ]
+    }
+   },
+   "R3a": {
+    "condition_seeds": [
+     "suspected_sepsis",
+     "possible_sepsis",
+     "low_likelihood_of_infection",
+     "suspected_sepsis_or_septic_shock",
+     "no_shock"
+    ],
+    "topic_seeds": [
+     "assess_likelihood_infectious_vs_noninfectious",
+     "search_for_alternative_diagnoses",
+     "reevaluate_continuously",
+     "discontinue_empiric_antimicrobial_therapy",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "statements": [
+     "stmt_005",
+     "stmt_019",
+     "stmt_035"
+    ],
+    "provenance": {
+     "stmt_005": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis",
+      "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+     ],
+     "stmt_019": [
+      "pulled_by_expansion",
+      "state:no_shock",
+      "state:possible_sepsis",
+      "topic:assess_likelihood_infectious_vs_noninfectious"
+     ],
+     "stmt_035": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis_or_septic_shock",
+      "topic:discontinue_empiric_antimicrobial_therapy",
+      "topic:reevaluate_continuously",
+      "topic:search_for_alternative_diagnoses"
+     ]
+    }
+   },
+   "R3b": {
+    "condition_seeds": [
+     "suspected_sepsis",
+     "possible_sepsis",
+     "low_likelihood_of_infection",
+     "suspected_sepsis_or_septic_shock",
+     "no_shock"
+    ],
+    "topic_seeds": [
+     "assess_likelihood_infectious_vs_noninfectious",
+     "search_for_alternative_diagnoses",
+     "reevaluate_continuously",
+     "discontinue_empiric_antimicrobial_therapy",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "statements": [
+     "stmt_005",
+     "stmt_019",
+     "stmt_035"
+    ],
+    "provenance": {
+     "stmt_005": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis",
+      "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+     ],
+     "stmt_019": [
+      "pulled_by_expansion",
+      "state:no_shock",
+      "state:possible_sepsis",
+      "topic:assess_likelihood_infectious_vs_noninfectious"
+     ],
+     "stmt_035": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis_or_septic_shock",
+      "topic:discontinue_empiric_antimicrobial_therapy",
+      "topic:reevaluate_continuously",
+      "topic:search_for_alternative_diagnoses"
+     ]
+    }
+   },
+   "R4": {
+    "condition_seeds": [
+     "septic_shock",
+     "sepsis_induced_hypoperfusion",
+     "sepsis_induced_hypotension"
+    ],
+    "topic_seeds": [
+     "administer_iv_crystalloid",
+     "administer_iv_crystalloid_bolus",
+     "start_vasopressor",
+     "start_vasopressor_peripherally",
+     "target::MAP",
+     "begin_treatment_and_resuscitation",
+     "titrate_vasopressor_to_maintain_MAP"
+    ],
+    "statements": [
+     "stmt_009",
+     "stmt_010",
+     "stmt_011",
+     "stmt_012",
+     "stmt_013",
+     "stmt_014"
+    ],
+    "provenance": {
+     "stmt_009": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:begin_treatment_and_resuscitation"
+     ],
+     "stmt_010": [
+      "pulled_by_expansion",
+      "state:sepsis_induced_hypoperfusion",
+      "state:septic_shock",
+      "topic:administer_iv_crystalloid"
+     ],
+     "stmt_011": [
+      "pulled_by_expansion",
+      "state:sepsis_induced_hypotension",
+      "topic:administer_iv_crystalloid_bolus",
+      "topic:start_vasopressor"
+     ],
+     "stmt_012": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:start_vasopressor_peripherally"
+     ],
+     "stmt_013": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:target::MAP",
+      "topic:titrate_vasopressor_to_maintain_MAP"
+     ],
+     "stmt_014": [
+      "overrides:stmt_013",
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:target::MAP"
+     ]
+    }
+   }
+  },
+  "agent2_workup": {
+   "W1_cultures": {
+    "condition_seeds": [
+     "possible_sepsis",
+     "probable_sepsis",
+     "definite_sepsis",
+     "septic_shock"
+    ],
+    "topic_seeds": [
+     "collect_blood_cultures",
+     "administer_antimicrobial_therapy"
+    ],
+    "statements": [
+     "stmt_007",
+     "stmt_016",
+     "stmt_017",
+     "stmt_018",
+     "stmt_020",
+     "stmt_021"
+    ],
+    "provenance": {
+     "stmt_007": [
+      "pulled_by_expansion",
+      "state:definite_sepsis",
+      "state:possible_sepsis",
+      "state:probable_sepsis",
+      "state:septic_shock",
+      "topic:collect_blood_cultures"
+     ],
+     "stmt_016": [
+      "pulled_by_expansion",
+      "state:definite_septic_shock",
+      "state:possible_septic_shock",
+      "state:probable_septic_shock",
+      "topic:administer_antimicrobial_therapy"
+     ],
+     "stmt_017": [
+      "pulled_by_expansion",
+      "state:probable_or_definite_sepsis",
+      "topic:administer_antimicrobial_therapy"
+     ],
+     "stmt_018": [
+      "pulled_by_expansion",
+      "state:possible_sepsis",
+      "topic:administer_antimicrobial_therapy"
+     ],
+     "stmt_020": [
+      "opposite_polarity_on:administer_antimicrobial_therapy",
+      "pulled_by_expansion"
+     ],
+     "stmt_021": [
+      "pulled_by_expansion",
+      "state:probable_or_definite_sepsis",
+      "topic:administer_antimicrobial_therapy"
+     ]
+    }
+   },
+   "W2_lactate": {
+    "condition_seeds": [
+     "possible_sepsis",
+     "probable_sepsis",
+     "definite_sepsis",
+     "septic_shock",
+     "sepsis_with_elevated_lactate",
+     "sepsis"
+    ],
+    "topic_seeds": [
+     "measure_blood_lactate",
+     "use_serial_lactate_measurements_to_guide_resuscitation",
+     "use_capillary_refill_time_to_guide_resuscitation"
+    ],
+    "statements": [
+     "stmt_008",
+     "stmt_051",
+     "stmt_052"
+    ],
+    "provenance": {
+     "stmt_008": [
+      "pulled_by_expansion",
+      "state:definite_sepsis",
+      "state:possible_sepsis",
+      "state:probable_sepsis",
+      "state:septic_shock",
+      "topic:measure_blood_lactate"
+     ],
+     "stmt_051": [
+      "pulled_by_expansion",
+      "state:sepsis_with_elevated_lactate",
+      "state:septic_shock",
+      "topic:use_serial_lactate_measurements_to_guide_resuscitation"
+     ],
+     "stmt_052": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:use_capillary_refill_time_to_guide_resuscitation"
+     ]
+    }
+   },
+   "W3_mimic_workup": {
+    "condition_seeds": [
+     "possible_sepsis",
+     "no_shock",
+     "suspected_sepsis"
+    ],
+    "topic_seeds": [
+     "assess_likelihood_infectious_vs_noninfectious",
+     "search_for_alternative_diagnoses",
+     "reevaluate_continuously",
+     "discontinue_empiric_antimicrobial_therapy",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "statements": [
+     "stmt_005",
+     "stmt_019"
+    ],
+    "provenance": {
+     "stmt_005": [
+      "pulled_by_expansion",
+      "state:suspected_sepsis",
+      "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+     ],
+     "stmt_019": [
+      "pulled_by_expansion",
+      "state:no_shock",
+      "state:possible_sepsis",
+      "topic:assess_likelihood_infectious_vs_noninfectious"
+     ]
+    }
+   },
+   "W4_procalcitonin": {
+    "condition_seeds": [
+     "possible_sepsis",
+     "probable_sepsis",
+     "septic_shock"
+    ],
+    "topic_seeds": [
+     "use_clinical_evaluation_alone_to_start_antimicrobials",
+     "procalcitonin_plus_clinical_evaluation"
+    ],
+    "statements": [
+     "stmt_022"
+    ],
+    "provenance": {
+     "stmt_022": [
+      "pulled_by_expansion",
+      "state:possible_sepsis",
+      "state:probable_sepsis",
+      "state:septic_shock",
+      "topic:procalcitonin_plus_clinical_evaluation",
+      "topic:use_clinical_evaluation_alone_to_start_antimicrobials"
+     ]
+    }
+   }
+  },
+  "agent3_treatment": {
+   "TX1_antibiotic_timing": {
+    "condition_seeds": [
+     "possible_sepsis",
+     "probable_sepsis",
+     "definite_sepsis",
+     "septic_shock",
+     "no_shock",
+     "low_likelihood_of_infection",
+     "possible_septic_shock"
+    ],
+    "topic_seeds": [
+     "administer_antimicrobial_therapy",
+     "perform_time_limited_rapid_investigation",
+     "monitor_patient_closely"
+    ],
+    "statements": [
+     "stmt_016",
+     "stmt_017",
+     "stmt_018",
+     "stmt_020",
+     "stmt_021"
+    ],
+    "provenance": {
+     "stmt_016": [
+      "pulled_by_expansion",
+      "state:definite_septic_shock",
+      "state:possible_septic_shock",
+      "state:probable_septic_shock",
+      "topic:administer_antimicrobial_therapy"
+     ],
+     "stmt_017": [
+      "pulled_by_expansion",
+      "state:no_shock",
+      "state:probable_or_definite_sepsis",
+      "topic:administer_antimicrobial_therapy"
+     ],
+     "stmt_018": [
+      "pulled_by_expansion",
+      "state:no_shock",
+      "state:possible_sepsis",
+      "topic:administer_antimicrobial_therapy",
+      "topic:perform_time_limited_rapid_investigation"
+     ],
+     "stmt_020": [
+      "pulled_by_expansion",
+      "state:low_likelihood_of_infection",
+      "state:no_shock",
+      "topic:administer_antimicrobial_therapy",
+      "topic:monitor_patient_closely"
+     ],
+     "stmt_021": [
+      "pulled_by_expansion",
+      "state:probable_or_definite_sepsis",
+      "topic:administer_antimicrobial_therapy"
+     ]
+    }
+   },
+   "TX2_fluids": {
+    "condition_seeds": [
+     "sepsis_induced_hypoperfusion",
+     "sepsis_induced_hypotension",
+     "sepsis",
+     "septic_shock",
+     "persistent_hypoperfusion"
+    ],
+    "topic_seeds": [
+     "administer_iv_crystalloid",
+     "administer_iv_crystalloid_bolus",
+     "use_crystalloids_as_first_line_fluid",
+     "use_balanced_crystalloids",
+     "use_crystalloids_alone",
+     "use_starches_for_resuscitation",
+     "use_gelatin_for_resuscitation",
+     "liberal_fluid_resuscitation_strategy",
+     "restrictive_fluid_resuscitation_strategy",
+     "reassess_fluid_status_frequently",
+     "calculate_dose_on_actual_body_weight",
+     "use_dynamic_measures_to_guide_fluid_resuscitation"
+    ],
+    "statements": [
+     "stmt_010",
+     "stmt_011",
+     "stmt_043",
+     "stmt_044",
+     "stmt_045",
+     "stmt_046",
+     "stmt_047",
+     "stmt_048",
+     "stmt_049"
+    ],
+    "provenance": {
+     "stmt_010": [
+      "pulled_by_expansion",
+      "state:sepsis_induced_hypoperfusion",
+      "state:septic_shock",
+      "topic:administer_iv_crystalloid",
+      "topic:calculate_dose_on_actual_body_weight",
+      "topic:reassess_fluid_status_frequently"
+     ],
+     "stmt_011": [
+      "pulled_by_expansion",
+      "state:sepsis_induced_hypotension",
+      "topic:administer_iv_crystalloid_bolus"
+     ],
+     "stmt_043": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:use_crystalloids_as_first_line_fluid"
+     ],
+     "stmt_044": [
+      "pulled_by_expansion",
+      "state:sepsis_or_septic_shock",
+      "topic:use_balanced_crystalloids"
+     ],
+     "stmt_045": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:use_crystalloids_alone"
+     ],
+     "stmt_046": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:use_starches_for_resuscitation"
+     ],
+     "stmt_047": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:use_gelatin_for_resuscitation"
+     ],
+     "stmt_048": [
+      "pulled_by_expansion",
+      "state:persistent_hypoperfusion",
+      "state:sepsis_or_septic_shock",
+      "topic:liberal_fluid_resuscitation_strategy",
+      "topic:restrictive_fluid_resuscitation_strategy"
+     ],
+     "stmt_049": [
+      "pulled_by_expansion",
+      "state:sepsis",
+      "state:septic_shock",
+      "topic:use_dynamic_measures_to_guide_fluid_resuscitation"
+     ]
+    }
+   },
+   "TX3_vasopressors": {
+    "condition_seeds": [
+     "septic_shock",
+     "escalating_norepinephrine_dose",
+     "cardiac_dysfunction",
+     "sepsis_induced_hypotension"
+    ],
+    "topic_seeds": [
+     "start_vasopressor",
+     "start_vasopressor_peripherally",
+     "target::MAP",
+     "use_norepinephrine_as_first_line_vasopressor",
+     "add_vasopressin",
+     "add_epinephrine",
+     "use_terlipressin",
+     "use_inotropes",
+     "use_levosimendan",
+     "use_beta_blockers_for_septic_shock",
+     "titrate_vasopressor_to_maintain_MAP",
+     "norepinephrine_first_line",
+     "epinephrine_first_line",
+     "add_dobutamine_to_norepinephrine",
+     "epinephrine_alone"
+    ],
+    "statements": [
+     "stmt_011",
+     "stmt_012",
+     "stmt_013",
+     "stmt_014",
+     "stmt_053",
+     "stmt_054",
+     "stmt_055",
+     "stmt_056",
+     "stmt_057",
+     "stmt_058",
+     "stmt_060",
+     "stmt_061",
+     "stmt_062",
+     "stmt_064"
+    ],
+    "provenance": {
+     "stmt_011": [
+      "pulled_by_expansion",
+      "state:sepsis_induced_hypotension",
+      "topic:start_vasopressor"
+     ],
+     "stmt_012": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:start_vasopressor_peripherally"
+     ],
+     "stmt_013": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:target::MAP",
+      "topic:titrate_vasopressor_to_maintain_MAP"
+     ],
+     "stmt_014": [
+      "overrides:stmt_013",
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:target::MAP"
+     ],
+     "stmt_053": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:use_norepinephrine_as_first_line_vasopressor"
+     ],
+     "stmt_054": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:use_terlipressin"
+     ],
+     "stmt_055": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:use_norepinephrine_as_first_line_vasopressor"
+     ],
+     "stmt_056": [
+      "pulled_by_expansion",
+      "state:escalating_norepinephrine_dose",
+      "state:septic_shock",
+      "topic:add_vasopressin"
+     ],
+     "stmt_057": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:add_epinephrine"
+     ],
+     "stmt_058": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:epinephrine_first_line",
+      "topic:norepinephrine_first_line"
+     ],
+     "stmt_060": [
+      "pulled_by_expansion",
+      "state:cardiac_dysfunction",
+      "state:septic_shock",
+      "topic:use_inotropes"
+     ],
+     "stmt_061": [
+      "pulled_by_expansion",
+      "state:cardiac_dysfunction",
+      "state:septic_shock",
+      "topic:add_dobutamine_to_norepinephrine",
+      "topic:epinephrine_alone"
+     ],
+     "stmt_062": [
+      "pulled_by_expansion",
+      "state:cardiac_dysfunction",
+      "state:septic_shock",
+      "topic:use_levosimendan"
+     ],
+     "stmt_064": [
+      "pulled_by_expansion",
+      "state:septic_shock",
+      "topic:use_beta_blockers_for_septic_shock"
+     ]
+    }
+   }
+  },
+  "agent4_disposition": {
+   "D1_disposition": {
+    "condition_seeds": [],
+    "topic_seeds": [],
+    "statements": [],
+    "provenance": {}
+   }
+  }
+ }
+}

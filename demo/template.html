@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RADAR Demo</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1d1d1b;--ink2:#4a4a46;--muted:#7a7a74;--line:#e4e2dc;--grid:#efede7;--accent:#2a78d6;--accent-soft:#eaf2fc;--warn:#eb6834;--warn-soft:#fdeee6;--ok:#2f8f5b;--ok-soft:#e8f4ed;--amber:#c98a12;--amber-soft:#fbf3df;
+--t-unlikely:#dbe7f7;--t-possible:#9dc1ee;--t-probable:#4f8fe0;--t-definite:#1f5fb8;
+--a1:#2a78d6;--a1s:#eaf2fc;--a2:#13897d;--a2s:#e3f4f1;--a3:#7a55d0;--a3s:#efeafb;--a4:#c46a12;--a4s:#fbefe2;
+--d-icu:#c8372d;--d-icus:#fbe6e4;--d-ward:#c46a12;--d-wards:#fbefe2;--d-obs:#2a78d6;--d-obss:#eaf2fc;--d-dis:#2f8f5b;--d-diss:#e8f4ed;--d-ed:#6b6a64;--d-eds:#efede7;--red:#c8372d;--red-soft:#fbe6e4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1f1f1d;--ink:#f0efec;--ink2:#c9c8c2;--muted:#94938d;--line:#34332f;--grid:#2a2926;--accent:#3987e5;--accent-soft:#1c2a3d;--warn:#d95926;--warn-soft:#3a2418;--ok:#4fb07c;--ok-soft:#18301f;--amber:#d9a43a;--amber-soft:#332914;
+--t-unlikely:#2a3a50;--t-possible:#2f5689;--t-probable:#3d78c6;--t-definite:#6aa6f0;
+--a1:#5b9ff0;--a1s:#1c2a3d;--a2:#3cbfae;--a2s:#14302c;--a3:#a88af0;--a3s:#2a2240;--a4:#e8994a;--a4s:#3a2a18;
+--d-icu:#ef6b60;--d-icus:#3d1e1b;--d-ward:#e8994a;--d-wards:#3a2a18;--d-obs:#5b9ff0;--d-obss:#1c2a3d;--d-dis:#4fb07c;--d-diss:#18301f;--d-ed:#b4b3ad;--d-eds:#2a2926;--red:#ef6b60;--red-soft:#3d1e1b}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+html[lang="en"] [lang="zh"],html[lang="zh"] [lang="en"]{display:none!important}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 80px}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px;border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:10px}
+.brand{font-weight:800;font-size:17px;letter-spacing:-.01em}.brand small{font-weight:500;color:var(--muted);font-size:12px;margin-left:6px}
+.sp{flex:1}
+.btn-s{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+.steps{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none}.steps::-webkit-scrollbar{display:none}
+.step{flex:1 0 auto;min-width:64px;text-align:center;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 10px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:inherit}
+.step[disabled]{opacity:.4;cursor:default}
+.step.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.step.done:not(.on){border-color:var(--accent);color:var(--accent)}
+.banner{font-size:12px;color:var(--muted);margin:10px 0 0}
+.banner b{color:var(--warn)}
+h2{font-size:20px;margin:18px 0 4px;letter-spacing:-.01em}
+.lede{color:var(--ink2);margin:0 0 14px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.seg button{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 8px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;text-align:left;line-height:1.3}
+.seg button b{display:block;font-size:14px}
+.seg button small{color:var(--muted)}
+.seg button.on{border:2px solid var(--accent);background:var(--accent-soft);padding:9px 7px}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+.form .full{grid-column:1/-1}
+.fld label{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+.fld .in{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--bg);font-weight:600;min-height:40px;display:flex;align-items:center;gap:6px}
+.fld .in small{font-weight:400;color:var(--muted)}
+.lock{font-size:12px;color:var(--muted);margin-top:10px}
+@media (min-width:640px){.form{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.cta{display:block;width:100%;border:0;border-radius:14px;background:var(--accent);color:#fff;font:inherit;font-size:16px;font-weight:700;padding:14px;cursor:pointer;margin:6px 0 4px}
+.cta:active{transform:scale(.99)}
+.cta.ghost{background:var(--card);color:var(--accent);border:1px solid var(--accent)}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;padding:18px 4px}
+.spin{width:18px;height:18px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* agent cards */
+.cards{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;scrollbar-width:none;margin:0 -2px}
+.cards::-webkit-scrollbar{display:none}
+.ac{flex:0 0 100%;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column}
+@media (min-width:900px){.cards{overflow:visible;display:grid;align-items:start;grid-template-columns:repeat(3,minmax(0,1fr))}.ac{flex:none}.pager{display:none!important}}
+.ac-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ac-id{font-weight:800;color:var(--accent);font-size:13px;background:var(--accent-soft);border-radius:6px;padding:2px 7px}
+.ac-n{font-size:13px;font-weight:700;color:var(--ink2)}
+.ac-k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.ac-big{font-size:24px;font-weight:800;line-height:1.2;margin:2px 0 8px;letter-spacing:-.01em}
+.pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:13px;font-weight:700}
+.t-unlikely{background:var(--t-unlikely)}.t-possible{background:var(--t-possible)}.t-probable{background:var(--t-probable);color:#fff}.t-definite{background:var(--t-definite);color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .t-definite{color:#0b1626}}
+.ac p{margin:0 0 8px;color:var(--ink2);font-size:14px}
+.ac>p{background:var(--ags,var(--grid));border-radius:10px;padding:9px 12px;margin:0 0 10px;color:var(--ink)}
+.ac>p.plainp{background:none;padding:0;margin:2px 0 8px}
+.ac .rs{background:var(--ags,var(--grid));border-radius:8px;padding:6px 10px;margin:4px 0 2px;color:var(--ink2);font-size:13px}
+.ac ul{margin:4px 0 8px;padding-left:18px;font-size:14px;overflow-wrap:anywhere}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.more-n{font-size:12.5px;color:var(--muted);margin:-4px 0 6px}
+.ac{border-top:4px solid var(--ag,var(--accent))}
+.ac.ag1{--ag:var(--a1);--ags:var(--a1s)}.ac.ag2{--ag:var(--a2);--ags:var(--a2s)}.ac.ag3{--ag:var(--a3);--ags:var(--a3s)}.ac.ag4{--ag:var(--a4);--ags:var(--a4s)}
+.ac .ac-id{color:var(--ag);background:var(--ags)}.ac .ac-n{color:var(--ag)}
+.ac .ac-k{color:var(--ag);opacity:.85}
+.disp{display:inline-block;border-radius:12px;padding:4px 12px;margin:2px 0 10px;background:var(--dbg);color:var(--dfg)}
+.disp.icu{--dbg:var(--d-icus);--dfg:var(--d-icu)}.disp.ward{--dbg:var(--d-wards);--dfg:var(--d-ward)}.disp.observation{--dbg:var(--d-obss);--dfg:var(--d-obs)}.disp.discharge{--dbg:var(--d-diss);--dfg:var(--d-dis)}.disp.continue_workup{--dbg:var(--d-eds);--dfg:var(--d-ed)}.disp.abstain{--dbg:var(--red-soft);--dfg:var(--red)}
+.urg{display:inline-block;border-radius:12px;padding:4px 12px;margin:2px 0 10px}
+.urg.u1{background:var(--red-soft);color:var(--red)}.urg.u3{background:var(--amber-soft);color:var(--amber)}.urg.u0{background:var(--grid);color:var(--ink2)}
+.yes{color:var(--a1)}.dec-give{color:var(--a3)}.dec-hold{color:var(--muted)}
+.fg-why .fchip{background:var(--a1s);color:var(--a1)}.fg-watch .fchip{background:var(--amber-soft);color:var(--amber)}.fg-wait .fchip{background:var(--grid);color:var(--ink2)}
+.lab.hi{background:var(--red-soft)}.lab.hi .v{color:var(--red)}.lab.lo{background:var(--a1s)}.lab.lo .v{color:var(--a1)}
+.lab .flag{font-size:11px;font-weight:700;margin-left:3px}
+.seg button i.pd{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.step.on{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+.brand{background:linear-gradient(90deg,var(--a1),var(--a3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand small{-webkit-text-fill-color:var(--muted)}
+.msw{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--card)}.msw:empty{display:none}
+.msw button{border:0;background:none;padding:5px 10px;font:inherit;font-size:12.5px;color:var(--ink2);cursor:pointer}.msw button.on{background:var(--a3s);color:var(--a3);font-weight:700}
+@media (max-width:520px){.msw button{padding:5px 7px;font-size:11.5px}.brand small{display:none}}
+.msw button,.btn-s{white-space:nowrap}
+.tr-note{font-size:11.5px;color:var(--muted)}
+.fchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.fchip{background:var(--grid);border-radius:8px;padding:3px 9px;font-size:13px}.ac li{margin:3px 0}
+.rows{border-top:1px solid var(--grid);margin-top:4px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--grid);font-size:14px}
+.row span:first-child{color:var(--ink2)}.row b{text-align:right}
+.tag{display:inline-block;font-size:11.5px;border-radius:5px;padding:1px 6px;font-weight:700;margin-left:4px;vertical-align:1px}
+.tag.now{background:var(--warn-soft);color:var(--warn)}.tag.soon{background:var(--amber-soft);color:var(--amber)}.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.cites{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.chip{border:1px solid var(--accent);color:var(--accent);background:none;border-radius:14px;padding:2px 9px;font-size:12px;cursor:pointer;font-family:inherit}
+.ac .warnbox{background:var(--warn-soft);border-radius:10px;padding:10px 12px;color:var(--ink);font-size:14px;margin-bottom:8px}
+.more{margin-top:auto;padding-top:10px}
+.more>button{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink2);border-radius:10px;padding:8px;font:inherit;font-size:13px;cursor:pointer}
+.pager{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0 6px}
+.pager button{border:1px solid var(--line);background:var(--card);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:var(--ink)}
+.dots{display:flex;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--accent)}
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--card);border-radius:18px 18px 0 0;max-height:82vh;overflow:auto;padding:8px 16px 28px;transform:translateY(100%);transition:transform .22s ease,visibility .22s;visibility:hidden;max-width:760px;margin:0 auto}
+.sheet.open{transform:none;visibility:visible}.sheet-bg.open{display:block}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 10px}
+.sheet h3{margin:0 0 4px;font-size:17px}
+.sheet .x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:22px;color:var(--muted);cursor:pointer}
+.q{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:14px}
+.q mark{background:#fff1a8;color:#1d1d1b;border-radius:2px;padding:0 1px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .q mark{background:#6b5a12;color:#fff}}
+.q ul{padding-left:18px;margin:6px 0 0;color:var(--ink2);font-size:13px}
+.meta{font-size:12px;color:var(--muted);margin-top:6px}
+.node{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.node-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.node-h b:first-child{color:var(--accent)}.node-h .ans{margin-left:auto;background:var(--grid);border-radius:6px;padding:0 7px;font-weight:700;font-size:13px}
+.ev{border-left:3px solid var(--accent);padding:4px 10px;margin:6px 0;font-size:13.5px}
+.ev.opp{border-left-color:var(--warn)}
+.ev .im{color:var(--ink2)}
+.vb{display:inline-block;font-size:11.5px;border-radius:5px;padding:1px 6px;margin:4px 4px 0 0;border:1px solid var(--line)}
+.vb.ok{color:var(--ok);border-color:var(--ok)}.vb.bad{color:var(--warn);border-color:var(--warn)}
+.h5{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:10px 0 2px}
+/* checkpoint */
+.sl{margin:4px 0 18px}
+.sl-h{display:flex;justify-content:space-between;align-items:baseline}
+.sl-h b{font-size:15px}.sl-v{font-size:22px;font-weight:800}.sl-v small{font-size:13px;font-weight:500;color:var(--muted)}
+.zone{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:3px}
+.track{position:relative;height:44px;margin-top:4px}
+.track .bands{position:absolute;left:0;right:0;top:18px;height:8px;border-radius:4px;overflow:hidden;display:flex}
+.track .bands i{height:100%;opacity:.45}
+.track input{position:absolute;left:0;right:0;top:8px;width:100%;margin:0;height:28px;background:transparent;-webkit-appearance:none;appearance:none}
+.track input::-webkit-slider-runnable-track{height:28px;background:transparent}
+.track input::-moz-range-track{height:28px;background:transparent}
+.track input::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--card);border:3px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.2);margin-top:1px}
+.track input::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--card);border:3px solid var(--ink)}
+.ticks{position:relative;height:18px;font-size:11.5px;color:var(--muted)}
+.ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.ticks span.stop{color:var(--ink);font-weight:700}
+.ticks span.stop::before{content:"";position:absolute;left:50%;top:-12px;width:2px;height:8px;background:var(--ink);margin-left:-1px}
+.labs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (min-width:640px){.labs{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.lab{background:var(--bg);border-radius:10px;padding:7px 9px}
+.lab .k{font-size:11.5px;color:var(--muted)}.lab .v{font-weight:700}.lab .v small{font-weight:400;color:var(--muted);font-size:11px}
+.foot{font-size:12px;color:var(--muted);margin-top:24px;line-height:1.6}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><div class="bar"><div class="brand">RADAR<small></small></div><span class="sp"></span><div class="msw" id="msw"></div><button class="btn-s" id="lang">中文 / EN</button></div>
+ <div class="steps" id="steps"></div></div>
+ <div id="view"></div>
+ <div class="foot" id="foot"></div>
+</div>
+<div class="sheet-bg" id="sbg"></div><div class="sheet" id="sheet"><div class="grab"></div><button class="x" id="sx">×</button><div id="sbody"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const D=/*__DATA__*/null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const Z=(zh,en)=>`<span lang="zh">${zh}</span><span lang="en">${en}</span>`;
+const nice=s=>esc(String(s??'—').replace(/_/g,' '));
+const CPS=[['C0_5','0.5 h',Z('0.5 小时','0.5 h')],['C1','1 h',Z('1 小时','1 h')],['C3','3 h',Z('3 小时','3 h')],['C6','6 h',Z('6 小时','6 h')]];
+const TIER={unlikely_sepsis:['unlikely','不太可能','Unlikely'],possible_sepsis:['possible','可能','Possible'],probable_sepsis:['probable','很可能','Probable'],definite_sepsis:['definite','确定','Definite']};
+const DISP={observation:['留观','Observation'],ward:['收住院（病房）','Admit to ward'],discharge:['可以出院','Discharge'],icu:['收 ICU','Admit to ICU'],continue_workup:['留急诊继续检查','Stay in ED for workup'],abstain:['请求医生判断','Clinician review needed']};
+const DEC={within_1h:['1 小时内给','Within 1 h'],within_3h:['3 小时内给','Within 3 h'],defer_and_monitor:['暂缓，继续观察','Defer and monitor'],give:['给','Give'],withhold:['暂不给','Withhold'],start:['开始','Start'],hold:['暂不用','Hold'],not_applicable:['不适用','Not applicable'],map_65:['MAP ≥ 65','MAP ≥ 65']};
+const ITEM={blood_cultures:['血培养','Blood cultures'],serum_lactate:['血乳酸','Serum lactate'],source_imaging_or_sampling:['感染源影像 / 取样','Source imaging / sampling'],alternative_diagnosis_testing:['替代诊断检查','Alternative-diagnosis testing']};
+const PRIO={immediate:['立即','Now','now'],this_visit:['本次就诊','This visit','soon']};
+const LABN={wbc:['白细胞','WBC'],hemoglobin:['血红蛋白','Hgb'],platelets:['血小板','Platelets'],creatinine:['肌酐','Creatinine'],bun:['尿素氮','BUN'],bilirubin_total:['总胆红素','Bilirubin'],glucose:['血糖','Glucose'],sodium:['钠','Na'],potassium:['钾','K'],bicarbonate:['碳酸氢根','HCO₃'],anion_gap:['阴离子间隙','Anion gap']};
+const tr=(m,k)=>m[k]?Z(m[k][0],m[k][1]):nice(k);
+const S={mi:0,pid:'P1',view:'T0',t0done:false,shown:{},lac:'L2',map:'M1',seen:new Set()};
+let TOK=0;
+
+function toast(m){const t=$('#toast');t.innerHTML=m;t.classList.add('on');clearTimeout(TOK);TOK=setTimeout(()=>t.classList.remove('on'),1800)}
+function sheet(h){$('#sbody').innerHTML=h;$('#sheet').classList.add('open');$('#sbg').classList.add('open')}
+function closeSheet(){$('#sheet').classList.remove('open');$('#sbg').classList.remove('open')}
+
+function steps(){
+ const b=[['T0','T0',Z('分诊','Triage')]].concat(CPS);
+ $('#steps').innerHTML=b.map(([id,,lab])=>`<button class="step ${S.view===id?'on':''} ${S.seen.has(id)?'done':''}" data-step="${id}" ${id!=='T0'&&!S.t0done?'disabled':''}>${id==='T0'?'T0 · ':''}${lab}</button>`).join('');
+}
+
+
+/* ---------- plain language for clinicians ---------- */
+const FIELD=[['agent2.workup_recommendation','待做检查','pending workup'],['workup_state','待回报结果','pending results'],
+['agent1.shock_concern','休克风险','shock concern'],['agent1_context.shock_concern','休克风险','shock concern'],['agent1.tier','脓毒症可能性','sepsis likelihood'],['agent1_context.tier','脓毒症可能性','sepsis likelihood'],
+['patient_state.sofa','器官功能（SOFA）','organ function (SOFA)'],['patient_state.vitals_trend','生命体征趋势','vital-sign trend'],
+['patient_state.vitals.map','血压','blood pressure'],['patient_state.vitals.sbp','血压','blood pressure'],['patient_state.vitals.heart_rate','心率','heart rate'],
+['patient_state.vitals.resp_rate','呼吸频率','respiratory rate'],['patient_state.vitals.spo2','血氧','oxygen saturation'],['patient_state.vitals','生命体征','vital signs'],
+['patient_state.labs.lactate_repeat','复查乳酸','repeat lactate'],['patient_state.labs.lactate','乳酸','lactate'],['patient_state.investigation_results.serum_lactate','乳酸','lactate'],
+['patient_state.labs.imaging_result','影像结果','imaging result'],['patient_state.labs.culture_result','培养结果','culture result'],
+['patient_state.investigation_results.creatinine','肌酐','creatinine'],['patient_state.investigation_results.wbc','白细胞','white cell count'],['patient_state.investigation_results','化验结果','lab results'],
+['treatment_state.ongoing_treatment','正在进行的治疗','ongoing treatment'],['treatment_state.treatment_response','治疗反应','response to treatment'],['patient_state.treatment_response','治疗反应','response to treatment'],
+['treatment_state.fluids','补液','fluids'],['patient_state.resuscitation','补液','fluids'],['treatment_state.antimicrobials','抗菌药','antimicrobials'],
+['treatment_state.vasopressors','升压药','vasopressors'],['patient_state.vasopressor','升压药','vasopressors'],['t0_state.active_support.vasopressor','升压药','vasopressors'],
+['treatment_state.respiratory_support','吸氧','oxygen'],['patient_state.oxygen_requirement','吸氧','oxygen'],
+['t0_state.triage_vitals.spo2','分诊血氧','triage oxygen saturation'],['t0_state.triage_vitals','分诊生命体征','triage vital signs'],['t0_state.comorbidities','合并症','comorbidities'],
+['t0_state.chief_complaint','主诉','chief complaint'],['t0_state.labs','分诊时化验','triage labs'],['t0_state.investigation_status','检查状态','test status'],['t0_state.nurse_esi','ESI 分级','ESI level'],
+['agent3.treatment_recommendation','A3 治疗建议','A3 treatment advice'],['reconciliation','建议与记录对照','advice vs record']];
+const T3ZH={definite_sepsis:'根据病史、体格检查和诊断性检查确认为脓毒症，其他诊断的可能性很低。',probable_sepsis:'高度怀疑脓毒症。根据病史、体格检查和诊断性检查，脓毒症是最可能的诊断，其他诊断的可能性较低。',possible_sepsis:'中度怀疑脓毒症。脓毒症是可能的诊断，但根据病史、体格检查和诊断性检查，其他诊断也同样可能。',unlikely_sepsis:'低度怀疑脓毒症。临床评估与脓毒症不符，或根据病史、体格检查和诊断性检查，其他诊断更可能。'};
+const fieldOf=f=>{f=String(f||'').replace(/\[\d+\]/g,'');let best=null;for(const x of FIELD)if(f===x[0]||f.startsWith(x[0]+'.')||f.startsWith(x[0]+'_')){if(!best||x[0].length>best[0].length)best=x}return best};
+const VAL={yes:['是','yes'],no:['否','no'],indeterminate:['不确定','uncertain'],true:['是','yes'],false:['否','no'],
+alternative_less_likely:['其他诊断可能性较低','alternative less likely'],alternative_also_likely:['其他诊断同样可能','alternative equally likely'],alternative_more_likely:['其他诊断更可能','alternative more likely'],
+recommend:['建议做','recommended'],not_indicated:['暂不需要','not needed'],already_addressed:['已经做了','already done'],insufficient_evidence:['信息不足','not enough information'],
+not_administered:['未给','not given'],administered:['已给','given'],pending:['待回报','pending'],resulted:['已出结果','resulted'],not_ordered:['未开单','not ordered'],
+recommended_not_yet_given:['已建议、尚未给','advised, not yet given'],recommended_and_given:['已建议并已给','advised and given'],not_recommended_and_not_given:['未建议、未给','not advised, not given'],
+observed_state_unavailable:['记录不详','not recorded'],response_assessed:['已评估反应','response assessed'],worsening:['恶化','worsening'],stable:['稳定','stable'],improving:['好转','improving'],
+nasal_cannula:['鼻导管吸氧','nasal cannula'],room_air:['未吸氧','room air'],iv_crystalloid:['静脉晶体液','IV crystalloid'],norepinephrine:['去甲肾上腺素','norepinephrine'],
+possible_sepsis:['可能脓毒症','possible sepsis'],probable_sepsis:['很可能脓毒症','probable sepsis'],definite_sepsis:['确定脓毒症','definite sepsis'],unlikely_sepsis:['不太可能脓毒症','sepsis unlikely'],
+pending_resolvable:['等待可出的结果','awaiting results'],discharge_not_supported_without_alternative_disposition:['不能出院，但也没有合适的其他去向','not safe to discharge, and no other disposition fits']};
+Object.assign(VAL,DEC,DISP);
+const val=k=>VAL[k]?Z(VAL[k][0],VAL[k][1]):esc(String(k??'—').replace(/_/g,' '));
+/* model sentences stay English; field paths and code words become plain English */
+function plain(t){
+ let s=String(t??'');
+ s=s.replace(/\b[a-z_]+\.vitals\.map\b/g,'MAP').replace(/\b[a-z_]+\.vitals\.sbp\b/g,'systolic BP').replace(/\b[a-z_]+\.vitals\.heart_rate\b/g,'heart rate');
+ s=s.replace(/\b[a-z][a-z0-9_]*(\.[a-z0-9_\[\]]+)+\b/g,m=>{const f=fieldOf(m);return f?f[2]:m.split('.').pop().replace(/_/g,' ')});
+ s=s.replace(/\b[a-z]+(_[a-z0-9]+)+\b/g,m=>VAL[m]?VAL[m][1]:m.replace(/_/g,' '));
+ s=s.replace(/'([^']{1,40})'/g,'$1');
+ return esc(s);
+}
+const MISS=[[/culture/i,'血培养结果','blood culture result'],[/lactate/i,'复查乳酸','repeat lactate'],[/pao2|arterial gas|respiratory sofa/i,'血气（PaO₂）','blood gas (PaO₂)'],
+[/imaging|source/i,'感染源影像或取样','source imaging or sampling'],[/response to fluids|antimicrobials once|have not yet been|neither has been/i,'治疗后的反应','response to treatment'],
+[/ecg/i,'心电图','ECG'],[/alternative/i,'替代诊断检查','alternative-diagnosis testing'],[/oxygen|breathing/i,'吸氧需求','oxygen need'],[/volume status|physical exam/i,'容量状态与查体','volume status and exam']];
+function missLab(x){for(const[re,zh,en] of MISS)if(re.test(x))return[zh,en];const f=fieldOf(x);return f?[f[1],f[2]]:null}
+function chipsFrom(list,kind){const seen=new Map();(list||[]).forEach(x=>{let lab=null;
+ if(kind==='miss')lab=missLab(typeof x==='string'?x:(x.detail||''));else{const f=fieldOf(typeof x==='string'?x:x.field);lab=f?[f[1],f[2]]:null}
+ if(!lab)lab=[null,null];const key=lab[1]||'other';if(!seen.has(key))seen.set(key,lab)});
+ return [...seen.values()].filter(([zh])=>zh).map(([zh,en])=>`<span class="fchip">${Z(zh,en)}</span>`).join('')}
+/* ---------- guideline + details ---------- */
+function stmt(id,quote){
+ const s=D.st[id];if(!s)return `<div class="q">${esc(id)}</div>`;
+ const hl=t=>{let e=esc(t);if(quote&&t.includes(quote))e=e.replace(esc(quote),`<mark>${esc(quote)}</mark>`);return e};
+ return `<div class="q">${hl(s.t)}${(s.r||[]).length?`<ul>${s.r.map(r=>`<li>${hl(r)}</li>`).join('')}</ul>`:''}</div><div class="meta">${esc(s.src)}${s.s?' · '+nice(s.s):''}${s.c?' · '+nice(s.c)+' certainty':''}</div>`;
+}
+function openStmt(id,quote){sheet(`<h3>${citeLab(id)}</h3><div class="meta" style="margin:0 0 8px">${Z('指南原文；黄色是 Agent 引用的部分','Guideline text; highlighted part is what the agent cited')}</div>${stmt(id,quote)}`)}
+let QS=[];
+function citeLab(id){let m;if(m=/^stmt_0*(\d+)$/.exec(id))return Z(`SSC 第 ${m[1]} 条`,`SSC #${m[1]}`);if(id==='table_03')return Z('SSC 表 3','SSC Table 3');if(id.startsWith('sepsis3::'))return 'Sepsis-3 · '+esc(id.slice(9).replace(/_/g,' '));return esc(id)}
+function cite(id,q){QS.push([id,q]);return `<button class="chip" data-q="${QS.length-1}">${citeLab(id)}</button>`}
+function evH(e,opp){return `<div class="ev ${opp?'opp':''}"><div>${plain(e.f)}</div>${e.im?`<div class="im">→ ${plain(e.im)}</div>`:''}${e.id?`<div class="cites">${cite(e.id,e.q)}</div>`:''}</div>`}
+function detailsSheet(a,title){
+ const nodes=(a.nodes||[]).map(n=>{
+  let h=`<div class="node"><div class="node-h"><b>${esc(n.n)}</b><span>${Z(esc(n.zh),esc(n.en))}</span><span class="ans">${val(n.a)}</span></div>`;
+  if(n.det){h+=`<div class="meta">${Z('由代码判断，不调用模型','Decided by code, no model call')}${n.icu&&n.icu.length?' · '+esc(JSON.stringify(n.icu)):''}</div>`}
+  else{h+=(n.v||[]).map((v,i)=>v.ok?`<span class="vb ok">${Z(`第 ${i+1} 次`,`Attempt ${i+1}`)} ✓ ${Z('通过校验','passed checks')}</span>`:`<span class="vb bad">${Z(`第 ${i+1} 次`,`Attempt ${i+1}`)} ✗ ${esc(v.f.join('; '))}</span>`).join('')+(n.conf?`<span class="vb">${Z('把握','confidence')} ${esc(n.conf)}</span>`:'');
+   if(n.sup&&n.sup.length)h+=`<div class="h5">${Z('支持','Supporting')}</div>`+n.sup.map(e=>evH(e)).join('');
+   if(n.opp&&n.opp.length)h+=`<div class="h5">${Z('反对 / 其他解释','Against / alternatives')}</div>`+n.opp.map(e=>evH(e,1)).join('');
+   if(n.miss&&n.miss.length)h+=`<div class="h5">${Z('还缺什么','Missing')}</div><ul style="margin:2px 0;padding-left:18px;font-size:13.5px">${n.miss.map(x=>`<li>${plain(x)}</li>`).join('')}</ul>`;}
+  return h+'</div>';}).join('');
+ const r=a.r||{};const full=(k,lab)=>(r[k]||[]).length?`<div class="h5">${lab}</div><ul style="margin:2px 0;padding-left:18px;font-size:13.5px">${r[k].map(x=>{const f=typeof x==='string'?null:fieldOf(x.field);return `<li>${f?`<b>${Z(f[1],f[2])}</b>：`:''}${plain(typeof x==='string'?x:x.detail)}</li>`}).join('')}</ul>`:'';
+ const top=r.workup_plan||r.treatment_plan||r.tier?'':full('key_reasons',Z('全部理由','All reasons'))+full('unresolved_risks',Z('未解决的风险','Open risks'))+full('missing_information',Z('还缺什么','Still missing'));
+ sheet(`<h3>${title}</h3>${top}<div class="meta" style="margin:0 0 6px">${Z('每个节点：问题的答案、证据、校验结果。点编号看指南原文。','Each node: answer, evidence and validation. Tap an ID for the guideline text.')}</div>${nodes}`);
+}
+let AGS=[];
+function moreBtn(a,title){AGS.push([a,title]);return `<div class="more"><button data-ag="${AGS.length-1}">${Z('看推理和依据 ›','Reasoning and evidence ›')}</button></div>`}
+function nodeCites(a){const ids=new Map();(a.nodes||[]).forEach(n=>(n.sup||[]).forEach(e=>{if(e.id&&!ids.has(e.id))ids.set(e.id,e.q)}));return ids.size?`<div class="ac-k" style="margin-top:6px">${Z('依据','Based on')}</div><div class="cites">${[...ids].map(([i,q])=>cite(i,q)).join('')}</div>`:''}
+function failed(a,name){return `<div class="warnbox">${Z(name+'这一步没有给出结论，交给医生判断。','No conclusion at this step; handed to the clinician.')}</div>`}
+
+/* ---------- cards ---------- */
+function cardA1(a,when){
+ const r=a.r||{},t=TIER[r.tier];
+ let h=`<div class="ac ag1"><div class="ac-h"><span class="ac-id">A1</span><span class="ac-n">${Z('脓毒症识别','Sepsis recognition')}</span></div>`;
+ if(!t)return h+failed(a,'识别')+moreBtn(a,'A1')+'</div>';
+ h+=`<div class="ac-k">${Z('可能性（SSC 2026 表 3）','Likelihood (SSC 2026 Table 3)')}</div><div class="ac-big"><span class="pill t-${t[0]}">${Z(t[1],t[2])}</span> ${Z('脓毒症','sepsis')}</div>`;
+ h+=`<p>${r.shock_concern?`<b style="color:var(--warn)">${Z('⚠ 考虑休克 / 低灌注。','⚠ Shock / hypoperfusion concern.')}</b> `:''}<span lang="en">${esc(r.table3_verbatim||'')}</span><span lang="zh">${T3ZH[r.tier]||esc(r.table3_verbatim||'')}<br><span class="tr-note">小兔叽翻译；原文见 SSC 2026 表 3（点下方「SSC 表 3」）</span></span></p>`;
+ h+=`<div class="rows">${(a.nodes||[]).map(n=>`<div class="row"><span>${Z(esc(n.zh),esc(n.en))}</span><b class="${n.a==='yes'?'yes':''}">${val(n.a)}</b></div>`).join('')}</div>`;
+ return h+nodeCites(a)+moreBtn(a,`A1 · ${when}`)+'</div>';
+}
+function cardA2(a){
+ const p=(a.r||{}).workup_plan;let h=`<div class="ac ag2"><div class="ac-h"><span class="ac-id">A2</span><span class="ac-n">${Z('建议检查','Suggested workup')}</span></div>`;
+ if(!p)return h+failed(a,'检查建议')+moreBtn(a,'A2')+'</div>';
+ h+=`<div class="ac-k">${Z('建议做','Order')}</div><ul>${(p.recommendations||[]).map(x=>`<li><b>${tr(ITEM,x.item)}</b>${PRIO[x.priority]?`<span class="tag ${PRIO[x.priority][2]}">${Z(PRIO[x.priority][0],PRIO[x.priority][1])}</span>`:''}<div class="rs">${plain(x.reason||'')}</div></li>`).join('')||'<li>—</li>'}</ul>`;
+ if((p.already_addressed||[]).length)h+=`<div class="ac-k">${Z('已经做了','Already done')}</div><p class="plainp">${p.already_addressed.map(x=>tr(ITEM,x.item||x)).join(', ')}</p>`;
+ if((p.not_indicated||[]).length)h+=`<div class="ac-k">${Z('暂不需要','Not indicated')}</div><p class="plainp">${p.not_indicated.map(x=>tr(ITEM,x.item||x)).join(', ')}</p>`;
+ if((p.indeterminate||[]).length)h+=`<div class="ac-k">${Z('信息不够，暂无法判断','Not enough information yet')}</div><ul>${p.indeterminate.map(x=>`<li><b>${tr(ITEM,x.item)}</b><div class="rs">${plain((x.missing_information||[]).join('; '))}</div></li>`).join('')}</ul>`;
+ return h+nodeCites(a)+moreBtn(a,'A2 · T0')+'</div>';
+}
+function cardA3(a,rec,when){
+ const tp=(a.r||{}).treatment_plan;let h=`<div class="ac ag3"><div class="ac-h"><span class="ac-id">A3</span><span class="ac-n">${Z('治疗建议','Treatment')}</span></div>`;
+ if(!tp)return h+failed(a,'治疗建议')+moreBtn(a,'A3')+'</div>';
+ const ab=tp.antimicrobial_timing||{};
+ h+=`<div class="ac-k">${Z('抗菌药','Antimicrobials')}</div><div class="ac-big"><span class="urg ${ab.decision==='within_1h'?'u1':ab.decision==='within_3h'?'u3':'u0'}">${tr(DEC,ab.decision)}</span></div>`;
+ h+=`<div class="rows">${[['fluids',Z('补液','Fluids')],['vasopressors',Z('升压药','Vasopressors')],['map_target',Z('MAP 目标','MAP target')]].map(([k,l])=>tp[k]?`<div class="row"><span>${l}</span><b class="${['give','start'].includes(tp[k].decision)?'dec-give':['hold','withhold','not_applicable'].includes(tp[k].decision)?'dec-hold':''}">${tr(DEC,tp[k].decision)}${tp[k].fluid_class?' · '+val(tp[k].fluid_class):''}${tp[k].first_line_agent?' · '+val(tp[k].first_line_agent):''}</b></div>`:'').join('')}</div>`;
+ return h+`<p style="font-size:12.5px;margin-top:8px">${Z('目前记录：尚未给抗菌药、补液或升压药。建议不等于已经给药。','Recorded so far: no antimicrobials, fluids or vasopressors given. A recommendation is not administration.')}</p>`+nodeCites(a)+moreBtn(a,`A3 · ${when}`)+'</div>';
+}
+function cardA4(a,when){
+ const r=a.r||{};const ab=r.status==='abstain';const k=ab?'abstain':(r.disposition||r.status);
+ let h=`<div class="ac ag4"><div class="ac-h"><span class="ac-id">A4</span><span class="ac-n">${Z('去向','Disposition')}</span></div>`;
+ h+=`<div class="ac-k">${Z('建议','Recommendation')}</div><div class="ac-big"><span class="disp ${esc(k)}">${tr(DISP,k)}</span></div>`;
+ if(ab)h+=`<div class="warnbox">${Z('信息之间有矛盾，系统不给去向，请医生判断。','The information conflicts, so no disposition is given; clinician review needed.')}${r.abstain_reason?`<br><small>${val(r.abstain_reason)}</small>`:''}</div>`;
+ const sec=(list,kind,zh,en,g)=>(list||[]).length?`<div class="ac-k">${Z(zh,en)}</div><div class="fchips fg-${g}">${chipsFrom(list,kind)}</div>`:'';
+ h+=sec(r.key_reasons,'f','主要看了','Based on','why');
+ h+=sec(r.unresolved_risks,'f','需要留意','Watch','watch');
+ h+=sec(r.missing_information,'miss','还在等','Still waiting for','wait');
+ if(r.escalation_trigger)h+=`<div class="ac-k">${Z('何时升级','Escalate if')}</div><p class="clamp">${plain(r.escalation_trigger)}</p>`;
+ return h+`<p style="font-size:12.5px">${Z('完整理由见下方「推理和依据」。A4 不引用指南。','Full reasons under “Reasoning and evidence”. A4 cites no guideline.')}</p>`+moreBtn(a,`A4 · ${when}`)+'</div>';
+}
+function cardsWrap(list){
+ return `<div class="cards" id="cards">${list.join('')}</div><div class="pager"><button data-pg="-1">‹</button><div class="dots">${list.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><button data-pg="1">›</button></div>`;
+}
+function bindCards(){const c=$('#cards');if(!c)return;c.addEventListener('scroll',()=>{const i=Math.round(c.scrollLeft/c.clientWidth);document.querySelectorAll('.dots i').forEach((d,j)=>d.classList.toggle('on',i===j))},{passive:true})}
+
+/* ---------- views ---------- */
+function viewT0(){
+ const p=D.patients[S.pid],t=p.t0,v=t.triage_vitals;
+ const F=(lab,val,full)=>`<div class="fld ${full?'full':''}"><label>${lab}</label><div class="in" data-lock>${val}</div></div>`;
+ let h=`<h2>${Z('T0 · 分诊','T0 · Triage')}</h2><p class="lede">${Z('选一位预设病人，确认分诊信息，然后请 Agent 辅助决策。','Pick a preset patient, review the triage data, then ask the agents for decision support.')}</p>
+ <div class="seg">${Object.entries(D.patients).map(([id,x],i)=>`<button class="${id===S.pid?'on':''}" data-pid="${id}"><b>${'①②③'[i]} ${Z(x.label.zh,x.label.en)}</b><small>${esc(x.t0.age)} ${esc(x.t0.sex)}</small></button>`).join('')}</div>
+ <div class="card"><div class="form">
+ ${F(Z('年龄','Age'),esc(t.age))}${F(Z('性别','Sex'),esc(t.sex))}${F('ESI',esc(t.nurse_esi))}${F(Z('到达方式','Arrival'),nice(t.arrival_transport))}
+ ${F(Z('主诉','Chief complaint'),esc(t.chief_complaint),1)}
+ ${F(Z('体温','Temp'),`${esc(v.temperature_C)} <small>°C</small>`)}${F(Z('心率','HR'),`${esc(v.heart_rate)} <small>/min</small>`)}${F(Z('呼吸','RR'),`${esc(v.resp_rate)} <small>/min</small>`)}${F('SpO₂',`${esc(v.spo2)} <small>%</small>`)}
+ ${F(Z('血压','BP'),`${esc(v.sbp)}/${esc(v.dbp)} <small>mmHg</small>`)}${F(Z('疼痛','Pain'),`${esc(v.pain_0_10)} <small>/10</small>`)}
+ ${F(Z('合并症','Comorbidities'),esc((t.comorbidities||[]).join(', ')||'—'),1)}
+ </div><div class="lock">🔒 ${Z('演示版：数值是预设的，每个结果都提前算好；可以切换上面的病人。','Demo: values are preset and every result is precomputed; switch patients above.')}</div></div>
+ <button class="cta" id="go0">${Z('Agent 辅助决策','Get agent support')}</button><div id="out0"></div>`;
+ return h;
+}
+function showT0(){
+ const p=D.patients[S.pid],r=M().t0[S.pid];QS=[];AGS=[];
+ if(!r){$('#out0').innerHTML=`<div class="card">${Z('这个病人还没有运行结果。','No results for this patient yet.')}</div>`;return}
+ $('#out0').innerHTML=`<h2>${Z('Agent 建议 · T0','Agent support · T0')}</h2><p class="lede">${Z('A1 识别、A2 检查、A4 去向（A3 治疗从第一个检查点开始）。手机上左右滑动翻页。','A1 recognition, A2 workup, A4 disposition (A3 treatment starts at the first checkpoint). Swipe on a phone.')}</p>`
+  +cardsWrap([cardA1(r.a1,'T0'),cardA2(r.a2),cardA4(r.a4,'T0')])
+  +`<h2>${Z('下一步：选一个时间点','Next: pick a time point')}</h2><p class="lede">${Z('到了这个时间点，会出来一批化验结果。','At each time point a batch of results comes back.')}</p><div class="seg" style="grid-template-columns:repeat(4,1fr)">${CPS.map(([id,,l])=>`<button data-step="${id}" style="text-align:center"><b>${l}</b></button>`).join('')}</div>`;
+ bindCards();
+}
+function zoneLac(x){return x>=4?['≥ 4','now']:x>=2?['2–4','soon']:['< 2','ok']}
+function zoneMap(x){return x<65?['< 65','now']:x<70?['65–70','soon']:['≥ 70','ok']}
+function slider(key,label,unit,min,max,step,levels,cur,bands,zone){
+ const val=levels[cur],pct=x=>(x-min)/(max-min)*100,z=zone(val);
+ return `<div class="sl"><div class="sl-h"><b>${label}</b><span class="sl-v">${val} <small>${unit}</small><span class="zone tag ${z[1]}">${z[0]}</span></span></div>
+ <div class="track"><div class="bands">${bands.map(([a,b,c])=>`<i style="width:${pct(b)-pct(a)}%;background:${c}"></i>`).join('')}</div>
+ <input type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-sl="${key}" aria-label="${unit}"></div>
+ <div class="ticks">${[min,max].map(x=>`<span style="left:${pct(x)}%">${x}</span>`).join('')}${Object.entries(levels).map(([k,x])=>`<span class="stop" style="left:${pct(x)}%">${x}</span>`).join('')}</div></div>`;
+}
+const REF={wbc:[4,11],hemoglobin:[12,17.5],platelets:[150,400],creatinine:[0.6,1.2],bun:[7,20],bilirubin_total:[0.1,1.2],glucose:[70,140],sodium:[135,145],potassium:[3.5,5.1],bicarbonate:[22,29],anion_gap:[3,12]};
+function viewCP(){
+ const cp=CPS.find(c=>c[0]===S.view),p=D.patients[S.pid],L=D.levels,u=L.lab_units,v=p.t0.triage_vitals;
+ const okc='var(--ok)',am='var(--amber)',wr='var(--red)';
+ return `<h2>${cp[2]} · ${Z(p.label.zh,p.label.en)}</h2><p class="lede">${Z('这是截至这个时间点已经出来的结果。拖动滑块选乳酸和 MAP（会吸附到最近的预设值），然后查看 Agent 建议。','Results available by this time. Drag the sliders for lactate and MAP (they snap to the nearest preset), then view the agents’ advice.')}</p>
+ <div class="card">
+ ${slider('lac',Z('血乳酸','Serum lactate'),'mmol/L',0.5,8,0.1,L.lactate,S.lac,[[0.5,2,okc],[2,4,am],[4,8,wr]],zoneLac)}
+ ${slider('map',Z('平均动脉压 MAP','Mean arterial pressure'),'mmHg',40,110,1,L.map,S.map,[[40,65,wr],[65,70,am],[70,110,okc]],zoneMap)}
+ <div class="ac-k" style="margin-bottom:6px">${Z('其他结果（这位病人固定）','Other results (fixed for this patient)')} <span class="tr-note" style="text-transform:none;letter-spacing:0">${Z('↑↓ 按常用成人参考范围标注，仅供演示','↑↓ flagged against common adult reference ranges; demo only')}</span></div>
+ <div class="labs">${Object.entries(p.labs).map(([k,x])=>{const rg=REF[k];const f=rg?(x>rg[1]?'hi':x<rg[0]?'lo':''):'';return `<div class="lab ${f}"><div class="k">${tr(LABN,k)}</div><div class="v">${x} <small>${esc(u[k]||'')}</small>${f?`<span class="flag">${f==='hi'?'↑':'↓'}</span>`:''}</div></div>`}).join('')}
+ <div class="lab"><div class="k">${Z('心率','HR')}</div><div class="v">${v.heart_rate}</div></div><div class="lab"><div class="k">${Z('呼吸','RR')}</div><div class="v">${v.resp_rate}</div></div>
+ <div class="lab"><div class="k">${Z('吸氧','Oxygen')}</div><div class="v">${p.oxygen?Z('鼻导管','Nasal cannula'):Z('未吸氧','Room air')}</div></div>
+ <div class="lab"><div class="k">${Z('已给治疗','Given so far')}</div><div class="v">${Z('无','None')}</div></div>
+ <div class="lab"><div class="k">${Z('血培养','Blood cultures')}</div><div class="v">${Z('待回报','Pending')}</div></div></div>
+ </div>
+ <button class="cta" id="gocp">${Z('查看 Agent 建议','View agent advice')}</button><div id="outcp"></div>`;
+}
+function showCP(){
+ const k=`${S.pid}|${S.view}|${S.lac}|${S.map}`,r=M().cp[k],cp=CPS.find(c=>c[0]===S.view);QS=[];AGS=[];
+ if(!r){$('#outcp').innerHTML=`<div class="card">${Z('这个组合还没有运行结果。','No result for this combination yet.')}</div>`;return}
+ if(r.err){$('#outcp').innerHTML=`<div class="card">${Z('这个组合运行时停止了：','This run stopped: ')}${esc(r.err)}</div>`;return}
+ $('#outcp').innerHTML=`<h2>${Z('Agent 建议','Agent advice')} · ${cp[2]}</h2><p class="lede">${Z('A1 重新评估、A3 治疗、A4 去向。','A1 reassessment, A3 treatment, A4 disposition.')}</p>`
+  +cardsWrap([cardA1(r.a1,cp[1]),cardA3(r.a3,r.rec,cp[1]),cardA4(r.a4,cp[1])])
+  +`<div class="seg" style="grid-template-columns:repeat(4,1fr);margin-top:10px">${CPS.filter(c=>c[0]!==S.view).map(([id,,l])=>`<button data-step="${id}" style="text-align:center"><b>${l}</b></button>`).join('')}<button data-step="T0" style="text-align:center"><b>T0</b></button></div>`;
+ bindCards();
+}
+function loading(el,cb){el.innerHTML=`<div class="loading"><div class="spin"></div>${Z('Agent 正在分析…','Agents are working…')}</div>`;setTimeout(()=>{cb();el.scrollIntoView({behavior:'smooth',block:'start'})},650)}
+function render(){
+ steps();
+ $('#view').innerHTML=(S.view==='T0'?viewT0():viewCP());
+ if(S.view==='T0'&&S.t0done&&S.shown.T0===S.pid)showT0();
+ if(S.view!=='T0'&&S.shown[S.view]===`${S.pid}|${S.lac}|${S.map}`)showCP();
+}
+const M=()=>D.models[S.mi];
+function msw(){if(D.models.length<2){$('#msw').innerHTML='';return}$('#msw').innerHTML=D.models.map((m,i)=>`<button class="${i===S.mi?'on':''}" data-mi="${i}" title="${esc(m.meta.model)}">${esc(m.label)}</button>`).join('')}
+function foot(){
+ const m=M().meta;
+ $('#foot').innerHTML=`<div style="margin-bottom:6px"><b>${Z('仅供演示，不用于临床决策。','For demonstration only; not for clinical decisions.')}</b> ${Z('三位病人和全部数值都是小兔叽（Yana 的 AI 助手）编写的示例，不是真实病例。','All three patients and every value are examples written by Bunny (Yana’s AI assistant), not real patients.')}</div>
+ ${m.dry_run?`<div style="color:var(--warn)"><b>DRY RUN</b> · ${Z('当前是空跑数据，Agent 输出是工程占位，不是模型结果。','dry-run data; agent outputs are engineering stubs, not model results.')}</div>`:''}
+ ${Z('运行','Run')} ${esc(m.run_id)} · ${Z('模型','model')} ${esc(m.model)} · code ${esc(m.code_commit)}`;
+}
+document.querySelector('.brand small').innerHTML=Z('脓毒症辅助决策演示','sepsis decision-support demo');
+try{const L=localStorage.getItem('radar-demo-lang');if(L)document.documentElement.lang=L}catch(e){}
+$('#lang').onclick=()=>{const n=document.documentElement.lang==='en'?'zh':'en';document.documentElement.lang=n;try{localStorage.setItem('radar-demo-lang',n)}catch(e){}};
+document.addEventListener('click',e=>{
+ const t=e.target;let b;
+ if(b=t.closest('[data-mi]')){S.mi=+b.dataset.mi;msw();render();foot();toast(Z('已切换到 ','Switched to ')+esc(M().label));return}
+ if(b=t.closest('[data-pid]')){S.pid=b.dataset.pid;S.shown={};render();return}
+ if(b=t.closest('[data-step]')){if(b.disabled)return;S.view=b.dataset.step;render();window.scrollTo({top:0,behavior:'smooth'});return}
+ if(t.closest('#go0')){S.t0done=true;S.shown.T0=S.pid;S.seen.add('T0');steps();loading($('#out0'),showT0);return}
+ if(t.closest('#gocp')){S.shown[S.view]=`${S.pid}|${S.lac}|${S.map}`;S.seen.add(S.view);steps();loading($('#outcp'),showCP);return}
+ if(b=t.closest('[data-q]')){const[i,q]=QS[+b.dataset.q];openStmt(i,q);return}
+ if(b=t.closest('[data-ag]')){const[a,ti]=AGS[+b.dataset.ag];detailsSheet(a,ti);return}
+ if(b=t.closest('[data-pg]')){const c=$('#cards');c.scrollBy({left:c.clientWidth*+b.dataset.pg,behavior:'smooth'});return}
+ if(t.closest('[data-lock]'))toast(Z('演示版数值为预设，可以切换病人','Demo values are preset; switch patients instead'));
+ if(t.closest('#sx')||t===$('#sbg'))closeSheet();
+});
+document.addEventListener('input',e=>{const s=e.target.closest('[data-sl]');if(!s)return;
+ const key=s.dataset.sl,lv=key==='lac'?D.levels.lactate:D.levels.map,x=+s.value;
+ const best=Object.entries(lv).sort((a,b)=>Math.abs(a[1]-x)-Math.abs(b[1]-x))[0][0];
+ const box=s.closest('.sl'),val=lv[best],z=(key==='lac'?zoneLac:zoneMap)(val);
+ box.querySelector('.sl-v').innerHTML=`${val} <small>${key==='lac'?'mmol/L':'mmHg'}</small><span class="zone tag ${z[1]}">${z[0]}</span>`;
+ s.dataset.pending=best;});
+document.addEventListener('change',e=>{const s=e.target.closest('[data-sl]');if(!s)return;const key=s.dataset.sl,best=s.dataset.pending;if(!best)return;
+ if(key==='lac')S.lac=best;else S.map=best;s.value=(key==='lac'?D.levels.lactate:D.levels.map)[best];
+ if(S.shown[S.view]&&S.shown[S.view]!==`${S.pid}|${S.lac}|${S.map}`){$('#outcp').innerHTML=`<div class="lock" style="margin:4px 2px">${Z('数值改了，点上面按钮重新查看。','Values changed; tap the button to view again.')}</div>`}});
+msw();render();foot();
+</script>
+</body>
+</html>

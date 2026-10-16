@@ -1,0 +1,16 @@
+# Patient-level data never enter this repository (PhysioNet DUA).
+# Inputs live in ../RADAR_input, run outputs in ../RADAR_output (see radar/paths.py).
+RADAR_input/
+RADAR_output/
+*.csv
+*.csv.gz
+
+# Guideline PDFs: publisher copyright; listed with links in radar/knowledge/README.md
+radar/knowledge/sources/
+
+# Secrets and local clutter
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store

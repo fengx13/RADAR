@@ -1,0 +1,740 @@
+{
+ "agent": "agent1_recognition",
+ "version": "0.6",
+ "changelog": [
+  "v0.3 — hand-written scopes replaced by the ones generated offline from ssc2026_graph.json (see 02_Graph/scope_tables.json). Net effect on Agent 1: 11 -> 16 distinct statements, 0 lost. R3a/R3b gain stmt_019 and stmt_035, the guideline's two explicit mandates to assess infectious vs non-infectious causes — the citable basis this node previously lacked. R4 gains stmt_014 through the OVERRIDDEN_BY edge (MAP 60-65 for age >= 65).",
+  "v0.2 — terminals rewritten to SSC 2026 Table 3's own four-tier terminology (unlikely / possible / probable / definite) instead of the low/moderate/high scale we had invented. Table 3 defines every tier by how the ALTERNATIVE diagnosis ranks against sepsis, so the mimic question moved from a side branch to the discriminating node. Table 3 is now a citable source (table_03).",
+  "v0.1 — first graph; low/moderate/high/indeterminate terminals.",
+  {
+   "version": "0.4",
+   "date": "2026-08-07",
+   "changes": [
+    "Sepsis-3 入库：11 条可引用命题按 adjudicates 分配到各节点；R2 终于有了器官功能障碍的判据（SOFA>=2）",
+    "R4 从可跳过改为必经：R3a/R3b 的每个答案都进 R4",
+    "终端改为 f(R3 答案, R4 答案) 查表；新增 T_UNLIKELY_SHOCK_OTHER 与 T_POSSIBLE_SHOCK"
+   ],
+   "why": "2026-08-07 gpt-5-mini 实跑：16 次调用中 R4 一次未被走到；R2 因 scope 内无器官功能障碍判据，把「没测乳酸」当成「无器官功能障碍」"
+  },
+  {
+   "version": "0.5",
+   "date": "2026-08-07",
+   "changes": [
+    "R3a/R3b 新增闭集字段 leading_alternative：必须点名最佳替代（非感染）诊断",
+    "候选表 = 队列设计中 S3 拟态层的 13 个诊断标志 ＋ other ＋ none"
+   ],
+   "why": "v0.4 实跑中模型一次都没说出具体的替代诊断 —— 连急性心衰和肺栓塞这两例也只说「心肺疾病」。输出 schema 里没有这个字段，所以「替代诊断排第几」这个判断无法审计"
+  },
+  {
+   "version": "0.6",
+   "date": "2026-08-09",
+   "changes": [
+    "R2 判据从 SOFA>=2 改为 T0 床旁可得的器官功能障碍；SOFA>=2 推迟到 T1",
+    "qSOFA 三条命题从 R1 的 scope 挪进 R2 —— 它们回答的是器官功能障碍，不是有没有感染",
+    "R2 的问题文本明确写出『不要因为缺化验就答 indeterminate』"
+   ],
+   "why": "v0.4/v0.5 实跑中 R2 一次都没答过 yes：判据 SOFA>=2 需要化验，而 T0 按定义没有化验。结果 R3a 在 T0 是死代码，probable 档不可达，41 条路径里 32 条落在 possible。可达性分析见 03_Agent/graph_reachability.py"
+  }
+ ],
+ "decision_time": "T0 — triage complete; no laboratory results available",
+ "guideline": {
+  "name": "Surviving Sepsis Campaign 2026",
+  "citation": "Prescott HC, et al. Crit Care Med 2026;54:725-812",
+  "pmid": "41869847",
+  "frozen_on": "2026-08-07"
+ },
+ "design_notes": [
+  "The model may only return one of allowed_answers at each node; the code walks the graph.",
+  "The model never emits the tier — that is fixed by the terminal reached.",
+  "Table 3 has no 'indeterminate' tier. Moderate suspicion with a competing alternative IS 'possible sepsis', so an indeterminate answer maps to possible rather than to a separate state.",
+  "definite_sepsis requires diagnostic testing (Table 3). At T0 there are no results, so the graph caps at probable; definite becomes reachable only on the T1 pass.",
+  "R3a and R3b ask the same question with the same scope but different downstream, because the tier depends on whether organ dysfunction was established."
+ ],
+ "entry": "R1",
+ "nodes": {
+  "R1": {
+   "title": "感染证据",
+   "question": "Based only on the information available at triage, is there clinical evidence to suspect infection as the cause of this presentation?",
+   "allowed_answers": [
+    "yes",
+    "no",
+    "indeterminate"
+   ],
+   "transitions": {
+    "yes": "R2",
+    "no": "T_UNLIKELY",
+    "indeterminate": "R2"
+   },
+   "scope": [
+    "stmt_001",
+    "stmt_002",
+    "stmt_003",
+    "stmt_004",
+    "stmt_005",
+    "stmt_006",
+    "table_03",
+    "sepsis3::definition_sepsis",
+    "sepsis3::neither_is_standalone",
+    "sepsis3::qsofa_criteria",
+    "sepsis3::qsofa_validity_in_icu",
+    "sepsis3::qsofa_validity_outside_icu"
+   ],
+   "scope_source": "generated offline from ssc2026_graph.json; frozen",
+   "scope_seeds": {
+    "condition": [
+     "suspected_sepsis",
+     "acutely_ill",
+     "in_hospital",
+     "positive_sepsis_screen",
+     "prehospital_ambulance_or_flight",
+     "acutely_ill_high_risk_patients"
+    ],
+    "topic": [
+     "screen_for_sepsis",
+     "screen_for_sepsis_with_tool",
+     "use_standard_sepsis_screening_tool",
+     "use_code_sepsis_or_sepsis_huddle_protocol",
+     "constraint::rule_in_or_out_sepsis_on_single_test",
+     "constraint::novel_rapid_host_response_diagnostics"
+    ]
+   },
+   "scope_provenance": {
+    "stmt_004": [
+     "state:acutely_ill",
+     "state:in_hospital",
+     "topic:screen_for_sepsis_with_tool"
+    ],
+    "stmt_003": [
+     "state:prehospital_ambulance_or_flight",
+     "topic:use_standard_sepsis_screening_tool"
+    ],
+    "stmt_006": [
+     "state:suspected_sepsis",
+     "topic:constraint::novel_rapid_host_response_diagnostics"
+    ],
+    "stmt_005": [
+     "state:suspected_sepsis",
+     "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "stmt_001": [
+     "state:acutely_ill_high_risk_patients",
+     "topic:screen_for_sepsis"
+    ],
+    "stmt_002": [
+     "state:positive_sepsis_screen",
+     "topic:use_code_sepsis_or_sepsis_huddle_protocol"
+    ],
+    "sepsis3::definition_sepsis": [
+     "sepsis3:Box 3",
+     "adjudicates:R1"
+    ],
+    "sepsis3::qsofa_criteria": [
+     "sepsis3:Box 3 / Box 4",
+     "adjudicates:R1"
+    ],
+    "sepsis3::neither_is_standalone": [
+     "sepsis3:narrative, p.807",
+     "adjudicates:R1"
+    ],
+    "sepsis3::qsofa_validity_outside_icu": [
+     "sepsis3:Abstract / Results",
+     "adjudicates:R1"
+    ],
+    "sepsis3::qsofa_validity_in_icu": [
+     "sepsis3:Results",
+     "adjudicates:R1"
+    ]
+   }
+  },
+  "R2": {
+   "title": "器官功能障碍",
+   "question": "Based only on what is observable at the moment triage is completed — vital signs, mental status, oxygen requirement, and history — is there acute organ dysfunction attributable to the suspected infection? Laboratory results are NOT available at this decision time, so the SOFA >= 2 criterion cannot be computed; judge on the bedside findings you are given. Answer `indeterminate` only if the bedside findings themselves are missing, not merely because laboratory confirmation is unavailable.",
+   "allowed_answers": [
+    "yes",
+    "no",
+    "indeterminate"
+   ],
+   "transitions": {
+    "yes": "R3a",
+    "no": "R3b",
+    "indeterminate": "R3b"
+   },
+   "scope": [
+    "stmt_005",
+    "stmt_008",
+    "stmt_009",
+    "stmt_051",
+    "table_03",
+    "sepsis3::baseline_sofa",
+    "sepsis3::definition_sepsis",
+    "sepsis3::neither_is_standalone",
+    "sepsis3::organ_dysfunction_criterion",
+    "sepsis3::sofa_table",
+    "sepsis3::sofa_threshold_mortality",
+    "sepsis3::qsofa_criteria",
+    "sepsis3::qsofa_validity_outside_icu",
+    "sepsis3::qsofa_validity_in_icu"
+   ],
+   "known_gap": "分诊记录里没有意识状态字段，qSOFA 三项只有 RR 与 SBP 两项可得 —— 在补上意识状态之前，本节点的判据实际是 2/3 项。见 04_Data/phase0_cases.json 的 input 结构。",
+   "scope_source": "generated offline from ssc2026_graph.json; frozen",
+   "scope_seeds": {
+    "condition": [
+     "suspected_sepsis",
+     "sepsis",
+     "septic_shock",
+     "possible_sepsis",
+     "probable_sepsis",
+     "definite_sepsis"
+    ],
+    "topic": [
+     "begin_treatment_and_resuscitation",
+     "measure_blood_lactate",
+     "use_serial_lactate_measurements_to_guide_resuscitation",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ]
+   },
+   "scope_provenance": {
+    "stmt_008": [
+     "state:definite_sepsis",
+     "state:possible_sepsis",
+     "state:probable_sepsis",
+     "state:septic_shock",
+     "topic:measure_blood_lactate"
+    ],
+    "stmt_009": [
+     "state:sepsis",
+     "state:septic_shock",
+     "topic:begin_treatment_and_resuscitation"
+    ],
+    "stmt_051": [
+     "state:sepsis_with_elevated_lactate",
+     "state:septic_shock",
+     "topic:use_serial_lactate_measurements_to_guide_resuscitation"
+    ],
+    "stmt_005": [
+     "state:suspected_sepsis",
+     "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "sepsis3::definition_sepsis": [
+     "sepsis3:Box 3",
+     "adjudicates:R2"
+    ],
+    "sepsis3::organ_dysfunction_criterion": [
+     "sepsis3:Box 3",
+     "adjudicates:R2"
+    ],
+    "sepsis3::baseline_sofa": [
+     "sepsis3:narrative, p.806",
+     "adjudicates:R2"
+    ],
+    "sepsis3::sofa_threshold_mortality": [
+     "sepsis3:Box 3",
+     "adjudicates:R2"
+    ],
+    "sepsis3::sofa_table": [
+     "sepsis3:Table 1",
+     "adjudicates:R2"
+    ],
+    "sepsis3::neither_is_standalone": [
+     "sepsis3:narrative, p.807",
+     "adjudicates:R2"
+    ],
+    "sepsis3::qsofa_criteria": [
+     "sepsis3:Box 3 / Box 4",
+     "adjudicates:R2 (v0.6)"
+    ],
+    "sepsis3::qsofa_validity_outside_icu": [
+     "sepsis3:Box 3 / Box 4",
+     "adjudicates:R2 (v0.6)"
+    ],
+    "sepsis3::qsofa_validity_in_icu": [
+     "sepsis3:Box 3 / Box 4",
+     "adjudicates:R2 (v0.6)"
+    ]
+   },
+   "t0_criterion": "T0 用床旁可得的器官功能障碍证据：意识改变 / 呼吸≥22 或新发缺氧需氧 / SBP≤100 或休克体征。SOFA>=2 需要胆红素、肌酐、血小板、PaO2，分诊时全部不存在，因此推迟到 T1 复评时使用。Sepsis-3 明确 qSOFA 不是 sepsis 的独立定义（sepsis3::neither_is_standalone 已在本节点 scope 内），因此 qSOFA 在这里只作为『床旁是否已有器官功能障碍』的证据，不作为 sepsis 的判定。"
+  },
+  "R3a": {
+   "title": "替代诊断排序（器官功能障碍已确立）",
+   "question": "Weighing history, examination and what is known at triage, how does the best alternative (non-infectious) diagnosis rank against sepsis?",
+   "allowed_answers": [
+    "alternative_more_likely",
+    "alternative_also_likely",
+    "alternative_less_likely",
+    "alternative_very_unlikely",
+    "indeterminate"
+   ],
+   "transitions": {
+    "alternative_more_likely": "R4",
+    "alternative_also_likely": "R4",
+    "alternative_less_likely": "R4",
+    "alternative_very_unlikely": "R4",
+    "indeterminate": "R4"
+   },
+   "scope": [
+    "stmt_005",
+    "stmt_019",
+    "stmt_035",
+    "table_03",
+    "sepsis3::neither_is_standalone"
+   ],
+   "known_gap": "The mimic guidelines (heart failure, PE, AKI, ARDS, COPD exacerbation, ACS) are in 00_Reference/Mimics/ but are not yet parsed into citable units, so a named alternative diagnosis still needs citation:null. The DUTY to look for one is now citable: stmt_019 and stmt_035.",
+   "scope_source": "generated offline from ssc2026_graph.json; frozen",
+   "scope_seeds": {
+    "condition": [
+     "suspected_sepsis",
+     "possible_sepsis",
+     "low_likelihood_of_infection",
+     "suspected_sepsis_or_septic_shock",
+     "no_shock"
+    ],
+    "topic": [
+     "assess_likelihood_infectious_vs_noninfectious",
+     "search_for_alternative_diagnoses",
+     "reevaluate_continuously",
+     "discontinue_empiric_antimicrobial_therapy",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ]
+   },
+   "scope_provenance": {
+    "stmt_035": [
+     "state:suspected_sepsis_or_septic_shock",
+     "topic:discontinue_empiric_antimicrobial_therapy",
+     "topic:reevaluate_continuously",
+     "topic:search_for_alternative_diagnoses"
+    ],
+    "stmt_019": [
+     "state:no_shock",
+     "state:possible_sepsis",
+     "topic:assess_likelihood_infectious_vs_noninfectious"
+    ],
+    "stmt_005": [
+     "state:suspected_sepsis",
+     "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "sepsis3::neither_is_standalone": [
+     "sepsis3:narrative, p.807",
+     "adjudicates:R3a"
+    ]
+   },
+   "transition_note": "每个答案都必须经过 R4。档位由本节点的答案决定，休克/低灌注由 R4 决定，终端由两者共同查表得出 —— 见 R4.transitions。2026-08-07 之前 alternative_more_likely 直接到 T_UNLIKELY，休克评估被整段跳过。",
+   "requires_leading_alternative": true,
+   "alternative_candidates": [
+    {
+     "id": "acute_heart_failure",
+     "zh": "急性心衰",
+     "en": "acute heart failure",
+     "dx_flag": "dx_hf_acute"
+    },
+    {
+     "id": "pulmonary_embolism",
+     "zh": "肺栓塞",
+     "en": "pulmonary embolism",
+     "dx_flag": "dx_pe"
+    },
+    {
+     "id": "acs_or_mi",
+     "zh": "ACS / 心梗",
+     "en": "acute coronary syndrome or MI",
+     "dx_flag": "dx_acs_mi"
+    },
+    {
+     "id": "stroke",
+     "zh": "卒中",
+     "en": "stroke",
+     "dx_flag": "dx_stroke"
+    },
+    {
+     "id": "acute_kidney_injury",
+     "zh": "急性肾损伤",
+     "en": "acute kidney injury",
+     "dx_flag": "dx_aki"
+    },
+    {
+     "id": "copd_exacerbation",
+     "zh": "COPD 急性加重",
+     "en": "COPD exacerbation",
+     "dx_flag": "dx_copd_exac"
+    },
+    {
+     "id": "asthma_exacerbation",
+     "zh": "哮喘急性加重",
+     "en": "asthma exacerbation",
+     "dx_flag": "dx_asthma_exac"
+    },
+    {
+     "id": "ards",
+     "zh": "ARDS",
+     "en": "ARDS",
+     "dx_flag": "dx_ards"
+    },
+    {
+     "id": "respiratory_failure",
+     "zh": "呼吸衰竭",
+     "en": "respiratory failure",
+     "dx_flag": "dx_resp_failure"
+    },
+    {
+     "id": "altered_mental_status",
+     "zh": "意识改变",
+     "en": "altered mental status",
+     "dx_flag": "dx_ams"
+    },
+    {
+     "id": "delirium",
+     "zh": "谵妄",
+     "en": "delirium",
+     "dx_flag": "dx_delirium"
+    },
+    {
+     "id": "adverse_drug_event",
+     "zh": "药物不良反应",
+     "en": "adverse drug event",
+     "dx_flag": "dx_ade"
+    },
+    {
+     "id": "traumatic_brain_injury",
+     "zh": "颅脑外伤",
+     "en": "traumatic brain injury",
+     "dx_flag": "dx_tbi"
+    },
+    {
+     "id": "other_noninfectious",
+     "zh": "其他非感染性病因",
+     "en": "other non-infectious cause",
+     "dx_flag": null
+    },
+    {
+     "id": "none_identified",
+     "zh": "想不出替代诊断",
+     "en": "no alternative identified",
+     "dx_flag": null
+    }
+   ],
+   "alternative_candidates_note": "这 15 项不是指南条文，是本研究的操作性候选表：前 13 项与队列设计中定义 S3 拟态层的13 个诊断标志逐一对应，后 2 项是兜底。因此它不进 V2/V3 的引用校验 —— 模型可以从中选一个，但不能把这张表当成指南来引用。选中项与 S3 层的真值诊断标志可直接对表评分。"
+  },
+  "R3b": {
+   "title": "替代诊断排序（无明确器官功能障碍）",
+   "question": "Weighing history, examination and what is known at triage, how does the best alternative (non-infectious) diagnosis rank against sepsis?",
+   "allowed_answers": [
+    "alternative_more_likely",
+    "alternative_also_likely",
+    "alternative_less_likely",
+    "alternative_very_unlikely",
+    "indeterminate"
+   ],
+   "transitions": {
+    "alternative_more_likely": "R4",
+    "alternative_also_likely": "R4",
+    "alternative_less_likely": "R4",
+    "alternative_very_unlikely": "R4",
+    "indeterminate": "R4"
+   },
+   "scope": [
+    "stmt_005",
+    "stmt_019",
+    "stmt_035",
+    "table_03",
+    "sepsis3::neither_is_standalone"
+   ],
+   "scope_source": "generated offline from ssc2026_graph.json; frozen",
+   "scope_seeds": {
+    "condition": [
+     "suspected_sepsis",
+     "possible_sepsis",
+     "low_likelihood_of_infection",
+     "suspected_sepsis_or_septic_shock",
+     "no_shock"
+    ],
+    "topic": [
+     "assess_likelihood_infectious_vs_noninfectious",
+     "search_for_alternative_diagnoses",
+     "reevaluate_continuously",
+     "discontinue_empiric_antimicrobial_therapy",
+     "constraint::rule_in_or_out_sepsis_on_single_test"
+    ]
+   },
+   "scope_provenance": {
+    "stmt_035": [
+     "state:suspected_sepsis_or_septic_shock",
+     "topic:discontinue_empiric_antimicrobial_therapy",
+     "topic:reevaluate_continuously",
+     "topic:search_for_alternative_diagnoses"
+    ],
+    "stmt_019": [
+     "state:no_shock",
+     "state:possible_sepsis",
+     "topic:assess_likelihood_infectious_vs_noninfectious"
+    ],
+    "stmt_005": [
+     "state:suspected_sepsis",
+     "topic:constraint::rule_in_or_out_sepsis_on_single_test"
+    ],
+    "sepsis3::neither_is_standalone": [
+     "sepsis3:narrative, p.807",
+     "adjudicates:R3b"
+    ]
+   },
+   "known_gap": "The mimic guidelines (heart failure, PE, AKI, ARDS, COPD exacerbation, ACS) are in 00_Reference/Mimics/ but are not yet parsed into citable units, so a named alternative diagnosis still needs citation:null. The DUTY to look for one is now citable: stmt_019 and stmt_035.",
+   "transition_note": "每个答案都必须经过 R4。档位由本节点的答案决定，休克/低灌注由 R4 决定，终端由两者共同查表得出 —— 见 R4.transitions。2026-08-07 之前 alternative_more_likely 直接到 T_UNLIKELY，休克评估被整段跳过。",
+   "requires_leading_alternative": true,
+   "alternative_candidates": [
+    {
+     "id": "acute_heart_failure",
+     "zh": "急性心衰",
+     "en": "acute heart failure",
+     "dx_flag": "dx_hf_acute"
+    },
+    {
+     "id": "pulmonary_embolism",
+     "zh": "肺栓塞",
+     "en": "pulmonary embolism",
+     "dx_flag": "dx_pe"
+    },
+    {
+     "id": "acs_or_mi",
+     "zh": "ACS / 心梗",
+     "en": "acute coronary syndrome or MI",
+     "dx_flag": "dx_acs_mi"
+    },
+    {
+     "id": "stroke",
+     "zh": "卒中",
+     "en": "stroke",
+     "dx_flag": "dx_stroke"
+    },
+    {
+     "id": "acute_kidney_injury",
+     "zh": "急性肾损伤",
+     "en": "acute kidney injury",
+     "dx_flag": "dx_aki"
+    },
+    {
+     "id": "copd_exacerbation",
+     "zh": "COPD 急性加重",
+     "en": "COPD exacerbation",
+     "dx_flag": "dx_copd_exac"
+    },
+    {
+     "id": "asthma_exacerbation",
+     "zh": "哮喘急性加重",
+     "en": "asthma exacerbation",
+     "dx_flag": "dx_asthma_exac"
+    },
+    {
+     "id": "ards",
+     "zh": "ARDS",
+     "en": "ARDS",
+     "dx_flag": "dx_ards"
+    },
+    {
+     "id": "respiratory_failure",
+     "zh": "呼吸衰竭",
+     "en": "respiratory failure",
+     "dx_flag": "dx_resp_failure"
+    },
+    {
+     "id": "altered_mental_status",
+     "zh": "意识改变",
+     "en": "altered mental status",
+     "dx_flag": "dx_ams"
+    },
+    {
+     "id": "delirium",
+     "zh": "谵妄",
+     "en": "delirium",
+     "dx_flag": "dx_delirium"
+    },
+    {
+     "id": "adverse_drug_event",
+     "zh": "药物不良反应",
+     "en": "adverse drug event",
+     "dx_flag": "dx_ade"
+    },
+    {
+     "id": "traumatic_brain_injury",
+     "zh": "颅脑外伤",
+     "en": "traumatic brain injury",
+     "dx_flag": "dx_tbi"
+    },
+    {
+     "id": "other_noninfectious",
+     "zh": "其他非感染性病因",
+     "en": "other non-infectious cause",
+     "dx_flag": null
+    },
+    {
+     "id": "none_identified",
+     "zh": "想不出替代诊断",
+     "en": "no alternative identified",
+     "dx_flag": null
+    }
+   ],
+   "alternative_candidates_note": "这 15 项不是指南条文，是本研究的操作性候选表：前 13 项与队列设计中定义 S3 拟态层的13 个诊断标志逐一对应，后 2 项是兜底。因此它不进 V2/V3 的引用校验 —— 模型可以从中选一个，但不能把这张表当成指南来引用。选中项与 S3 层的真值诊断标志可直接对表评分。"
+  },
+  "R4": {
+   "title": "休克 / 低灌注",
+   "question": "Are there signs of sepsis-induced hypoperfusion or septic shock?",
+   "allowed_answers": [
+    "yes",
+    "no"
+   ],
+   "transitions": {
+    "yes": {
+     "depends_on": [
+      "R3a",
+      "R3b"
+     ],
+     "map": {
+      "R3a:alternative_more_likely": "T_UNLIKELY_SHOCK_OTHER",
+      "R3a:alternative_also_likely": "T_POSSIBLE_SHOCK",
+      "R3a:alternative_less_likely": "T_PROBABLE_SHOCK",
+      "R3a:alternative_very_unlikely": "T_PROBABLE_SHOCK",
+      "R3a:indeterminate": "T_POSSIBLE_SHOCK",
+      "R3b:alternative_more_likely": "T_UNLIKELY_SHOCK_OTHER",
+      "R3b:alternative_also_likely": "T_POSSIBLE_SHOCK",
+      "R3b:alternative_less_likely": "T_POSSIBLE_SHOCK",
+      "R3b:alternative_very_unlikely": "T_POSSIBLE_SHOCK",
+      "R3b:indeterminate": "T_POSSIBLE_SHOCK"
+     }
+    },
+    "no": {
+     "depends_on": [
+      "R3a",
+      "R3b"
+     ],
+     "map": {
+      "R3a:alternative_more_likely": "T_UNLIKELY",
+      "R3a:alternative_also_likely": "T_POSSIBLE",
+      "R3a:alternative_less_likely": "T_PROBABLE",
+      "R3a:alternative_very_unlikely": "T_PROBABLE",
+      "R3a:indeterminate": "T_POSSIBLE",
+      "R3b:alternative_more_likely": "T_UNLIKELY",
+      "R3b:alternative_also_likely": "T_POSSIBLE",
+      "R3b:alternative_less_likely": "T_POSSIBLE",
+      "R3b:alternative_very_unlikely": "T_POSSIBLE",
+      "R3b:indeterminate": "T_POSSIBLE"
+     }
+    }
+   },
+   "scope": [
+    "stmt_009",
+    "stmt_010",
+    "stmt_011",
+    "stmt_012",
+    "stmt_013",
+    "stmt_014",
+    "table_03",
+    "sepsis3::septic_shock_concept",
+    "sepsis3::septic_shock_criteria"
+   ],
+   "scope_source": "generated offline from ssc2026_graph.json; frozen",
+   "scope_seeds": {
+    "condition": [
+     "septic_shock",
+     "sepsis_induced_hypoperfusion",
+     "sepsis_induced_hypotension"
+    ],
+    "topic": [
+     "administer_iv_crystalloid",
+     "administer_iv_crystalloid_bolus",
+     "start_vasopressor",
+     "start_vasopressor_peripherally",
+     "target::MAP",
+     "begin_treatment_and_resuscitation",
+     "titrate_vasopressor_to_maintain_MAP"
+    ]
+   },
+   "scope_provenance": {
+    "stmt_011": [
+     "state:sepsis_induced_hypotension",
+     "topic:administer_iv_crystalloid_bolus",
+     "topic:start_vasopressor"
+    ],
+    "stmt_010": [
+     "state:sepsis_induced_hypoperfusion",
+     "state:septic_shock",
+     "topic:administer_iv_crystalloid"
+    ],
+    "stmt_014": [
+     "overrides:stmt_013",
+     "state:septic_shock",
+     "topic:target::MAP"
+    ],
+    "stmt_012": [
+     "state:septic_shock",
+     "topic:start_vasopressor_peripherally"
+    ],
+    "stmt_009": [
+     "state:septic_shock",
+     "topic:begin_treatment_and_resuscitation"
+    ],
+    "stmt_013": [
+     "state:septic_shock",
+     "topic:target::MAP",
+     "topic:titrate_vasopressor_to_maintain_MAP"
+    ],
+    "sepsis3::septic_shock_concept": [
+     "sepsis3:Box 3",
+     "adjudicates:R4"
+    ],
+    "sepsis3::septic_shock_criteria": [
+     "sepsis3:Box 3",
+     "adjudicates:R4"
+    ]
+   },
+   "transition_note": "终端 = f(R3 的答案, R4 的答案)。休克为 yes 但档位为 unlikely 时不会改档 —— 替代诊断更合理就说明这是非感染性休克 —— 但必须落到 T_UNLIKELY_SHOCK_OTHER，让「有休克」这个时间敏感的发现被显式报出来，而不是随档位一起消失。"
+  }
+ },
+ "terminals": {
+  "T_UNLIKELY": {
+   "tier": "unlikely_sepsis",
+   "shock_concern": false,
+   "table3_verbatim": "Low suspicion for sepsis. Clinical assessment is not consistent with sepsis, or an alternate diagnosis is more likely based on history, clinical examination, and diagnostic testing.",
+   "downstream": "stmt_020 — for low likelihood of infection without shock, defer antimicrobials while monitoring closely"
+  },
+  "T_POSSIBLE": {
+   "tier": "possible_sepsis",
+   "shock_concern": false,
+   "table3_verbatim": "Moderate suspicion for sepsis. Sepsis is a possible diagnosis; however, an alternative diagnosis is also likely based on history, clinical examination, and diagnostic testing.",
+   "downstream": "stmt_018 — possible sepsis without shock: time-limited rapid investigation, antimicrobials within 3 h if concern persists"
+  },
+  "T_PROBABLE": {
+   "tier": "probable_sepsis",
+   "shock_concern": false,
+   "table3_verbatim": "High suspicion for sepsis. Sepsis is the most likely diagnosis based on history, clinical examination, and diagnostic testing. An alternative diagnosis is less likely.",
+   "downstream": "stmt_017 — probable or definite sepsis without shock: antimicrobials immediately, ideally within 1 h"
+  },
+  "T_PROBABLE_SHOCK": {
+   "tier": "probable_sepsis",
+   "shock_concern": true,
+   "table3_verbatim": "High suspicion for sepsis. Sepsis is the most likely diagnosis based on history, clinical examination, and diagnostic testing. An alternative diagnosis is less likely.",
+   "downstream": "stmt_016 — possible, probable or definite septic shock: antimicrobials immediately, ideally within 1 h"
+  },
+  "T_DEFINITE": {
+   "tier": "definite_sepsis",
+   "shock_concern": null,
+   "table3_verbatim": "Sepsis is confirmed based on history, clinical examination, and diagnostic testing. An alternative diagnosis is very unlikely.",
+   "reachable_at": "T1 only — Table 3 requires diagnostic testing, which does not exist at triage",
+   "downstream": "stmt_017 / stmt_016 depending on shock"
+  },
+  "T_UNLIKELY_SHOCK_OTHER": {
+   "tier": "unlikely_sepsis",
+   "shock_concern": true,
+   "table3_verbatim": "Low suspicion for sepsis. Clinical assessment is not consistent with sepsis, or an alternate diagnosis is more likely based on history, clinical examination, and diagnostic testing.",
+   "flag": "shock_or_hypoperfusion_present_non_infectious_cause_favoured",
+   "downstream": "不是脓毒性休克，但休克本身是时间敏感的：交给拟态路径（PE / 心衰 / ACS）并按非感染性休克处理。这个终端存在的唯一目的，是不让「有休克」被「不像 sepsis」吞掉。",
+   "safety_note": "这是我们自己加的终端，Table 3 里没有对应档 —— Table 3 只分档，不管休克"
+  },
+  "T_POSSIBLE_SHOCK": {
+   "tier": "possible_sepsis",
+   "shock_concern": true,
+   "table3_verbatim": "Moderate suspicion for sepsis. Sepsis is a possible diagnosis; however, an alternative diagnosis is also likely based on history, clinical examination, and diagnostic testing.",
+   "downstream": "stmt_016 — possible, probable or definite septic shock: antimicrobials immediately, ideally within 1 h",
+   "note": "possible + 休克把抗菌药时限从 stmt_018 的 3 小时收紧到 stmt_016 的 1 小时 —— 这正是原来跳过 R4 会漏掉的那一格"
+  }
+ },
+ "abstain": {
+  "tier": "abstained",
+  "meaning": "模型输出连续两次未通过校验，系统拒绝给出判断"
+ }
+}

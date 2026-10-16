@@ -1,0 +1,55 @@
+{
+ "cases": [
+  {
+   "case_id": "A4_DRY_DISCHARGE",
+   "t1_time": 4,
+   "t1_state": {
+    "vitals": {"sbp": 122, "map": 82, "resp_rate": 18, "spo2": 97},
+    "oxygen_requirement": {"oxygen_therapy_documented": false, "mode": "room_air", "start_time": 0},
+    "vasopressor": {"active": false, "setting": "none", "start_time": null},
+    "ventilation": {"status": "None", "start_time": null, "current_encounter": true},
+    "resuscitation": {"initial_fluid_30ml_per_kg": {"completed": false, "completion_time": null}},
+    "post_resuscitation": {"vital_map_min": 82, "map_time": 4, "vital_o2sat_min": 97, "o2sat_time": 4},
+    "labs": {
+     "lactate_initial": {"status": "resulted", "value": 1.7, "sample_time": 2, "result_time": 3},
+     "lactate_repeat": null,
+     "culture_result": null,
+     "imaging_result": null
+    },
+    "treatment_response": "assessed_stable",
+    "vitals_trend": "stable"
+   },
+   "agent1": {"tier": "unlikely_sepsis", "shock_concern": false},
+   "agent2": {"workup_recommendation": {}},
+   "workup_state": {"pending_workup": []},
+   "agent3": {"treatment_recommendation": {}},
+   "treatment_state": {"ongoing_treatment": [], "treatment_response_flag": "stable"},
+   "mock_llm_answers": {
+    "D2": {"answer": "no", "key_reasons": [{"field": "agent1.tier", "detail": "low recognition tier"}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": null, "blocking": []},
+    "D3": {"answer": "no", "key_reasons": [{"field": "t1_state.vitals_trend", "detail": "stable trend"}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": null, "blocking": []},
+    "D4": {"answer": "yes", "key_reasons": [{"field": "t1_state.vitals.sbp", "detail": "stable blood pressure"}], "unresolved_risks": [], "missing_information": [], "escalation_trigger": "Return immediately for worsening symptoms or clinician-specified concern.", "blocking": []}
+   }
+  },
+  {
+   "case_id": "A4_DRY_ICU_VASO",
+   "t1_time": 2,
+   "t1_state": {
+    "vitals": {"sbp": 92, "map": 62, "resp_rate": 24, "spo2": 94},
+    "oxygen_requirement": {"oxygen_therapy_documented": true, "mode": "nasal_cannula", "start_time": 0},
+    "vasopressor": {"active": true, "setting": "ed", "start_time": 1},
+    "ventilation": {"status": "None", "start_time": null, "current_encounter": true},
+    "resuscitation": {"initial_fluid_30ml_per_kg": {"completed": false, "completion_time": null}},
+    "post_resuscitation": {"vital_map_min": 62, "map_time": 2, "vital_o2sat_min": 94, "o2sat_time": 2},
+    "labs": {"lactate_initial": {"status": "pending", "value": null, "sample_time": null, "result_time": null}},
+    "treatment_response": "assessed_unstable",
+    "vitals_trend": "unstable"
+   },
+   "agent1": {"tier": "possible_sepsis", "shock_concern": true},
+   "agent2": {"workup_recommendation": {}},
+   "workup_state": {"pending_workup": ["lactate"]},
+   "agent3": {"treatment_recommendation": {}},
+   "treatment_state": {"ongoing_treatment": ["vasopressor"], "treatment_response_flag": "worsening"},
+   "mock_llm_answers": {}
+  }
+ ]
+}

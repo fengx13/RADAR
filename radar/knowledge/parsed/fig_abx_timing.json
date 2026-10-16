@@ -1,0 +1,45 @@
+{
+  "id": "fig_abx_timing",
+  "source": "SSC 2026, Infographic: ANTIBIOTIC TIMING FRAMEWORK FOR ADULTS",
+  "citation": "Surviving Sepsis Campaign, Antibiotic Timing Framework for Adults infographic, 2026. Society of Critical Care Medicine / European Society of Intensive Care Medicine.",
+  "local_file": "00_Reference/SSC2026/SSC2026_infographic_antibiotic_timing.pdf",
+  "note": "Not one of the 129 numbered statements. It is the operational form of statements 16-20 and is the only place the branch conditions are drawn as a single decision tree. Text is extractable, so quotes from it can pass verbatim validation.",
+  "disclaimer_verbatim": "This infographic is not a validated clinical decision aid.",
+
+  "branches": [
+    {
+      "path": ["shock_present"],
+      "action_verbatim": "Administer antimicrobials immediately, ideally within 1 hour of recognition.",
+      "strength": "strong_for",
+      "maps_to_statement": "stmt_016"
+    },
+    {
+      "path": ["shock_absent", "sepsis_definite_or_probable"],
+      "action_verbatim": "Administer antimicrobials immediately, ideally within 1 hour of recognition.",
+      "strength": "strong_for",
+      "maps_to_statement": "stmt_017"
+    },
+    {
+      "path": ["shock_absent", "sepsis_possible"],
+      "action_verbatim": "Rapid assessment* of infectious vs. noninfectious causes of acute illness. Administer antimicrobials within 3 hours if concern for infection persists.",
+      "strength": "conditional_for",
+      "maps_to_statement": "stmt_018"
+    }
+  ],
+
+  "rapid_assessment_definition_verbatim": "Rapid assessment includes history and clinical examination, tests for both infectious and noninfectious causes of acute illness, and immediate treatment of acute conditions that can mimic sepsis. Whenever possible, this should be completed within 3 hours of presentation so that a decision can be made as to the likelihood of an infectious cause of the patient's presentation and timely antimicrobial therapy provided if the likelihood is thought to be high.",
+
+  "why_this_matters_to_us": [
+    "It is the only guideline text that explicitly authorises testing directed at NON-infectious causes ('tests for both infectious and noninfectious causes'), which is what Agent 2 needs in order to recommend a mimic work-up with a citation rather than with citation:null.",
+    "It also mandates 'immediate treatment of acute conditions that can mimic sepsis' — an action, not just a test.",
+    "It gives Agent 1 -> Agent 2/3 a hard causal link written by the guideline: a tier of 'possible sepsis' without shock triggers the mimic work-up and moves the antimicrobial deadline from 1 h to 3 h."
+  ],
+
+  "tier_definitions_verbatim": {
+    "_note": "The infographic reprints Table 3 verbatim, so it is a second citable source for the ladder.",
+    "definite_sepsis": "Sepsis is confirmed based on history, clinical examination, and diagnostic testing. An alternative diagnosis is very unlikely.",
+    "probable_sepsis": "High suspicion for sepsis. Sepsis is the most likely diagnosis based on history, clinical examination, and diagnostic testing. An alternative diagnosis is less likely.",
+    "possible_sepsis": "Moderate suspicion for sepsis. Sepsis is a possible diagnosis; however, an alternative diagnosis is also likely based on history, clinical examination, and diagnostic testing.",
+    "unlikely_sepsis": "Low suspicion for sepsis. Clinical assessment is not consistent with sepsis, or an alternate diagnosis is more likely based on history, clinical examination, and diagnostic testing."
+  }
+}

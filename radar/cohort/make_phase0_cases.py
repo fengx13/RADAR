@@ -9,6 +9,7 @@ phase0_case_ids.json.  Re-running never reshuffles an already-pinned case,
 so changing one case's criteria cannot cascade into the others.
 """
 from radar import paths
+from radar.common.seeding import stable_seed
 import pandas as pd, numpy as np, json, pathlib
 
 ROOT = paths.RAW_ROOT / "master/mimic"
@@ -71,7 +72,7 @@ for cid, label, mask in SPEC:
         pool = [j for j in d.index[mask & complete] if j not in used]
         if not pool:
             print(f"  !! {cid} 无匹配病例"); continue
-        i = int(np.random.default_rng([SEED, hash(cid) % 10**6]).choice(pool))
+        i = int(np.random.default_rng([SEED, stable_seed(cid)]).choice(pool))
         pins[cid] = int(d.loc[i, 'stay_id'])
     used.add(i)
     r = d.loc[i]
@@ -106,7 +107,7 @@ for cid, label, mask in SPEC:
         "outcomes": {k: (None if pd.isna(r.get(k)) else int(r.get(k))) for k in DSP if k in d.columns},
       }})
 
-OUT.mkdir(exist_ok=True)
+(OUT / "phase0_cases.json").parent.mkdir(parents=True, exist_ok=True)
 json.dump(cases, open(OUT / "phase0_cases.json", "w"), ensure_ascii=False, indent=1)
 json.dump(pins,  open(PINS, "w"), indent=1)
 print(f"\n{len(cases)} 例 -> phase0_cases.json   stay_id 已锁定于 phase0_case_ids.json\n")

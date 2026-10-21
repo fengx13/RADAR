@@ -34,6 +34,7 @@ Usage
 """
 from __future__ import annotations
 from radar import paths
+from radar.common.seeding import stable_seed
 
 import argparse
 import json
@@ -223,6 +224,9 @@ def build(args):
 
     pins_path = OUT / args.pins
     pins = json.loads(pins_path.read_text()) if pins_path.exists() else {}
+    # A pinned cohort is rebuilt exactly as pinned: no new draws. Sampling only happens
+    # on a first build (no pins file). Replacements are made by replace_no_result_cases.
+    pinned_cohort = bool(pins)
 
     # Carry the original eight in, so earlier measurements stay comparable.
     seeded = OUT / "phase0_case_ids.json"
@@ -238,8 +242,8 @@ def build(args):
         prefix = f"{stratum}_{key}"
         already = [cid for cid in pins if cid.startswith(prefix + "_")]
         pool = d.index[(S == stratum) & mask & complete & ~d.stay_id.isin(taken)]
-        rng = np.random.default_rng([SEED, abs(hash(prefix)) % 10 ** 6])
-        need = want - len(already)
+        rng = np.random.default_rng([SEED, stable_seed(prefix)])
+        need = 0 if pinned_cohort else want - len(already)
         picks = list(rng.choice(pool, size=min(need, len(pool)), replace=False)) if need > 0 and len(pool) else []
         if need > len(pool):
             print(f"  !! {prefix}: wanted {want}, only {len(pool) + len(already)} available")

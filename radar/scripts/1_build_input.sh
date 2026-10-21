@@ -13,15 +13,19 @@ run radar.cohort.make_cohort100 --source mimic        # stratified 4 x 25 at T0
 run radar.cohort.deidentify_cohort --cases cohort100_cases.json --crosswalk cohort100_identifiers.json
 run radar.cohort.make_longitudinal_cases --site mimic # results and vitals over 6 h
 run radar.cohort.replace_no_result_cases --site mimic # inclusion: >=1 ED lab result within 6 h
+run radar.cohort.build_caches --site mimic      # pyxis, emar, extra labs, radiology subsets
 run radar.cohort.make_observed_treatment --site mimic
 run radar.cohort.make_infection_results --site mimic  # -> _v4
-run radar.cohort.make_full_record --site mimic --build-cache   # -> _v5
+run radar.cohort.make_full_record --site mimic --build-cache   # raw-row caches only
+run radar.cohort.make_full_record --site mimic                 # writes _v5
 
 # MC-MED (Stanford), external validation
 run radar.cohort.make_cohort100 --source stanford
 run radar.cohort.deidentify_cohort --cases stanford100_cases.json --crosswalk stanford100_identifiers.json --summary stanford100_summary.json
 run radar.cohort.make_longitudinal_cases --site mcmed
 run radar.cohort.replace_no_result_cases --site mcmed
+run radar.cohort.build_caches --site mcmed      # orders, extra labs, radiology subsets
 run radar.cohort.make_observed_treatment --site mcmed --no-oxygen-order-means-none
 run radar.cohort.make_infection_results --site mcmed
 run radar.cohort.make_full_record --site mcmed --build-cache
+run radar.cohort.make_full_record --site mcmed                 # writes _v5

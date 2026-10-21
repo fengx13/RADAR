@@ -15,6 +15,7 @@ Usage
     python -m radar.cohort.replace_no_result_cases --site mcmed
 """
 from radar import paths
+from radar.common.seeding import stable_seed
 import argparse
 import json
 import pathlib
@@ -133,6 +134,9 @@ def main():
     if a.emar_only:
         return extend_emar_cache()
     retire = a.retire or load_json(cfg["longitudinal"])["meta"]["cases_with_no_visible_result"]
+    if not retire:
+        print("no case without a result within the horizon; nothing to replace")
+        return
     cases = load_json(f"{stem}_cases.json")
     pins = load_json(f"{stem}_case_ids.json")
     cw = load_json(f"{stem}_identifiers.json")
@@ -154,7 +158,7 @@ def main():
         key = (c["stratum"], c["sub_stratum"])
         desc, mask = subs[key]
         pool = d.index[(S == key[0]) & mask & complete & ~d.stay_id.isin(taken)]
-        rng = np.random.default_rng([mc.SEED, 20261011, abs(hash(f"{key[0]}_{key[1]}_{cid}")) % 10 ** 6])
+        rng = np.random.default_rng([mc.SEED, 20261011, stable_seed(f"{key[0]}_{key[1]}_{cid}")])
         picks = list(rng.choice(pool, size=min(CANDIDATES, len(pool)), replace=False))
         plan[cid] = (key, desc, picks)
         taken |= {int(d.loc[i, "stay_id"]) for i in picks}      # candidates must not collide across slots

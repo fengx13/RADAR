@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style>
+<title>RADAR Clinician Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a guided worksheet — step rail on top, case chart on the left, the clinician's decision form on the right */
+:root{
+  --bg:#FAF8F7; --surface:#FFFFFF; --ink:#22191B; --muted:#6C6063; --line:#E4DBDC;
+  --maroon:#7A0019; --onmaroon:#FFFFFF; --gold:#FFCC33; --goldtint:#FFF4CF; --newtint:#E8F0FB; --newink:#1F5FAE;
+  --ok:#1B8A5A; --warn:#B4541A;
+  --o-red:#B3261E; --o-amber:#C27A00; --o-green:#2E7D4F; --o-teal:#11807A; --o-blue:#2A63B8; --o-grey:#6B6466; --o-purple:#7A3EA8;
+  --f-display:"Source Serif 4",Georgia,serif; --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161113; --surface:#211A1C; --ink:#F2EAEB; --muted:#B5A8AB; --line:#3B3134;
+  --maroon:#E8647A; --onmaroon:#1A0E10; --gold:#FFCC33; --goldtint:#3A2F12; --newtint:#16273F; --newink:#8FB9F2; --ok:#4CC28C; --warn:#F0A35A; --o-red:#FF7A70; --o-amber:#F2B33D; --o-green:#5CC98A; --o-teal:#4FD1C5; --o-blue:#7FB0F5; --o-grey:#A79FA1; --o-purple:#C49BEE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161113; --surface:#211A1C; --ink:#F2EAEB; --muted:#B5A8AB; --line:#3B3134;
+  --maroon:#E8647A; --onmaroon:#1A0E10; --gold:#FFCC33; --goldtint:#3A2F12; --newtint:#16273F; --newink:#8FB9F2; --ok:#4CC28C; --warn:#F0A35A; --o-red:#FF7A70; --o-amber:#F2B33D; --o-green:#5CC98A; --o-teal:#4FD1C5; --o-blue:#7FB0F5; --o-grey:#A79FA1; --o-purple:#C49BEE; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--f-display);font-size:clamp(24px,3vw,30px);color:var(--maroon);margin:0}
+h2{font-family:var(--f-display);font-size:clamp(20px,2.4vw,24px);margin:0;text-wrap:balance}
+h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--maroon);margin:14px 0 6px}
+.muted{color:var(--muted)} .small{font-size:13px}
+.banner{background:var(--goldtint);border-radius:10px;padding:8px 14px;font-size:14px}
+.rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rail div{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface);font-size:14px}
+.rail b{display:block;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.rail .now{border-color:var(--maroon);box-shadow:inset 0 0 0 1px var(--maroon)} .rail .now b{color:var(--maroon)}
+.rail .done{opacity:.6}
+.tl{display:flex;gap:6px;flex-wrap:wrap}
+.tl span{font-family:var(--f-mono);font-size:13px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.tl .on{background:var(--maroon);color:var(--onmaroon);border-color:var(--maroon)}
+.tl .past{color:var(--ink)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.panel.radar{border-color:var(--maroon)}
+ul{margin:4px 0;padding-left:20px} li{margin:2px 0}
+.new{background:var(--newtint);border-radius:6px;padding:1px 6px}
+.tag{font-family:var(--f-mono);font-size:11.5px;color:var(--newink);font-weight:500;margin-right:6px}
+.src{font-family:var(--f-mono);font-size:11px;color:var(--maroon);border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:6px;white-space:nowrap}
+.badge{display:inline-block;font-weight:700;border-radius:8px;padding:3px 10px;margin:0 6px 6px 0;border:2px solid var(--maroon);color:var(--maroon)}
+.badge.fill{background:var(--maroon);color:var(--onmaroon)}
+table.form{width:100%;border-collapse:collapse}
+table.form td{padding:7px 4px;border-top:1px solid var(--line);vertical-align:top}
+table.form td:first-child{font-weight:600;width:34%;padding-right:10px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts label{--oc:var(--o-grey);border:1.5px solid color-mix(in srgb,var(--oc) 45%,transparent);color:var(--oc);font-weight:600;border-radius:999px;padding:3px 11px;cursor:pointer;font-size:14px;user-select:none;background:var(--surface)}
+.opts input{position:absolute;opacity:0;pointer-events:none}
+.opts label:has(input:checked){background:var(--oc);color:var(--surface);border-color:var(--oc)}
+.opts label:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:1px}
+.opts label.radarpick{box-shadow:0 0 0 2.5px var(--gold)}
+.compact .hide-c{display:none}
+.other{margin-top:12px}
+.changed td:first-child{color:var(--warn)}
+textarea,input[type=text],select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+textarea{min-height:56px;resize:vertical}
+.reason{margin-top:6px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+button{font:inherit;font-weight:600;border-radius:9px;padding:9px 18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.primary{background:var(--maroon);color:var(--onmaroon);border-color:var(--maroon)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.err{color:var(--warn);font-size:14px}
+table.sum{width:100%;border-collapse:collapse;font-size:14px}
+table.sum th,table.sum td{border-top:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.sum th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.chg{background:var(--goldtint);font-weight:600}
+.scroll{overflow-x:auto}
+.legendkey{display:inline-block;width:14px;height:14px;border-radius:999px;box-shadow:0 0 0 2px var(--gold);vertical-align:-2px;margin-right:4px}
+.status{font-size:13px;color:var(--muted)}
+a.btnlink{display:inline-block;font-weight:600;border-radius:9px;padding:9px 18px;background:var(--maroon);color:var(--onmaroon);text-decoration:none}
+</style>
+</head><body>
+
+
+<div class="wrap">
+  <header>
+    <h1>RADAR clinician review</h1>
+    <p class="muted hide-c" style="margin:2px 0 0">You will manage one emergency-department patient twice: first on your own, then with RADAR's advice. We record what you decide, how sure you are and how long it takes. Nothing here changes patient care.</p>
+  </header>
+  <div class="banner hide-c" id="banner">Example case for piloting the workflow: details are adapted from a real visit and changed, so this is not a real patient record.</div>
+  <div class="rail hide-c" id="rail"></div>
+  <main id="app"></main>
+  <div class="actions"><p class="status" id="status"></p><span id="restart"><button type="button" id="rs-btn" class="small">Start over</button></span></div>
+</div>
+
+<script>
+const DECISIONS=[
+ ["tier","Sepsis likelihood",["unlikely","possible","probable","definite"]],
+ ["shock","Shock or hypoperfusion",["yes","no"]],
+ ["cultures","Blood cultures",["now","this visit","not needed","already done"]],
+ ["lactate","Lactate",["now","this visit","not needed","already done"]],
+ ["panel","Sepsis blood panel",["now","this visit","not needed","already done"]],
+ ["ua","Urinalysis",["now","this visit","not needed","already done"]],
+ ["cxr","Chest X-ray",["now","this visit","not needed","already done"]],
+ ["ecg","12-lead ECG",["now","this visit","not needed","already done"]],
+ ["abx","Antibiotics",["within 1 h","within 3 h","hold and reassess","already given"]],
+ ["fluids","IV fluid bolus",["give","withhold"]],
+ ["vaso","Vasopressor",["start","hold"]],
+ ["dispo","Disposition",["not yet","discharge","observe","ward","ICU"]],
+];
+const OC={"unlikely":"green","possible":"amber","probable":"red","definite":"purple","yes":"red","no":"green",
+ "now":"red","this visit":"amber","not needed":"grey","already done":"blue","within 1 h":"red","within 3 h":"amber","hold and reassess":"teal","already given":"blue",
+ "give":"blue","withhold":"grey","start":"red","hold":"grey","not yet":"grey","discharge":"green","observe":"teal","ward":"amber","ICU":"red"};
+const TP=["T0","0.5 h","1 h","3 h","6 h"];
+const CASE={id:"example-1",title:"79-year-old man · near-fainting at home",
+ base:{triage:["Arrived by ambulance · ESI 2","T 35.9 °C · HR 94 · RR 18 · SpO₂ 98% on air","BP 98/42 (MAP 61) · alert, slow to answer"],
+       history:["Chronic kidney disease, prosthetic aortic valve","Recurrent urinary infections, bloodstream infection last year (resistant organism)"]},
+ results:[[],
+  ["ECG: sinus rhythm, right bundle branch block"],
+  [],
+  ["Lactate 4.1 mmol/L","WBC 29 ×10⁹/L, neutrophils 91%","BP 85/50 (MAP 62)"],
+  ["Creatinine 6.9 mg/dL (baseline 2.1), Na 128","Bicarbonate 7, anion gap 29","Chest X-ray: no acute process","Venous pH 7.15, lactate 4.3"]],
+ actions:[[],["ECG done"],["None"],["Blood cultures drawn","Lactate drawn","Urinalysis sent"],["None"]]};
+const RADAR=[
+ {badges:[["Probable sepsis",1],["Shock concern · MAP 61",0]],boxes:[
+  ["Why",["Low temperature at 79: sepsis may present without fever <span class=src>NICE 1.4.2</span>","Recurrent urinary and bloodstream infection <span class=src>NICE 1.1.1</span>","MAP 61, below 65 <span class=src>Sepsis-3</span>"]],
+  ["Do now",["Blood cultures before antibiotics: <b>now</b> <span class=src>SSC #7</span>","Lactate: <b>now</b> <span class=src>SSC #8</span>","Sepsis blood panel: <b>now</b>","Urinalysis, chest X-ray, ECG: <b>this visit</b>"]],
+  ["Against",["No fever; HR 94, RR 18","No localising symptom yet"]],
+  ["Disposition",["Not yet: continue work-up"]]],
+  pick:{tier:"probable",shock:"yes",cultures:"now",lactate:"now",panel:"now",ua:"this visit",cxr:"this visit",ecg:"this visit",dispo:"not yet"}},
+ {badges:[["Probable sepsis",1],["Shock concern",0],["Admit · ward",0]],boxes:[
+  ["Treat",["Antibiotics <b>within 1 h</b> <span class=src>SSC #16</span>","Cover resistant organisms (history) <span class=src>SSC #25</span>","Balanced crystalloid bolus <span class=src>SSC #10 · #11</span>","Vasopressor: hold, give fluids first <span class=src>SSC #11</span>","Repeat lactate <span class=src>SSC #51</span>"]],
+  ["Disposition",["Admit to a monitored ward bed","MAP 61 without vasopressor"]]],
+  pick:{abx:"within 1 h",fluids:"give",vaso:"hold",dispo:"ward"}},
+ {badges:[["Probable sepsis",1],["Ward",0]],boxes:[["Plan",["No new results; plan from 0.5 h stands","Still open: cultures, lactate, antibiotics, fluids"]]],pick:{}},
+ {badges:[["Probable sepsis",1],["Ward watch",0]],boxes:[["Ward watch (code)",["No ICU trigger met","Plan unchanged: antibiotics, fluids, repeat lactate"]]],pick:{}},
+ {badges:[["Probable sepsis",1],["Ward watch",0]],boxes:[["Ward watch (code)",["No ICU trigger met","Plan unchanged"]]],pick:{}},
+];
+const radarAt=i=>{const p={};for(let k=0;k<=i;k++)Object.assign(p,RADAR[k].pick);return p};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let S={stage:"start",reviewer:{name:""},step1:[],step2:[],rating:null,comment:"",submitted:false};
+let tp=0,tStart=Date.now(),db=null,uid=null,saving=false;
+const app=document.getElementById("app"),statusEl=document.getElementById("status");
+
+function rail(){const steps=[["1","Read the triage packet and decide"],["2","Update your plan as results arrive"],["3","Open RADAR: keep or change each decision"],["4","Check your changes and submit"]];
+ const cur={start:0,step1:1,step2:3,summary:4,done:5}[S.stage];
+ const idx=S.stage==="step1"?(tp===0?1:2):cur;
+ document.getElementById("rail").innerHTML=steps.map(([n,t],i)=>`<div class="${i+1===idx?"now":(i+1<idx?"done":"")}"><b>Step ${n}</b>${t}</div>`).join("");}
+function tlHtml(){return `<div class="tl">${TP.map((t,i)=>`<span class="${i===tp?"on":(i<tp?"past":"")}">${t}</span>`).join("")}</div>`;}
+function chartHtml(){const c=CASE;let h=`<h2>${esc(c.title)}</h2><h3>Triage</h3><ul>${c.base.triage.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h3>History</h3><ul>${c.base.history.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h3>Results so far</h3>`;
+ const rs=[];for(let i=1;i<=tp;i++)c.results[i].forEach(r=>rs.push([TP[i],r,i===tp]));
+ h+=rs.length?`<ul>${rs.map(([t,r,n])=>`<li class="${n?"new":""}"><span class="tag">${n?"NEW · ":""}${t}</span>${esc(r)}</li>`).join("")}</ul>`:`<p class="muted">None yet</p>`;
+ if(tp>0){h+=`<h3>Done by the team since last check</h3><ul>${c.actions[tp].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`}
+ return h;}
+function formHtml(prefill,opts={}){return `<table class="form">${DECISIONS.map(([k,l,os])=>{const v=prefill[k];const rp=opts.radar?opts.radar[k]:undefined;const base=opts.base?opts.base[k]:undefined;
+  return `<tr id="row-${k}" class="${opts.base&&v!==base?"changed":""}"><td>${l}</td><td><div class="opts">${os.map(o=>`<label style="--oc:var(--o-${OC[o]||"grey"})" class="${rp===o?"radarpick":""}"><input type="radio" name="${k}" value="${esc(o)}" ${v===o?"checked":""}>${esc(o)}</label>`).join("")}</div>${opts.base?`<div class="reason" ${v!==base?"":"hidden"}><input type="text" id="why-${k}" placeholder="Why did you change this? (required)" value="${esc((opts.reasons||{})[k]||"")}"></div>`:""}</td></tr>`}).join("")}
+  <tr><td>How sure are you?</td><td><div class="opts">${[1,2,3,4,5].map(n=>`<label style="--oc:var(--o-blue)"><input type="radio" name="conf" value="${n}" ${prefill.conf==n?"checked":""}>${n}</label>`).join("")}</div><div class="small muted">1 = guessing · 5 = certain</div></td></tr></table><label class="other">Other options you would consider<textarea id="other" placeholder="Anything not listed above: other tests, treatments, diagnoses">${esc(prefill.other||"")}</textarea></label>`;}
+function readForm(){const o={};DECISIONS.forEach(([k])=>{const r=app.querySelector(`input[name="${k}"]:checked`);if(r)o[k]=r.value});const c=app.querySelector('input[name="conf"]:checked');if(c)o.conf=+c.value;o.other=(app.querySelector("#other")?.value||"").trim();return o;}
+
+function render(){rail();document.body.classList.toggle("compact",S.stage!=="start");const rsEl=document.getElementById("restart");if(rsEl)rsEl.hidden=S.stage==="start";
+ if(S.stage==="start"){app.innerHTML=`<div class="panel"><h2>Before you start</h2>
+  <label style="display:block;max-width:420px">Your name<input type="text" id="r-name" value="${esc(S.reviewer.name||"")}" autocomplete="name"></label>
+  <h3>How it works</h3><ol><li>See only what was known at triage. Record your decisions.</li><li>Results are released at 0.5, 1, 3 and 6 h. Update your decisions each time.</li><li>Go through the same case again with RADAR's card at each time point. Keep or change each decision; give a reason for every change.</li><li>Review the comparison and press Finish: your results go to the RADAR team. About 10 minutes.</li></ol><p class="small muted">Until you finish, your answers stay only in this browser.</p>
+  <div class="actions"><span class="err" id="e"></span><button class="primary" id="go">Start with the triage packet</button></div></div>`;
+  app.querySelector("#go").onclick=()=>{S.reviewer={name:app.querySelector("#r-name").value.trim()};
+   if(!S.reviewer.name){app.querySelector("#e").textContent="Enter your name to continue.";return}
+   S.stage="step1";tp=0;tStart=Date.now();save();render();scrollTo(0,0)};return;}
+ if(S.stage==="step1"){const prev=S.step1[tp]||S.step1[tp-1]||{};const pre={...prev};if(!S.step1[tp]){delete pre.conf;delete pre.other}
+  app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">Step ${tp===0?1:2} · on your own · time point ${tp+1} of 5</span></div>
+  <div class="grid"><div class="panel">${chartHtml()}</div><div class="panel"><h2>${tp===0?"What would you do now?":"New results are in. Update your plan."}</h2><p class="small muted">${tp===0?"Choose one option per row.":"Your previous answers are filled in; change anything the new results change."}</p>${formHtml(pre)}
+  <div class="actions"><span class="err" id="e"></span><span>${tp>0?`<button id="back">Back</button> `:""}<button class="primary" id="next">${tp<4?"Save and see "+TP[tp+1]:"Save and open RADAR"}</button></span></div></div></div>`;
+  app.querySelector("#next").onclick=()=>{const f=readForm();const miss=DECISIONS.filter(([k])=>!f[k]).map(([,l])=>l);if(miss.length||!f.conf){app.querySelector("#e").textContent="Still to answer: "+[...miss,...(f.conf?[]:["How sure are you?"])].join(", ");return}
+   f.seconds=Math.round((Date.now()-tStart)/1000);S.step1[tp]=f;tStart=Date.now();if(tp<4){tp++}else{S.stage="step2";tp=0}save();render();scrollTo(0,0)};
+  const b=app.querySelector("#back");if(b)b.onclick=()=>{tp--;render()};return;}
+ if(S.stage==="step2"){const base=S.step1[tp];const cur=S.step2[tp]||{...base,conf:undefined,other:"",reasons:{}};const rp=radarAt(tp);const R=RADAR[tp];
+  app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">Step 3 · with RADAR · time point ${tp+1} of 5</span></div>
+  <div class="grid"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="panel radar"><h3 style="margin-top:0">RADAR card · ${TP[tp]}</h3><div>${R.badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(t)}</span>`).join("")}</div>${R.boxes.map(([h,it])=>`<h3>${h}</h3><ul>${it.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("")}</div><div class="panel">${chartHtml()}</div></div>
+  <div class="panel"><h2>Keep or change each decision</h2><p class="small muted">Your Step 1 answers are filled in. <span class="legendkey"></span>marks RADAR's choice. Every change needs a reason.</p>${formHtml(cur,{base,radar:rp,reasons:cur.reasons})}
+  <div class="actions"><span class="err" id="e"></span><span>${tp>0?`<button id="back">Back</button> `:""}<button class="primary" id="next">${tp<4?"Save and go to "+TP[tp+1]:"Save and review"}</button></span></div></div></div>`;
+  app.querySelectorAll('.opts input').forEach(inp=>inp.addEventListener("change",()=>{const k=inp.name;if(k==="conf")return;const row=app.querySelector("#row-"+k);const ch=inp.value!==base[k];row.classList.toggle("changed",ch);row.querySelector(".reason").hidden=!ch;}));
+  app.querySelector("#next").onclick=()=>{const f=readForm();f.reasons={};const miss=[];DECISIONS.forEach(([k,l])=>{if(f[k]!==base[k]){const w=(app.querySelector("#why-"+k)?.value||"").trim();if(!w)miss.push(l);f.reasons[k]=w}});
+   if(miss.length||!f.conf){app.querySelector("#e").textContent=(miss.length?"Add a reason for: "+miss.join(", ")+". ":"")+(f.conf?"":"Rate how sure you are.");return}
+   f.seconds=Math.round((Date.now()-tStart)/1000);S.step2[tp]=f;tStart=Date.now();if(tp<4){tp++}else{S.stage="summary"}save();render();scrollTo(0,0)};
+  const b=app.querySelector("#back");if(b)b.onclick=()=>{tp--;render()};return;}
+ if(S.stage==="summary"||S.stage==="done"){const fin1=S.step1[4],fin2=S.step2[4],rp=radarAt(4);let nch=0;
+  const rows=DECISIONS.map(([k,l])=>{const c=TP.map((t,i)=>S.step1[i][k]!==S.step2[i][k]?t:null).filter(Boolean);if(c.length)nch++;return `<tr><td><b>${l}</b></td><td>${esc(fin1[k])}</td><td class="${fin1[k]!==fin2[k]?"chg":""}">${esc(fin2[k])}</td><td>${esc(rp[k]||"—")}</td><td>${c.length?"changed at "+c.join(", "):"—"}</td></tr>`}).join("");
+  const sum=a=>a.reduce((x,y)=>x+(y?.seconds||0),0);
+  app.innerHTML=`<div class="panel"><h2>${S.stage==="done"?"Submitted. Thank you.":"Check your answers, then submit"}</h2><p class="muted">Final decisions at 6 h. ${nch} of ${DECISIONS.length} decisions changed at some point after you saw RADAR.</p>
+  <div class="scroll"><table class="sum"><tr><th>Decision</th><th>On your own</th><th>With RADAR</th><th>RADAR</th><th>When it changed</th></tr>${rows}
+  <tr><td><b>Confidence (6 h)</b></td><td>${fin1.conf}</td><td class="${fin1.conf!==fin2.conf?"chg":""}">${fin2.conf}</td><td></td><td></td></tr>
+  <tr><td><b>Time</b></td><td>${Math.round(sum(S.step1)/60*10)/10} min</td><td>${Math.round(sum(S.step2)/60*10)/10} min</td><td></td><td></td></tr></table></div>
+  <h3>How useful was the RADAR card?</h3><div class="opts">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="rating" value="${n}" ${S.rating==n?"checked":""} ${S.stage==="done"?"disabled":""}>${n}</label>`).join("")}</div><div class="small muted">1 = not useful · 5 = very useful</div>
+  <h3>Anything RADAR got wrong, or should show differently?</h3><textarea id="cm" ${S.stage==="done"?"disabled":""}>${esc(S.comment)}</textarea>
+  <div class="actions" style="margin-top:12px"><span class="err" id="e"></span>${S.stage==="done"?`<span class="muted" id="sendmsg">${S.sent?`Thank you, ${esc(S.reviewer.name)}. Your results were sent to the RADAR team (${TEAM_EMAIL}).`:`Thank you, ${esc(S.reviewer.name)}. Please email the results file to ${TEAM_EMAIL}.`}</span><span>${S.sent?"":`<a class="btnlink" href="${mailtoHref()}">Open email to ${TEAM_EMAIL}</a> `}<button id="dl">Download results file</button></span>`:`<span><button id="back">Back to 6 h</button> <button class="primary" id="sub">Finish and send results</button></span>`}</div></div>`;
+  if(S.stage==="done"){app.querySelector("#dl").onclick=download}
+  if(S.stage==="summary"){app.querySelector("#back").onclick=()=>{S.stage="step2";tp=4;render()};
+   app.querySelector("#sub").onclick=async()=>{const r=app.querySelector('input[name="rating"]:checked');if(!r){app.querySelector("#e").textContent="Rate the RADAR card first.";return}
+    S.rating=+r.value;S.comment=app.querySelector("#cm").value;S.stage="done";S.submitted=true;S.submittedAt=new Date().toISOString();S.sent=await sendResults();if(!S.sent)download();await save();render();scrollTo(0,0)}}
+  return;}
+}
+const KEY="radar-review-"+CASE.id;
+// Paste the Google Apps Script web-app URL here to send results automatically (see tools/review_mailer.gs).
+const SEND_URL="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
+const TEAM_EMAIL="jin00330@umn.edu";
+function payload(){return {tool:"RADAR clinician review",version:"offline-2",case:CASE.id,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S))};}
+async function sendResults(){if(!SEND_URL)return false;try{await fetch(SEND_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload())});return true}catch(e){return false}}
+function mailtoHref(){const p=payload();const lines=[`RADAR clinician review - ${p.reviewer.name}`,`Case: ${p.case}`,`Finished: ${p.submittedAt||p.sentAt}`,"","Please attach the downloaded results file (RADAR_review_*.json) to this email."];return `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent("RADAR review - "+p.reviewer.name)}&body=${encodeURIComponent(lines.join("\n"))}`;}
+async function save(){try{localStorage.setItem(KEY,JSON.stringify(S));statusEl.textContent="Saved in this browser "+new Date().toLocaleTimeString();}catch(e){statusEl.textContent="This browser cannot keep answers; please finish in one sitting."}}
+function download(){const data=payload();
+ const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});const a=document.createElement("a");
+ const nm=(S.reviewer.name||"reviewer").replace(/[^A-Za-z0-9]+/g,"_");a.href=URL.createObjectURL(blob);a.download=`RADAR_review_${nm}_${CASE.id}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);}
+const RS=document.getElementById("restart");
+function restartUI(){RS.innerHTML=`<button type="button" id="rs-btn">Start over</button>`;RS.querySelector("#rs-btn").onclick=()=>{
+ RS.innerHTML=`<span class="small">Clear all your answers and start again?</span> <button type="button" id="rs-no">Cancel</button> <button type="button" class="primary" id="rs-yes">Yes, start over</button>`;
+ RS.querySelector("#rs-no").onclick=restartUI;
+ RS.querySelector("#rs-yes").onclick=async()=>{S={stage:"start",reviewer:{name:""},step1:[],step2:[],rating:null,comment:"",submitted:false};tp=0;try{localStorage.removeItem(KEY)}catch(e){};restartUI();render();scrollTo(0,0);statusEl.textContent="Started a new review.";};};}
+restartUI();
+try{const v=localStorage.getItem(KEY);if(v){S={...S,...JSON.parse(v)};if(S.stage==="step1")tp=Math.min(S.step1.length,4);if(S.stage==="step2")tp=Math.min(S.step2.length,4);statusEl.textContent="Picked up where you left off.";}}catch(e){}
+render();
+</script>
+</body></html>

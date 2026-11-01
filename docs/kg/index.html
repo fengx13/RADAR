@@ -220,7 +220,7 @@ function setMode(m){const L=m==="light";document.getElementById("gwrap").classLi
  document.getElementById("m-dark").setAttribute("aria-pressed",String(!L));document.getElementById("m-light").setAttribute("aria-pressed",String(L));try{localStorage.setItem("radar-kg-mode",m)}catch(e){}}
 document.getElementById("m-dark").onclick=()=>setMode("dark");document.getElementById("m-light").onclick=()=>setMode("light");
 try{const m=localStorage.getItem("radar-kg-mode");if(m)setMode(m)}catch(e){}
-showRadar("R1");
+document.getElementById("clear").click();
 </script>
 
 </body></html>

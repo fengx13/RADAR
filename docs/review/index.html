@@ -76,6 +76,10 @@ td.chg{background:var(--goldtint);font-weight:600}
 .legendkey{display:inline-block;width:14px;height:14px;border-radius:999px;box-shadow:0 0 0 2px var(--gold);vertical-align:-2px;margin-right:4px}
 .status{font-size:13px;color:var(--muted)}
 a.btnlink{display:inline-block;font-weight:600;border-radius:9px;padding:9px 18px;background:var(--maroon);color:var(--onmaroon);text-decoration:none}
+.adapted{margin:-4px 0 6px}
+.vt{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}.vt th,.vt td{padding:2px 8px 2px 0;text-align:left}.vt th{color:var(--muted,#777);font-weight:500}.vt tr.new td{background:var(--newtint)}
+details.pn{margin:4px 0;padding:2px 6px;border-radius:6px}details.pn.new{background:var(--newtint)}details.pn summary{cursor:pointer;font-size:13px}
+.pv{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12.5px;padding:3px 0 4px 14px}.pv .ab{color:#8a1538;font-weight:600}
 </style>
 </head><body>
 
@@ -118,7 +122,26 @@ const CASE={id:"example-1",title:"79-year-old man · near-fainting at home",
   [],
   ["Lactate 4.1 mmol/L","WBC 29 ×10⁹/L, neutrophils 91%","BP 85/50 (MAP 62)"],
   ["Creatinine 6.9 mg/dL (baseline 2.1), Na 128","Bicarbonate 7, anion gap 29","Chest X-ray: no acute process","Venous pH 7.15, lactate 4.3"]],
- actions:[[],["ECG done"],["None"],["Blood cultures drawn","Lactate drawn","Urinalysis sent"],["None"]]};
+ actions:[[],["ECG done"],["None"],["Blood cultures drawn","Lactate drawn","Urinalysis sent"],["Cefepime IV given at 3.5 h"]]};
+// Full chart for the example case. Adapted from a real ED visit: age and every value changed; not patient data.
+const TPH=[0,0.5,1,3,6];
+const FULL={
+ problems:["Chronic kidney disease (baseline creatinine 2.1 mg/dL)","Prosthetic aortic valve","Ileostomy","Gout","Recurrent urinary infections; bloodstream infection last year (resistant organism)"],
+ homeMeds:["Hydrocodone–acetaminophen as needed"],
+ baseline:"Last visit: creatinine 2.1 · BUN 40 · Na 138 · K 4.3 · albumin 3.8 · WBC 11.2 · Hb 10.5 · platelets 310 · lactate 1.9 · INR 1.4 · NT-proBNP 780",
+ vitals:[[0,"35.9",94,18,98,"98/42"],[2.6,"",100,18,98,"84/52"],[2.9,"",103,20,99,"85/50"],[3.5,"35.4",101,20,97,"99/54"],[4.4,"",98,20,99,"98/64"],[4.9,"",95,22,96,"101/63"]],
+ panels:[
+  [0.3,"ECG",[["Sinus rhythm, right bundle branch block, indeterminate axis",0]]],
+  [2.2,"Lactate",[["Lactate 4.1 mmol/L",1]]],
+  [2.4,"Full blood count",[["WBC 29 ×10⁹/L",1],["Neutrophils 91%",1],["Lymphocytes 2%",1],["Monocytes 5%",0],["Eosinophils 0.4%",0],["Basophils 0.1%",0],["Hemoglobin 13.9 g/dL",0],["Hematocrit 44%",0],["Platelets 330 ×10⁹/L",0],["MCV 87 fL",0],["RDW 15.8%",1]]],
+  [3.2,"Chemistry",[["Creatinine 6.9 mg/dL",1],["BUN 135 mg/dL",1],["Sodium 128 mEq/L",1],["Potassium 5.3 mEq/L",1],["Chloride 97 mEq/L",0],["Bicarbonate 7 mEq/L",1],["Anion gap 29",1],["Glucose 198 mg/dL",1],["Calcium 8.5 mg/dL",0],["Magnesium 2.1 mg/dL",0],["Phosphate 8.4 mg/dL",1],["NT-proBNP 3800 pg/mL",1],["Lipase 430 U/L",1],["ALT 6 U/L",0],["AST 16 U/L",0],["Alkaline phosphatase 70 U/L",0],["Bilirubin 0.3 mg/dL",0]]],
+  [3.7,"Urinalysis",[["Protein 300 mg/dL",1],["RBC >100 /hpf",1],["Specific gravity 1.012",0],["pH 6",0],["Epithelial cells 0 /hpf",0],["Yeast none",0]]],
+  [4.3,"Chest X-ray",[["No acute cardiopulmonary process",0]]],
+  [4.8,"Venous blood gas",[["pH 7.15",1],["pCO₂ 24 mmHg",1],["pO₂ 36 mmHg",0],["Lactate (repeat) 4.3 mmol/L",1],["Base excess −20",1],["Total CO₂ 8 mEq/L",1]]],
+  [5.2,"Coagulation",[["INR 1.1",0],["PT 12.1 s",0],["PTT 30 s",0]]]],
+ meds:[[3.5,"Cefepime IV, given"]],
+ medsNote:"No IV fluids, vasopressors or oxygen recorded"
+};
 const RADAR=[
  {badges:[["Probable sepsis",1],["Shock concern · MAP 61",0]],boxes:[
   ["Why",["Low temperature at 79: sepsis may present without fever <span class=src>NICE 1.4.2</span>","Recurrent urinary and bloodstream infection <span class=src>NICE 1.1.1</span>","MAP 61, below 65 <span class=src>Sepsis-3</span>"]],
@@ -146,9 +169,16 @@ function rail(){const steps=[["1","Read the triage packet and decide"],["2","Upd
  const idx=S.stage==="step1"?(tp===0?1:2):cur;
  document.getElementById("rail").innerHTML=steps.map(([n,t],i)=>`<div class="${i+1===idx?"now":(i+1<idx?"done":"")}"><b>Step ${n}</b>${t}</div>`).join("");}
 function tlHtml(){return `<div class="tl">${TP.map((t,i)=>`<span class="${i===tp?"on":(i<tp?"past":"")}">${t}</span>`).join("")}</div>`;}
-function chartHtml(){const c=CASE;let h=`<h2>${esc(c.title)}</h2><h3>Triage</h3><ul>${c.base.triage.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h3>History</h3><ul>${c.base.history.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h3>Results so far</h3>`;
- const rs=[];for(let i=1;i<=tp;i++)c.results[i].forEach(r=>rs.push([TP[i],r,i===tp]));
- h+=rs.length?`<ul>${rs.map(([t,r,n])=>`<li class="${n?"new":""}"><span class="tag">${n?"NEW · ":""}${t}</span>${esc(r)}</li>`).join("")}</ul>`:`<p class="muted">None yet</p>`;
+function chartHtml(){const c=CASE,F=FULL,now=TPH[tp],prev=tp>0?TPH[tp-1]:-1;const isNew=t=>tp>0&&t>prev&&t<=now;
+ let h=`<h2>${esc(c.title)}</h2><p class="small muted adapted">Example case adapted from a real ED visit; age and all values changed.</p><h3>Triage</h3><ul>${c.base.triage.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+ h+=`<h3>History</h3><ul>${F.problems.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p class="small"><b>Home medications:</b> ${esc(F.homeMeds.join("; "))}</p><p class="small"><b>Baseline labs.</b> ${esc(F.baseline)}</p>`;
+ const vs=F.vitals.filter(v=>v[0]<=now);
+ h+=`<h3>Vital signs</h3><table class="vt"><tr><th>Time</th><th>T °C</th><th>HR</th><th>RR</th><th>SpO₂</th><th>BP</th></tr>${vs.map(v=>`<tr class="${isNew(v[0])?"new":""}"><td>${v[0].toFixed(1)} h</td><td>${v[1]||"–"}</td><td>${v[2]}</td><td>${v[3]}</td><td>${v[4]}%</td><td>${v[5]}</td></tr>`).join("")}</table>`;
+ const ps=F.panels.filter(p=>p[0]<=now);
+ h+=`<h3>Results so far</h3>`+(ps.length?ps.map(([t,name,items])=>{const n=isNew(t),ab=items.filter(i=>i[1]).length;
+  return `<details class="pn ${n?"new":""}" open><summary><span class="tag">${n?"NEW · ":""}${t.toFixed(1)} h</span><b>${esc(name)}</b>${items.length>2?` <span class="small muted">${items.length} results${ab?" · "+ab+" abnormal":""}</span>`:""}</summary><div class="pv">${items.map(([s,a])=>`<span class="${a?"ab":""}">${esc(s)}</span>`).join("")}</div></details>`}).join(""):`<p class="muted">None yet</p>`);
+ const ms=F.meds.filter(m=>m[0]<=now);
+ h+=`<h3>Medications given</h3><ul>${ms.map(m=>`<li class="${isNew(m[0])?"new":""}">${m[0].toFixed(1)} h · ${esc(m[1])}</li>`).join("")}<li class="muted">${esc(F.medsNote)}${ms.length?"":"; no medications yet"}</li></ul>`;
  if(tp>0){h+=`<h3>Done by the team since last check</h3><ul>${c.actions[tp].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`}
  return h;}
 function formHtml(prefill,opts={}){return `<table class="form">${DECISIONS.map(([k,l,os])=>{const v=prefill[k];const rp=opts.radar?opts.radar[k]:undefined;const base=opts.base?opts.base[k]:undefined;

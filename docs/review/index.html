@@ -455,15 +455,15 @@ function a4Items(a4,isT0){if(!a4)return [];const out=[];
  out.push({txt:head+(by?` <span class="small muted">· decided by ${esc(by)}</span>`:""),conf:a4.confidence||lvl(a4.confidence_pct),
   forr:[...(a4.rule_reasons||[]),...(a4.key_reasons||[])].map(esc),against:(a4.unresolved_risks||[]).map(esc),more:(a4.missing_information||[]).map(esc)});
  return out}
-function prerunCard(i,sim){if(typeof PRERUN==="undefined")return null;const near=nearestPath(sim,i);if(!near)return null;
- const C=PRERUN.cards[near.pid],t=TPH[i];const cps=(C.checkpoints||[]).filter(c=>c.cutoff<=t+1e-9);const cp=cps[cps.length-1]||null;
+function prerunCard(i,sim,live){if(!live&&typeof PRERUN==="undefined")return null;const near=live?null:nearestPath(sim,i);if(!live&&!near)return null;
+ const C=live?live.card:PRERUN.cards[near.pid],t=TPH[i];const cps=(C.checkpoints||[]).filter(c=>c.cutoff<=t+1e-9);const cp=cps[cps.length-1]||null;
  const a1=cp?cp.agent1:C.t0.agent1,a3=cp?cp.agent3:null,a4=cp?cp.agent4:C.t0.agent4,a2=C.t0.agent2;
  const done=k=>sim.orders[k]&&sim.orders[k].done<=t;
  const S=[],pick={};
  const lastCp=(C.checkpoints||[]).slice(-1)[0];const stoppedBefore=lastCp&&lastCp.cutoff<t&&C.stopped_at===lastCp.id;
- S.push({h:"Pre-run RADAR output",items:[{txt:`RADAR (${esc(PRERUN.model)}) was run in advance on this simulated patient along three pre-set order paths. Shown: the path closest to your orders so far: <b>${esc(near.P.label)}</b>.`},
-  {txt:near.diff.length?"Differences from your orders by now: "+esc(near.diff.join("; ")):"Your orders so far match this path."},
-  {txt:cp?`RADAR's latest step: checkpoint ${esc(cp.id.replace("C","").replace("_","."))} h${cp.new_results&&cp.new_results.length?` (new results: ${cp.new_results.length})`:""}.`:(i===0?"RADAR's triage step (T0).":"No new result had returned on this path, so RADAR has not reassessed since triage.")},
+ S.push({h:live?"Live RADAR output":"Pre-run RADAR output",items:[...(live?[{txt:`RADAR (${esc(live.model)}) was run live on <b>your own orders</b> up to this time point${live.cached?" (same orders as an earlier run, so the saved result is shown)":live.seconds?` (took ${Math.round(live.seconds)} s)`:""}.`}]:[{txt:`RADAR (${esc(PRERUN.model)}) was run in advance on this simulated patient along three pre-set order paths. Shown: the path closest to your orders so far: <b>${esc(near.P.label)}</b>.`},
+  {txt:near.diff.length?"Differences from your orders by now: "+esc(near.diff.join("; ")):"Your orders so far match this path."}]),
+  {txt:cp?`RADAR's latest step: checkpoint ${esc(cp.id.replace("C","").replace("_","."))} h${cp.new_results&&cp.new_results.length?` (new results: ${cp.new_results.length})`:""}.`:(i===0?"RADAR's triage step (T0).":(live?"No new result had returned yet, so RADAR has not reassessed since triage.":"No new result had returned on this path, so RADAR has not reassessed since triage."))},
   ...(stoppedBefore?[{txt:`RADAR gave its level of care at ${esc(lastCp.id.replace("C","").replace("_","."))} h and stopped there, as in every RADAR run; it does not reassess after its decision.`}]:[])]});
  const A=a1Items(a1);S.push({h:"Assessment (Agent 1)",items:A});
  pick.tier=TIER[a1&&a1.tier];
@@ -484,7 +484,34 @@ function prerunCard(i,sim){if(typeof PRERUN==="undefined")return null;const near
  S.push({h:"Level of care (Agent 4)",items:a4Items(a4,!cp)});
  const lev=a4&&(a4.category?LEVEL[a4.category]:(a4.status==="decision"&&a4.disposition?LEVEL[a4.disposition]:null));
  pick.dispo=a4&&a4.status==="decision"&&lev?lev:"not yet decided";
- return {badges:[[`Sepsis: ${pick.tier||"—"}`,1],[`Shock: ${pick.shock}`,0],[pick.dispo,0]],sections:S,pick,prerun:{path:near.pid,distance:near.d,checkpoint:cp?cp.id:"T0"}};}
+ return {badges:[[`Sepsis: ${pick.tier||"—"}`,1],[`Shock: ${pick.shock}`,0],[pick.dispo,0]],sections:S,pick,prerun:live?null:{path:near.pid,distance:near.d,checkpoint:cp?cp.id:"T0"},live:live?{checkpoint:cp?cp.id:"T0",seconds:live.seconds||null,cost_usd:live.cost_usd??null,cached:!!live.cached}:null};}
+/* ----- Live RADAR (step 5): open the page with ?live=<server URL>; the reviewer enters the access code ----- */
+const LIVE_URL=(()=>{try{const u=new URLSearchParams(location.search).get("live");if(!u)return null;const x=new URL(u);
+ return (x.protocol==="https:"||["localhost","127.0.0.1"].includes(x.hostname))?x.origin:null}catch(e){return null}})();
+const liveJobs={};
+const liveOn=()=>!!(LIVE_URL&&S.liveCode);
+function liveKey(caseId,tpi,dec){return caseId+"|"+tpi+"|"+JSON.stringify(dec.slice(0,tpi).map(d=>Object.fromEntries(KEYS.filter(k=>d&&d[k]).map(k=>[k,d[k]]))))}
+function liveCard(caseId,tpi,dec,sim){if(!liveOn())return null;const L=(S.liveCards||{})[liveKey(caseId,tpi,dec)];return L&&L.status==="done"?prerunCard(tpi,sim,L):null}
+async function liveEnsure(caseId,tpi,dec,onDone){if(!liveOn())return;S.liveCards=S.liveCards||{};const key=liveKey(caseId,tpi,dec);const have=S.liveCards[key];
+ if(have&&have.status==="done")return;if(liveJobs[key])return;liveJobs[key]=1;
+ const H={"Content-Type":"application/json","X-Radar-Token":S.liveCode};
+ const note=t=>{const n=document.getElementById("livenote");if(n&&n.dataset.key===key)n.textContent=t};
+ const done=q=>{S.liveCards[key]={status:"done",card:q.card,model:q.model,seconds:q.seconds,cost_usd:q.cost_usd,cached:q.cached};save();delete liveJobs[key];onDone&&onDone(key)};
+ try{setTimeout(()=>note("Live RADAR is running on your orders (usually 1–2 minutes). The pre-run card is shown meanwhile."),50);
+  const r=await fetch(LIVE_URL+"/run",{method:"POST",headers:H,body:JSON.stringify({case_id:caseId,tp:tpi,decisions:dec.slice(0,tpi).map(d=>Object.fromEntries(KEYS.filter(k=>d&&d[k]).map(k=>[k,d[k]])))})});
+  const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);
+  if(j.status==="done"){done(j);return}if(j.status==="error")throw new Error(j.error);
+  const t0=Date.now();
+  while(Date.now()-t0<15*60*1000){await new Promise(z=>setTimeout(z,4000));
+   const q=await(await fetch(LIVE_URL+"/job/"+j.job,{headers:{"X-Radar-Token":S.liveCode}})).json();
+   if(q.status==="done"){done(q);return}
+   if(q.status==="error")throw new Error(q.error);
+   note(`Live RADAR is ${q.status==="running"?"running on your orders":"waiting for a free slot"} (${Math.round((Date.now()-t0)/1000)} s; usually 1–2 minutes). The pre-run card is shown meanwhile.`)}
+  throw new Error("timeout")}
+ catch(e){delete liveJobs[key];note(`Live RADAR is not available (${String(e.message||e).slice(0,40)}); the pre-run card is shown.`)}}
+function liveNoteHtml(key){return `<p class="small muted" id="livenote" data-key="${esc(key)}">Live RADAR is starting on your orders; the pre-run card is shown meanwhile.</p>`}
+function swapCard(R){const old=app.querySelector(".panel.radar");if(old){const d=document.createElement("div");d.innerHTML=cardHtml(R);old.replaceWith(d.firstElementChild)}
+ app.querySelectorAll(".opts label").forEach(l=>{const inp=l.querySelector("input");if(!inp||inp.name==="conf")return;l.classList.toggle("radarpick",R.pick[inp.name]===inp.value)})}
 
 /* ===================== UI ===================== */
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -530,17 +557,18 @@ function showMissing(list){app.querySelectorAll("tr.missing").forEach(r=>r.class
  const first=app.querySelector("#row-"+list[0][0])||app.querySelector("#"+list[0][0]);if(first)first.scrollIntoView({behavior:"smooth",block:"center"});}
 function prefillFrom(prev){const p={...prev};delete p.conf;delete p.other;delete p.seconds;delete p.reasons;delete p.disagree;return p}
 function cardHtml(R){const conf=c=>c?`<span class="conf conf-${c}">confidence: ${c}</span>`:"";
- return `<div class="panel radar"><h3 style="margin-top:0">RADAR card · ${TP[tp]}${R.prerun?" · pre-run":""}</h3><div>${R.badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(t)}</span>`).join("")}</div>
+ return `<div class="panel radar"><h3 style="margin-top:0">RADAR card · ${TP[tp]}${R.prerun?" · pre-run":R.live?" · live":""}</h3><div>${R.badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(t)}</span>`).join("")}</div>
  ${R.sections.map(s=>`<h3>${s.h}</h3><ul class="cardlist">${s.items.map(it=>`<li>${it.txt} ${conf(it.conf)}${(it.forr&&it.forr.length)||(it.against&&it.against.length)||(it.more&&it.more.length)?`<div class="ev">${it.forr&&it.forr.length?`<div><b>For:</b> ${it.forr.join("; ")}</div>`:""}${it.against&&it.against.length?`<div><b>Against:</b> ${it.against.join("; ")}</div>`:""}${it.more&&it.more.length?`<div class="more"><b>More data needed:</b> ${it.more.join("; ")}</div>`:""}</div>`:""}</li>`).join("")}</ul>`).join("")}
- <p class="small muted">The gold ring in the form marks RADAR's suggestion. You do not have to follow it. ${R.prerun?"This card is RADAR's real output, run in advance on this simulated patient (pre-run); confidence values come from RADAR's agents. RADAR was not re-run on your exact orders.":"In this version the card is built from RADAR's rules written out for the review, and confidence levels are illustrative."}</p></div>`;}
+ <p class="small muted">The gold ring in the form marks RADAR's suggestion. You do not have to follow it. ${R.live?"This card is RADAR's real output, run live on your own orders up to this time point; confidence values come from RADAR's agents.":R.prerun?"This card is RADAR's real output, run in advance on this simulated patient (pre-run); confidence values come from RADAR's agents. RADAR was not re-run on your exact orders.":"In this version the card is built from RADAR's rules written out for the review, and confidence levels are illustrative."}</p></div>`;}
 
 function render(){rail();document.body.classList.toggle("compact",S.stage!=="start");
  if(S.stage==="start"){app.innerHTML=`<div class="panel"><h2>Before you start</h2>
   <label style="display:block;max-width:420px">Your name<input type="text" id="r-name" value="${esc(S.reviewer.name||"")}" autocomplete="name"></label>
+  ${LIVE_URL?`<label style="display:block;max-width:420px;margin-top:8px">Live RADAR access code <span class="small muted">(from the RADAR team; leave empty to use the pre-run cards)</span><input type="password" id="r-code" value="${esc(S.liveCode||"")}" autocomplete="off"></label>`:""}
   <h3>How it works</h3><p class="small">Five patients, one at a time, in random order; not all of them have sepsis. For each patient:</p><ol><li>See what is known at triage and place your orders.</li><li>The team carries out your orders. At 0.5, 1, 3 and 6 h you see new vital signs and any results you ordered, and update your plan.</li><li>Manage the same patient again from triage with RADAR's card at each time point. RADAR shows what it sees, its confidence, the evidence for and against, and what data it still needs.</li><li>Compare the two runs, give your working diagnosis and go to the next patient.</li></ol><p class="small">After the fifth patient, answer two final questions and press Finish: your results go to the RADAR team. About 10–15 minutes per patient; you can save and come back.</p>
   <p class="small muted">Your answers stay in this browser until you finish. You can save and open the tutorial at any time.</p>
   <div class="actions"><span class="err" id="e"></span><span><button id="tut">Start with the tutorial (3 minutes)</button> <button class="primary" id="go">Start the review</button></span></div></div>`;
-  const nm=()=>{S.reviewer={name:app.querySelector("#r-name").value.trim()};if(!S.reviewer.name){app.querySelector("#e").textContent="Enter your name to continue.";return false}return true};
+  const nm=()=>{S.reviewer={name:app.querySelector("#r-name").value.trim()};const cd=app.querySelector("#r-code");if(cd)S.liveCode=cd.value.trim()||null;if(!S.reviewer.name){app.querySelector("#e").textContent="Enter your name to continue.";return false}return true};
   app.querySelector("#go").onclick=()=>{if(!nm())return;S.stage="step1";tp=0;tStart=Date.now();save();render();scrollTo(0,0)};
   app.querySelector("#tut").onclick=()=>{if(!nm())return;S.ret={stage:"step1",tp:0};S.stage="tutorial";S.tutPage=0;save();render();scrollTo(0,0)};return;}
  if(S.stage==="tutorial"){renderTutorial();return}
@@ -552,7 +580,7 @@ function render(){rail();document.body.classList.toggle("compact",S.stage!=="sta
   app.querySelector("#next").onclick=()=>{const f=readForm();const miss=DECISIONS.filter(([k])=>!f[k]).map(([k,l])=>[k,LABEL[k]]);if(!f.conf)miss.push(["conf","How sure are you"]);if(miss.length){showMissing(miss);return}
    f.seconds=Math.round((Date.now()-tStart)/1000);S.step1[tp]=f;S.step1.length=tp+1;delete S.draft["step1:"+tp];tStart=Date.now();if(tp<4){tp++}else{S.stage="step2";tp=0}save();render();scrollTo(0,0)};
   const b=app.querySelector("#back");if(b)b.onclick=()=>{saveDraft();tp--;render()};return;}
- if(S.stage==="step2"){const sim=simulate(S.step2.slice(0,tp));const R=radarCard(tp,sim);const auto=autoState(sim);S.radar[tp]={pick:R.pick,prerun:R.prerun||null,sections:R.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:it.txt.replace(/<[^>]+>/g,"")}))}))};
+ if(S.stage==="step2"){const sim=simulate(S.step2.slice(0,tp));const R=liveCard(CASE.id,tp,S.step2,sim)||radarCard(tp,sim);const auto=autoState(sim);S.radar[tp]={pick:R.pick,prerun:R.prerun||null,live:R.live||null,sections:R.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:it.txt.replace(/<[^>]+>/g,"")}))}))};
   const base=S.step1[tp];const cur=S.draft["step2:"+tp]||S.step2[tp]||{...prefillFrom(S.step2[tp-1]||base),reasons:{}};
   app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">Patient ${S.ci+1} of ${S.order.length} · with RADAR · time point ${tp+1} of 5</span>${toolbar()}</div>
   <div class="grid"><div style="display:flex;flex-direction:column;gap:16px;min-width:0">${cardHtml(R)}<div class="panel">${chartHtml(sim)}${modelNote()}</div></div>
@@ -560,6 +588,8 @@ function render(){rail();document.body.classList.toggle("compact",S.stage!=="sta
   <label class="other" id="dis-wrap">Where do you disagree with RADAR's card at this time point, and why? <span class="small muted">(optional)</span><textarea id="disagree" placeholder="For example: I do not think this is sepsis because ...">${esc(cur.disagree||"")}</textarea></label>
   <div class="actions"><span class="err" id="e"></span><span>${tp>0?`<button id="back">Back</button> `:""}<button class="primary" id="next">${tp<4?"Save and go to "+TP[tp+1]:"Save and compare"}</button></span></div></div></div>`;
   bindToolbar();
+  if(liveOn()&&!R.live){const key=liveKey(CASE.id,tp,S.step2);const pr=app.querySelector(".panel.radar");if(pr)pr.insertAdjacentHTML("afterbegin",liveNoteHtml(key));const myTp=tp,myCase=CASE.id;
+   liveEnsure(CASE.id,tp,S.step2,()=>{if(S.stage!=="step2"||tp!==myTp||CASE.id!==myCase)return;const L=liveCard(myCase,myTp,S.step2,simulate(S.step2.slice(0,myTp)));if(L){swapCard(L);S.radar[myTp]={pick:L.pick,prerun:null,live:L.live,sections:L.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:it.txt.replace(/<[^>]+>/g,"")}))}))};save()}})}
   app.querySelectorAll('.opts input').forEach(inp=>inp.addEventListener("change",()=>{const k=inp.name;if(k==="conf")return;const row=app.querySelector("#row-"+k);const ch=inp.value!==base[k];row.classList.toggle("changed",ch);const rs=row.querySelector(".reason");if(rs)rs.hidden=!ch;}));
   app.querySelector("#next").onclick=()=>{const f=readForm();f.reasons={};const miss=[];DECISIONS.forEach(([k])=>{if(!f[k]){miss.push([k,LABEL[k]]);return}if(f[k]!==base[k]){const w=(app.querySelector("#why-"+k)?.value||"").trim();if(!w)miss.push([k,"reason for "+LABEL[k]]);f.reasons[k]=w}});
    if(!f.conf)miss.push(["conf","How sure are you"]);if(miss.length){showMissing(miss);return}
@@ -648,7 +678,7 @@ function renderMulti(){const M=S.multi;tp=M.tp;const now=TPH[M.tp];
   return `<button type="button" class="pitem ${M.active===id?"on":""}" data-id="${id}"><b>Bed ${i+1}</b> · ${esc(byId(id).title)}<div class="st">MAP <b class="${v.map<65?"lowmap":""}">${v.map}</b> · HR ${v.hr} · SpO₂ ${v.spo2}%${nw?` · <b>${nw} new result${nw>1?"s":""}</b>`:""}</div><div class="st ${sv?"ok":"todo"}">${sv?"Plan saved for "+TP[M.tp]:"Not yet updated for "+TP[M.tp]}</div><div class="st muted">${M.radar[id]?"RADAR card on":"No RADAR card"}</div></button>`}).join("");
  let main=`<div class="panel"><h2>Choose a patient</h2><p class="small muted">Open a patient on the left, update the plan and save. Patients you do not update before the clock moves keep their previous plan (at T0: no orders). You choose the order.</p></div>`;
  if(M.active){const id=M.active,sim=multiSim(id),auto=autoState(sim),pre=M.plans[id][M.tp]&&!M.plans[id][M.tp].carried?M.plans[id][M.tp]:prefillFrom(M.plans[id][M.tp-1]||{});
-  const R=M.radar[id]?radarCard(M.tp,sim):null;
+  const R=M.radar[id]?(liveCard(id,M.tp,M.plans[id],sim)||radarCard(M.tp,sim)):null;
   main=`<div class="subgrid"><div style="display:flex;flex-direction:column;gap:16px;min-width:0">${R?cardHtml(R):""}<div class="panel">${chartHtml(sim)}${modelNote()}</div></div>
   <div class="panel"><h2>Bed ${M.ids.indexOf(id)+1}: your plan at ${TP[M.tp]}</h2><p class="small muted">Rows you leave empty count as no order. Confidence is optional here.</p>${formHtml(pre,{auto,radar:R?R.pick:undefined})}
   <div class="actions"><span class="err" id="e"></span><span><button id="mclose">Back to the list without saving</button> <button class="primary" id="msave">Save this patient</button></span></div></div></div>`}
@@ -659,6 +689,9 @@ function renderMulti(){const M=S.multi;tp=M.tp;const now=TPH[M.tp];
  app.querySelector("#madv").onclick=()=>multiAdvance(false);
  const c=app.querySelector("#mclose");if(c)c.onclick=()=>{mlog("closed without saving",M.active);M.active=null;save();render()};
  const sv=app.querySelector("#msave");if(sv)sv.onclick=()=>{const id=M.active,f=readForm();delete f.disagree;M.plans[id][M.tp]=f;M.saved[id+":"+M.tp]=true;mlog("saved",id,{radarCard:!!M.radar[id]});M.active=null;save();render();scrollTo(0,0)};
+ if(M.active&&M.radar[M.active]&&liveOn()){const id=M.active,myTp=M.tp,pr=app.querySelector(".panel.radar");
+  if(pr&&!/Live RADAR output/.test(pr.textContent)){pr.insertAdjacentHTML("afterbegin",liveNoteHtml(liveKey(id,myTp,M.plans[id])));
+   liveEnsure(id,myTp,M.plans[id],()=>{if(S.stage!=="multi"||M.active!==id||M.tp!==myTp)return;setCase(id);const L=liveCard(id,myTp,M.plans[id],simulate(M.plans[id].slice(0,myTp),byId(id)));if(L)swapCard(L)})}}
  if(!multiTimer)multiTimer=setInterval(multiTick,1000);multiTick();}
 function renderMultiIntro(){app.innerHTML=`<div class="panel"><h2>Optional: busy-shift level</h2>
  <p>Three patients arrive at the same time and share one clock (T0, 0.5, 1, 3 and 6 h). At each time point you have <b>${MULTI_LIMIT/60} minutes</b> for all three. You choose which patient to see next; when the time is up the clock moves on, and a patient you did not update keeps the previous plan.</p>
@@ -696,7 +729,7 @@ const KEY="radar-review-sim4";
 const SEND_URL="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
 const TEAM_EMAIL="jin00330@umn.edu";
 function payload(){const ev=(s,id)=>{const x=simulate(s,byId(id));return {events:x.events,results:x.results.map(r=>({name:r.name,at:r.at})),vitals:VT.map(x.vital)}};
- return {tool:"RADAR clinician review",version:"sim-6",caseOrder:S.order,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:Object.fromEntries(Object.entries(S.cases).map(([id,x])=>[id,{own:ev(x.step1,id),withRadar:ev(x.step2,id)}])),busyShift:S.multi?Object.fromEntries(S.multi.ids.map(id=>[id,ev(S.multi.plans[id].map(p=>{const q={...p};delete q.carried;return q}),id)])):null};}
+ return {tool:"RADAR clinician review",version:"sim-7",caseOrder:S.order,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify({...S,liveCode:undefined})),liveMode:!!LIVE_URL,course:Object.fromEntries(Object.entries(S.cases).map(([id,x])=>[id,{own:ev(x.step1,id),withRadar:ev(x.step2,id)}])),busyShift:S.multi?Object.fromEntries(S.multi.ids.map(id=>[id,ev(S.multi.plans[id].map(p=>{const q={...p};delete q.carried;return q}),id)])):null};}
 async function sendResults(){if(!SEND_URL)return false;try{await fetch(SEND_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload())});return true}catch(e){return false}}
 function mailtoHref(){const p=payload();const lines=[`RADAR clinician review - ${p.reviewer.name}`,`Patients completed: ${Object.keys(p.cases).length} of ${p.caseOrder.length}`,`Finished: ${p.submittedAt||p.sentAt}`,"","Please attach the downloaded results file (RADAR_review_*.json) to this email."];return `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent("RADAR review - "+p.reviewer.name)}&body=${encodeURIComponent(lines.join("\n"))}`;}
 async function save(loud){try{localStorage.setItem(KEY,JSON.stringify({...S,tpNow:tp}));statusEl.textContent=(loud?"Progress saved, including unsaved choices on this screen. ":"Saved in this browser ")+new Date().toLocaleTimeString();}catch(e){statusEl.textContent="This browser cannot keep answers; please finish in one sitting."}}

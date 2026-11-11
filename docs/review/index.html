@@ -81,6 +81,16 @@ a.btnlink{display:inline-block;font-weight:600;border-radius:9px;padding:9px 18p
 details.pn{margin:4px 0;padding:2px 6px;border-radius:6px}details.pn.new{background:var(--newtint)}details.pn summary{cursor:pointer;font-size:13px}
 .hint{font-weight:400;margin-top:2px;line-height:1.35}.lowmap{color:var(--o-red)}
 .pv{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12.5px;padding:3px 0 4px 14px}.pv .ab{color:#8a1538;font-weight:600}
+.toolbar{display:flex;gap:6px}.toolbar button{padding:5px 12px;font-size:13.5px}
+tr.grp td{border-top:2px solid var(--line);padding-top:12px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--maroon);font-weight:700}
+.autonote{color:var(--o-blue);font-weight:600;margin-top:2px}
+.opts label.dis{opacity:.35;cursor:not-allowed}
+tr.missing td{background:color-mix(in srgb,var(--o-red) 10%,transparent)}tr.missing td:first-child{box-shadow:inset 3px 0 0 var(--o-red)}
+.err a{color:var(--o-red);font-weight:600}
+.cardlist li{margin:6px 0}.ev{font-size:13px;color:var(--muted);margin:2px 0 0 0;line-height:1.4}.ev b{color:var(--ink);font-weight:600}.ev .more{color:var(--warn)}.ev .more b{color:var(--warn)}
+.conf{font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:4px;white-space:nowrap;border:1px solid}
+.conf-low{color:var(--warn);border-color:var(--warn)}.conf-moderate{color:var(--o-amber);border-color:var(--o-amber)}.conf-high{color:var(--ok);border-color:var(--ok)}
+.tut ul li{margin:6px 0}.dot{padding:3px 9px;font-size:13px;margin-left:4px}.dot.on{background:var(--maroon);color:var(--onmaroon);border-color:var(--maroon)}
 </style>
 </head><body>
 
@@ -97,57 +107,52 @@ details.pn{margin:4px 0;padding:2px 6px;border-radius:6px}details.pn.new{backgro
 </div>
 
 <script>
-/* ===== Decisions shown to the clinician ===== */
+/* ===================== Decisions ===================== */
 const WHEN=["now","before ED disposition","not needed","already done"];
+const TESTS=[["cultures","Blood cultures × 2"],["lactate","Lactate"],["cbc","Complete blood count (CBC)"],["bmp","Basic metabolic panel (BMP): sodium, potassium, chloride, bicarbonate, BUN, creatinine, glucose"],["lft","Liver function tests"],["coag","Coagulation: PT/INR, PTT"],["vbg","Venous blood gas"],["ua","Urinalysis"],["cxr","Chest X-ray"],["ecg","12-lead ECG"]];
 const DECISIONS=[
- ["tier","Sepsis likelihood",["unlikely","possible","probable","definite"]],
- ["shock","Shock or hypoperfusion",["yes","no"]],
- ["cultures","Blood cultures",WHEN],
- ["lactate","Lactate",WHEN],
- ["panel","Sepsis blood panel",WHEN],
- ["ua","Urinalysis",WHEN],
- ["cxr","Chest X-ray",WHEN],
- ["ecg","12-lead ECG",WHEN],
- ["abx","Antibiotics",["within 1 h","within 3 h","hold and reassess","already given"]],
- ["fluids","IV fluid bolus",["give","withhold"]],
- ["vaso","Vasopressor",["start or continue","hold or stop"]],
- ["dispo","Disposition",["not yet","discharge","observe","ward","ICU"]],
+ ["tier","Sepsis likelihood",["unlikely","possible","probable","definite"],"Assessment"],
+ ["shock","Shock or hypoperfusion",["yes","possible: need more data","no"],"Assessment"],
+ ...TESTS.map(([k,l])=>[k,l,WHEN,"Tests"]),
+ ["abx","Antibiotics",["within 1 h","within 3 h","decide after more information","not indicated","already given"],"Treatment"],
+ ["fluids","IV fluid bolus",["give","withhold"],"Treatment"],
+ ["vaso","Vasopressor",["start or continue","hold or stop"],"Treatment"],
+ ["dispo","Level of care",["not yet decided","discharge","observation","general ward","monitored bed","ICU-level care"],"Level of care"],
 ];
+const KEYS=DECISIONS.map(d=>d[0]),TESTKEYS=TESTS.map(t=>t[0]);
+const LABEL=Object.fromEntries(DECISIONS.map(d=>[d[0],d[1].split(":")[0]]));
 const HINT={
- panel:"Venous blood gas with glucose and lactate, full blood count (CBC), C-reactive protein, urea and electrolytes with creatinine (BMP), liver function tests and coagulation (NICE NG253). Blood cultures and lactate are separate rows.",
- cultures:"Two sets, drawn before antibiotics where possible.",
- fluids:"First bolus: 30 mL/kg balanced crystalloid (Lactated Ringer's, 2,100 mL for 70 kg) over 1 h. After that, “give” means another 500 mL.",
- vaso:"Norepinephrine via peripheral line, titrated by the nurse to MAP ≥ 65.",
- "when":"now = at triage or initial assessment; before ED disposition = any time before the patient leaves the ED."
-};
-const OC={"unlikely":"green","possible":"amber","probable":"red","definite":"purple","yes":"red","no":"green",
- "now":"red","before ED disposition":"amber","not needed":"grey","already done":"blue","within 1 h":"red","within 3 h":"amber","hold and reassess":"teal","already given":"blue",
- "give":"blue","withhold":"grey","start or continue":"red","hold or stop":"grey","not yet":"grey","discharge":"green","observe":"teal","ward":"amber","ICU":"red"};
-const TP=["T0","0.5 h","1 h","3 h","6 h"];const TPH=[0,0.5,1,3,6];
-const CASE={id:"example-1-sim",title:"79-year-old man · near-fainting at home",weight:70,
- triage:["Arrived by ambulance · ESI 2","T 35.9 °C · HR 94 · RR 18 · SpO₂ 98% on air","BP 98/42 (MAP 61) · alert, slow to answer"],
+ fluids:"First bolus: 30 mL/kg balanced crystalloid (Lactated Ringer's, 2,100 mL for 70 kg) over 1 h. After it, “give” means another 500 mL.",
+ vaso:"Norepinephrine via peripheral IV, titrated by the nurse to MAP ≥ 65.",
+ dispo:"The level of care the patient needs, not a named unit: units differ between hospitals."};
+const OC={"unlikely":"green","possible":"amber","probable":"red","definite":"purple","yes":"red","possible: need more data":"amber","no":"green",
+ "now":"red","before ED disposition":"amber","not needed":"grey","already done":"blue","within 1 h":"red","within 3 h":"amber","decide after more information":"teal","not indicated":"grey","already given":"blue",
+ "give":"blue","withhold":"grey","start or continue":"red","hold or stop":"grey","not yet decided":"grey","discharge":"green","observation":"teal","general ward":"amber","monitored bed":"purple","ICU-level care":"red"};
+const TP=["T0","0.5 h","1 h","3 h","6 h"],TPH=[0,0.5,1,3,6];
+const CASE={id:"example-1-sim2",title:"79-year-old man · near-fainting at home",weight:70,
+ triage:["Arrived by ambulance · ESI 2","T 35.9 °C · HR 94 · RR 18 · SpO₂ 98% on air","BP 98/42 (MAP 61), automated cuff · alert, slow to answer"],
  problems:["Chronic kidney disease (baseline creatinine 2.1 mg/dL)","Prosthetic aortic valve","Ileostomy","Gout","Recurrent urinary infections; bloodstream infection last year (resistant organism)"],
  homeMeds:["Hydrocodone–acetaminophen as needed"],
- baseline:"Last visit: creatinine 2.1 · BUN 40 · Na 138 · K 4.3 · albumin 3.8 · WBC 11.2 · Hb 10.5 · platelets 310 · lactate 1.9 · INR 1.4 · NT-proBNP 780"};
+ baseline:"Last visit: creatinine 2.1 · BUN 40 · Na 138 · K 4.3 · albumin 3.8 · WBC 11.2 · Hb 10.5 · platelets 310 · lactate 1.9 · INR 1.4 · BP 132/70"};
 
-/* ===== Simulated patient =====
-   Course without treatment: MAP drifts down 1.5 mmHg/h from 61 (floor 50); lactate rises 0.1 mmol/L per h from 3.9.
-   30 mL/kg crystalloid: partial response, MAP +3 at the end of the bolus; each further 500 mL: +1.
-   Norepinephrine: titrated to MAP 66-68; dose rises as the untreated MAP falls.
-   Lactate falls 0.4 mmol/L per h once MAP >= 65 after fluids or vasopressor.
+/* ===================== Simulated patient =====================
+   Without treatment MAP drifts down 1.5 mmHg/h from 61 (floor 50); lactate rises 0.1 mmol/L per h from 3.9.
+   30 mL/kg crystalloid: MAP +3 by the end of the bolus (partial response); each further 500 mL: +1.
+   Norepinephrine: titrated to MAP 66-68. Lactate falls 0.4 mmol/L per h once MAP >= 65 after fluids or vasopressor.
    Orders are carried out with usual ED delays; tests return only if ordered. */
-const DELAY={cultures:{now:.2,"before ED disposition":1.5},ecg:{now:.1,"before ED disposition":1.5},cxr:{now:.4,"before ED disposition":1.5},ua:{now:.3,"before ED disposition":1.5},lactate:{now:.15,"before ED disposition":1.5},panel:{now:.2,"before ED disposition":1.5}};
-const TURN={ecg:0,cxr:.4,ua:.8,lactate:.4,panel:1.0};
+const DRAW={now:.2,"before ED disposition":1.5};
+const TURN={cultures:3.0,lactate:.4,cbc:.9,bmp:1.1,lft:1.2,coag:1.0,vbg:.3,ua:.8,cxr:.4,ecg:0};
+const DONE_TXT={cultures:"Blood cultures × 2 drawn",lactate:"Lactate drawn",cbc:"CBC drawn",bmp:"BMP drawn",lft:"Liver function tests drawn",coag:"Coagulation tests drawn",vbg:"Venous blood gas drawn",ua:"Urine sample sent",cxr:"Portable chest X-ray taken",ecg:"12-lead ECG recorded"};
 const r1=x=>Math.round(x*10)/10;
-function simulate(dec){ // dec: array of decision objects, one per time point already answered
- const ev=[],orders={},labsAt={};let bolus=null,extra=[],vasoStart=null,vasoStop=null,abx=null,dispo=null;
+function simulate(dec){
+ const orders={};let bolus=null,extra=[],vasoStart=null,vasoStop=null,abx=null,dispo=null;
  dec.forEach((d,i)=>{if(!d)return;const t=TPH[i];
-  ["cultures","lactate","panel","ua","cxr","ecg"].forEach(k=>{const v=d[k];if(orders[k]||!DELAY[k][v])return;orders[k]={ordered:t,done:r1(t+DELAY[k][v])}});
+  TESTKEYS.forEach(k=>{const v=d[k];if(orders[k]||DRAW[v]===undefined)return;orders[k]={ordered:t,done:r1(t+(k==="ecg"?.1:k==="cxr"?.4:k==="ua"?.3:DRAW[v]))}});
   if(!abx&&(d.abx==="within 1 h"||d.abx==="within 3 h"))abx=r1(t+(d.abx==="within 1 h"?.6:2.0));
   if(d.fluids==="give"){if(!bolus)bolus={start:r1(t+.2),end:r1(t+1.2)};else if(t>=bolus.end)extra.push(r1(t+.1));}
   if(d.vaso==="start or continue"&&vasoStart===null)vasoStart=r1(t+.25);
   if(d.vaso==="hold or stop"&&vasoStart!==null&&vasoStop===null&&t>vasoStart)vasoStop=t;
-  if(!dispo&&["ward","ICU","observe","discharge"].includes(d.dispo))dispo={where:d.dispo,at:t};
+  if(!dispo&&d.dispo&&d.dispo!=="not yet decided")dispo={where:d.dispo,at:t};
  });
  const fluidVol=t=>{let v=0;if(bolus&&t>bolus.start)v+=Math.min(1,(t-bolus.start)/(bolus.end-bolus.start))*30*CASE.weight;extra.forEach(s=>{if(t>s)v+=Math.min(1,(t-s)/.5)*500});return Math.round(v)};
  const baseMap=t=>{let m=Math.max(50,61-1.5*t);if(bolus&&t>bolus.start)m+=3*Math.min(1,(t-bolus.start)/(bolus.end-bolus.start));extra.forEach(s=>{if(t>s)m+=Math.min(1,(t-s)/.5)});return m};
@@ -157,172 +162,246 @@ function simulate(dec){ // dec: array of decision objects, one per time point al
  const resusAt=()=>{for(let t=0;t<=6;t=r1(t+.1))if(map(t)>=65&&(fluidVol(t)>0||onVaso(t)))return t;return null};
  const lact=t=>{const ra=resusAt();if(ra!==null&&t>ra)return Math.max(1.6,3.9+.1*ra-.4*(t-ra));return 3.9+.1*t};
  const vital=t=>{const m=map(t),dbp=Math.round(m-18),sbp=dbp+54,hr=Math.round(94+3*t-(fluidVol(t)>=2000?5:0)+(onVaso(t)?3:0));
-  return {t,T:t===0?"35.9":(t>=3?"35.5":""),hr:Math.min(hr,118),rr:t<1?18:(t<3?20:22),spo2:t<3?98:97,bp:`${sbp}/${dbp}`,map:Math.round(m),ne:nedose(t),fluid:fluidVol(t)}};
- const results=[];const R=(k,at,name,items)=>{results.push({k,at:r1(at),name,items})};
- if(orders.ecg)R("ecg",orders.ecg.done+TURN.ecg,"ECG",[["Sinus rhythm, right bundle branch block, indeterminate axis; no acute ST changes",0]]);
- if(orders.lactate){const d=orders.lactate.done;R("lactate",d+TURN.lactate,"Lactate",[[`Lactate ${lact(d).toFixed(1)} mmol/L`,1]]);}
- if(orders.panel){const d=orders.panel.done;
-  R("vbg",d+.3,"Venous blood gas",[["pH 7.15",1],["pCO₂ 24 mmHg",1],["Base excess −20",1],["Glucose 198 mg/dL",1],[`Lactate ${lact(d).toFixed(1)} mmol/L`,1]]);
-  R("cbc",d+1.0,"Full blood count",[["WBC 29 ×10⁹/L",1],["Neutrophils 91%",1],["Lymphocytes 2%",1],["Hemoglobin 13.9 g/dL",0],["Platelets 330 ×10⁹/L",0],["RDW 15.8%",1]]);
-  R("chem",d+1.2,"Chemistry (BMP, liver, CRP)",[["Creatinine 6.9 mg/dL",1],["BUN 135 mg/dL",1],["Sodium 128 mEq/L",1],["Potassium 5.3 mEq/L",1],["Bicarbonate 7 mEq/L",1],["Anion gap 29",1],["CRP 210 mg/L",1],["ALT 6 U/L",0],["AST 16 U/L",0],["Bilirubin 0.3 mg/dL",0],["Lipase 430 U/L",1]]);
-  R("coag",d+1.3,"Coagulation",[["INR 1.1",0],["PT 12.1 s",0],["PTT 30 s",0]]);}
- if(orders.ua)R("ua",orders.ua.done+TURN.ua,"Urinalysis",[["Protein 300 mg/dL",1],["RBC >100 /hpf",1],["Leukocyte esterase positive",1],["Nitrite positive",1]]);
- if(orders.cxr)R("cxr",orders.cxr.done+TURN.cxr,"Chest X-ray",[["No acute cardiopulmonary process",0]]);
- if(orders.cultures)R("bc",orders.cultures.done+3.0,"Blood cultures",[["Pending: no growth reported yet",0]]);
+  return {t,T:t===0?"35.9":(t>=3?"35.5":""),hr:Math.min(hr,118),rr:t<1?18:(t<3?20:22),spo2:t<3?98:97,bp:`${sbp}/${dbp}`,map:Math.round(m),ne:nedose(t),fluid:fluidVol(t),method:t===0?"automated cuff":"repeat, appropriately sized cuff"}};
+ const results=[];const R=(k,at,name,items)=>{results.push({k,at:r1(at),name,items})};const O=k=>orders[k];
+ if(O("ecg"))R("ecg",O("ecg").done,"ECG",[["Sinus rhythm, right bundle branch block, indeterminate axis; no acute ST changes",0]]);
+ if(O("lactate"))R("lactate",O("lactate").done+TURN.lactate,"Lactate",[[`Lactate ${lact(O("lactate").done).toFixed(1)} mmol/L`,1]]);
+ if(O("vbg"))R("vbg",O("vbg").done+TURN.vbg,"Venous blood gas",[["pH 7.15",1],["pCO₂ 24 mmHg",1],["Base excess −20",1],[`Lactate ${lact(O("vbg").done).toFixed(1)} mmol/L`,1]]);
+ if(O("cbc"))R("cbc",O("cbc").done+TURN.cbc,"Complete blood count",[["WBC 29 ×10⁹/L",1],["Neutrophils 91%",1],["Lymphocytes 2%",1],["Hemoglobin 13.9 g/dL",0],["Platelets 330 ×10⁹/L",0]]);
+ if(O("bmp"))R("bmp",O("bmp").done+TURN.bmp,"Basic metabolic panel",[["Sodium 128 mEq/L",1],["Potassium 5.3 mEq/L",1],["Chloride 97 mEq/L",0],["Bicarbonate 7 mEq/L",1],["Anion gap 29",1],["BUN 135 mg/dL",1],["Creatinine 6.9 mg/dL (baseline 2.1)",1],["Glucose 198 mg/dL",1]]);
+ if(O("lft"))R("lft",O("lft").done+TURN.lft,"Liver function tests",[["ALT 6 U/L",0],["AST 16 U/L",0],["Alkaline phosphatase 70 U/L",0],["Bilirubin 0.3 mg/dL",0],["Albumin 3.4 g/dL",1]]);
+ if(O("coag"))R("coag",O("coag").done+TURN.coag,"Coagulation",[["INR 1.1",0],["PT 12.1 s",0],["PTT 30 s",0]]);
+ if(O("ua"))R("ua",O("ua").done+TURN.ua,"Urinalysis",[["Leukocyte esterase positive",1],["Nitrite positive",1],["WBC >50 /hpf",1],["Protein 300 mg/dL",1]]);
+ if(O("cxr"))R("cxr",O("cxr").done+TURN.cxr,"Chest X-ray",[["No acute cardiopulmonary process",0]]);
+ if(O("cultures"))R("cultures",O("cultures").done+TURN.cultures,"Blood cultures",[["Pending: no growth reported yet",0]]);
  const events=[];
- Object.entries(orders).forEach(([k,o])=>events.push({at:o.done,txt:{cultures:"Blood cultures × 2 drawn",lactate:"Lactate drawn",panel:"Sepsis blood panel drawn",ua:"Urine sample sent",cxr:"Portable chest X-ray taken",ecg:"12-lead ECG recorded"}[k]}));
+ Object.entries(orders).forEach(([k,o])=>events.push({at:o.done,txt:DONE_TXT[k]}));
  if(abx!==null)events.push({at:abx,txt:"Broad-spectrum antibiotics given (cefepime 2 g IV)"});
  if(bolus)events.push({at:bolus.start,txt:`Lactated Ringer's 2,100 mL (30 mL/kg) started, runs to ${bolus.end} h`});
  extra.forEach(s=>events.push({at:s,txt:"Lactated Ringer's 500 mL bolus started"}));
  if(vasoStart!==null)events.push({at:vasoStart,txt:"Norepinephrine started via peripheral IV, titrated to MAP ≥ 65"});
  if(vasoStop!==null)events.push({at:vasoStop,txt:"Norepinephrine stopped"});
- if(dispo)events.push({at:dispo.at,txt:{ICU:"ICU bed requested",ward:"Ward bed requested",observe:"Observation bed requested",discharge:"Discharge planned"}[dispo.where]});
+ if(dispo)events.push({at:dispo.at,txt:`Bed requested: ${dispo.where}`});
  return {orders,abx,bolus,extra,vasoStart,vasoStop,dispo,vital,map,lact,fluidVol,onVaso,results,events};
 }
 const VT=[0,.5,1,1.5,2,3,4,5,6];
 
-/* ===== RADAR card from the pathway rules (updated after clinician feedback, Nov 2026) =====
-   Assay: urinalysis, chest X-ray and ECG are "now" in a hypotensive patient (ECG: clinician panel, rules out ACS).
-   Route: no ward or discharge while MAP < 65; ICU when MAP < 65 persists after 30 mL/kg, on a vasopressor, or MAP < 65 with lactate >= 4. */
-function radarCard(i,sim){const t=TPH[i],v=sim.vital(t),m=v.map,fv=v.fluid,onV=sim.onVaso(t);
- const lacRes=sim.results.find(r=>r.k==="lactate"&&r.at<=t)||sim.results.find(r=>r.k==="vbg"&&r.at<=t);
- const lacVal=lacRes?parseFloat((lacRes.items.find(x=>/Lactate/.test(x[0]))||["0"])[0].replace(/[^0-9.]/g,"")):null;
+/* ===================== RADAR card =====================
+   Rules after clinician feedback (Nov 2026):
+   - Shock: one MAP < 65 = "possible: need more data" (repeat BP with a correct cuff, lactate); "yes" when a repeat MAP is < 65 or lactate >= 2.
+   - Tests: cultures, lactate, CBC, BMP, liver tests, coagulation, urinalysis, chest X-ray and ECG are "now" in a hypotensive patient.
+   - Level of care: a triage estimate first (MultiTask model; illustrative here), then rules: ICU-level care if on a vasopressor,
+     MAP < 65 after 30 mL/kg, or MAP < 65 with lactate >= 4; never ward or discharge while shock is possible or present.
+   Confidence levels in this simulated case are set by these rules and are illustrative. */
+function lactNow(sim,t){const r=[...sim.results].filter(x=>(x.k==="lactate"||x.k==="vbg")&&x.at<=t).sort((a,b)=>b.at-a.at)[0];if(!r)return null;return parseFloat(r.items.find(x=>/Lactate/.test(x[0]))[0].replace(/[^0-9.]/g,""))}
+function levelOfCare(sim,t){const v=sim.vital(t),m=v.map,onV=sim.onVaso(t),bolusDone=sim.bolus&&t>=sim.bolus.end,lac=lactNow(sim,t);
+ const reps=VT.filter(x=>x>0&&x<=t).map(sim.vital),repLow=reps.length&&reps[reps.length-1].map<65;
+ const shock=(repLow||(lac!==null&&lac>=2&&m<65))?"yes":(m<65?"possible: need more data":"no");
+ let level,why;
+ if(onV){level="ICU-level care";why="on a vasopressor"}
+ else if(bolusDone&&m<65){level="ICU-level care";why=`MAP ${m} after 30 mL/kg`}
+ else if(m<65&&lac!==null&&lac>=4){level="ICU-level care";why=`MAP ${m} with lactate ${lac.toFixed(1)}`}
+ else if(shock!=="no"){level="not yet decided";why=`MAP ${m} < 65: not ward or discharge while shock is possible`}
+ else if(lac!==null&&lac>=2){level="monitored bed";why=`MAP ${m} ≥ 65, lactate ${lac.toFixed(1)}`}
+ else {level="general ward";why=`MAP ${m} ≥ 65 without a vasopressor`}
+ return {level,why,shock,m,lac,onV,bolusDone,fv:v.fluid};}
+function radarCard(i,sim){const t=TPH[i],v=sim.vital(t),L=levelOfCare(sim,t),m=L.m,lac=L.lac;
  const done=k=>sim.orders[k]&&sim.orders[k].done<=t,ordered=k=>!!sim.orders[k];
- const pick={tier:"probable",shock:(m<65||(lacVal!==null&&lacVal>=4))?"yes":"no"};const B=[];
- const seen=[];seen.push(`MAP ${m} now${onV?` on norepinephrine ${v.ne.toFixed(2)} µg/kg/min`:""}`);
- if(fv>0)seen.push(`Fluids so far: ${fv} mL${sim.bolus&&t>=sim.bolus.end?" (30 mL/kg bolus complete)":""}`);else seen.push("No IV fluid given yet");
+ const pick={};const S=[];
+ const seen=[`MAP ${m} (${v.method})${L.onV?`, on norepinephrine ${v.ne.toFixed(2)} µg/kg/min`:""}`,L.fv>0?`Fluids so far: ${L.fv} mL${L.bolusDone?" (30 mL/kg complete)":""}`:"No IV fluid given yet"];
  if(sim.abx!==null&&sim.abx<=t)seen.push(`Antibiotics given at ${sim.abx} h`);
- if(lacVal!==null)seen.push(`Lactate ${lacVal.toFixed(1)} mmol/L`);
- B.push(["What RADAR sees now",seen]);
- if(i===0)B.push(["Why",["Low temperature at 79: sepsis may present without fever <span class=src>NICE 1.4.2</span>","Recurrent urinary and bloodstream infection <span class=src>NICE 1.1.1</span>","MAP 61, below 65 <span class=src>Sepsis-3</span>"]]);
- const wk=[["cultures","Blood cultures before antibiotics","SSC #7"],["lactate","Lactate","SSC #8"],["panel","Sepsis blood panel","NICE NG253"],["ua","Urinalysis (urinary infection history)","NICE 1.11.2"],["cxr","Chest X-ray","NICE 1.11.2"],["ecg","12-lead ECG: hypotension, rule out ACS","clinician panel"]];
- const tests=[];wk.forEach(([k,l,s])=>{if(done(k)){pick[k]="already done"}else if(ordered(k)){pick[k]="now";tests.push(`${l}: ordered, not yet done`)}else{pick[k]="now";tests.push(`${l}: <b>now</b> <span class=src>${s}</span>`)}});
- if(tests.length)B.push(["Work-up",tests]);
- const tr=[];
- if(sim.abx!==null&&sim.abx<=t)pick.abx="already given";else{pick.abx="within 1 h";tr.push(`Antibiotics <b>within 1 h</b>, cover resistant organisms <span class=src>SSC #16 · #25</span>`)}
- const bolusDone=sim.bolus&&t>=sim.bolus.end;
- if(!sim.bolus){pick.fluids="give";tr.push(`Balanced crystalloid 30 mL/kg <span class=src>SSC #10</span>`)}
- else if(!bolusDone){pick.fluids="withhold";tr.push(`Bolus running (${fv} mL so far): reassess MAP when it ends`)}
+ seen.push(lac!==null?`Lactate ${lac.toFixed(1)} mmol/L`:"Lactate not resulted yet");
+ S.push({h:"What RADAR sees now",items:seen.map(x=>({txt:x}))});
+ // Assessment
+ const wbc=sim.results.find(r=>r.k==="cbc"&&r.at<=t),ua=sim.results.find(r=>r.k==="ua"&&r.at<=t);
+ const tierConf=(lac!==null&&lac>=2&&(wbc||ua))?"high":"moderate";pick.tier="probable";
+ const A=[];
+ A.push({txt:`Sepsis: <b>probable</b>`,conf:tierConf,forr:["Recurrent urinary and bloodstream infection <span class=src>NICE 1.1.1</span>","Low temperature at 79: sepsis may present without fever <span class=src>NICE 1.4.2</span>",...(lac!==null&&lac>=2?[`Lactate ${lac.toFixed(1)}`]:[]),...(wbc?["WBC 29"]:[]),...(ua?["Urinalysis suggests urinary infection"]:[])],
+  against:["No fever",...(m>=65?[]:[]),...(wbc?[]:["No blood count yet"])],more:[...(lac===null?["Lactate"]:[]),...(wbc?[]:["CBC"]),...(ua?[]:["Urinalysis"])]});
+ pick.shock=L.shock;
+ if(L.shock==="possible: need more data")A.push({txt:"Shock: <b>possible, need more data</b>",conf:"low",forr:[`MAP ${m}, below 65 <span class=src>Sepsis-3</span>`,"Slow to answer"],against:["HR 94 is normal","One automated reading: cuff size, measurement error or a low baseline are possible"],more:["Repeat BP with a correctly sized cuff (manual if possible)","Lactate"]});
+ else if(L.shock==="yes")A.push({txt:"Shock: <b>yes</b>",conf:(lac!==null&&lac>=4)?"high":"moderate",forr:[`Repeat MAP ${m} < 65`,...(lac!==null&&lac>=2?[`Lactate ${lac.toFixed(1)}`]:[])],against:["HR still below 110"],more:lac===null?["Lactate"]:[]});
+ else A.push({txt:"Shock: <b>no</b>",conf:"moderate",forr:[`MAP ${m} ≥ 65${L.onV?" on a vasopressor":""}`],against:L.onV?["Needs a vasopressor to hold MAP ≥ 65"]:[],more:[]});
+ S.push({h:"Assessment",items:A});
+ // Tests
+ const T=[];const src={cultures:"SSC #7",lactate:"SSC #8",cbc:"NICE NG253",bmp:"NICE NG253",lft:"NICE NG253",coag:"NICE NG253",vbg:"NICE NG253",ua:"NICE 1.11.2",cxr:"NICE 1.11.2",ecg:"clinician panel: hypotension, rule out ACS"};
+ TESTS.forEach(([k,l])=>{if(done(k))pick[k]="already done";else{pick[k]="now";T.push({txt:ordered(k)?`${l.split(":")[0]}: ordered, pending`:`${l.split(":")[0]}: <b>now</b> <span class=src>${src[k]}</span>`})}});
+ if(T.length)S.push({h:"Tests",items:T});
+ // Treatment
+ const Tr=[];
+ if(sim.abx!==null&&sim.abx<=t)pick.abx="already given";
+ else{pick.abx="within 1 h";Tr.push({txt:"Antibiotics <b>within 1 h</b>, covering resistant organisms <span class=src>SSC #16 · #25</span>",conf:L.shock==="yes"?"high":"moderate",forr:[L.shock==="no"?"Probable sepsis: within 3 h, sooner given resistant-organism history":"Possible or probable septic shock: within 1 h","Resistant organism last year"],against:["Source not yet confirmed"],more:[]})}
+ if(!sim.bolus){pick.fluids="give";Tr.push({txt:"30 mL/kg balanced crystalloid <span class=src>SSC #10</span>",conf:L.shock==="yes"?"high":"moderate",forr:[`MAP ${m}`],against:["Chronic kidney disease, prosthetic valve: reassess volume after each 500 mL"],more:L.shock==="yes"?[]:["Repeat BP"]})}
+ else if(!L.bolusDone){pick.fluids="withhold";Tr.push({txt:`Bolus running (${L.fv} mL so far): reassess MAP when it ends`})}
  else pick.fluids="withhold";
- if(onV){pick.vaso="start or continue";tr.push(`Continue norepinephrine to MAP ≥ 65 <span class=src>SSC #11</span>`)}
- else if(bolusDone&&m<65){pick.vaso="start or continue";tr.push(`MAP ${m} after 30 mL/kg: <b>start norepinephrine</b> <span class=src>SSC #11 · #12</span>`)}
- else if(m<65){pick.vaso="hold or stop";tr.push(`Vasopressor: give the fluid bolus first; start if MAP stays < 65 after it <span class=src>SSC #11</span>`)}
+ if(L.onV){pick.vaso="start or continue";Tr.push({txt:"Continue norepinephrine to MAP ≥ 65 <span class=src>SSC #11</span>",conf:"high"})}
+ else if(L.bolusDone&&m<65){pick.vaso="start or continue";Tr.push({txt:`MAP ${m} after 30 mL/kg: <b>start norepinephrine</b> <span class=src>SSC #11 · #12</span>`,conf:"high",forr:["Hypotension persists after the initial bolus"],against:["SSC suggests a MAP target of 60–65 at age ≥ 65 <span class=src>SSC #14</span>"],more:[]})}
+ else if(m<65){pick.vaso="hold or stop";Tr.push({txt:"Vasopressor: not yet; give the bolus first, start if MAP stays < 65 after it <span class=src>SSC #11</span>",conf:"moderate"})}
  else pick.vaso="hold or stop";
- B.push(["Treatment",tr.length?tr:["No change"]]);
- let d;
- if(onV||(bolusDone&&m<65)||(m<65&&lacVal!==null&&lacVal>=4)){pick.dispo="ICU";d=[`<b>ICU</b>: ${onV?"on a vasopressor":(bolusDone&&m<65?"MAP < 65 after 30 mL/kg":"MAP < 65 with lactate ≥ 4")}`]}
- else if(m<65){pick.dispo="not yet";d=["Not yet: MAP < 65, so not ward or discharge; reassess after the fluid bolus"]}
- else{pick.dispo="ward";d=["Monitored ward bed; MAP ≥ 65 without vasopressor"]}
- B.push(["Disposition",d]);
- const badges=[["Probable sepsis",1]];if(pick.shock==="yes")badges.push([`Shock concern · MAP ${m}`,0]);badges.push([pick.dispo==="ICU"?"ICU":pick.dispo==="ward"?"Ward":"Not yet",0]);
- return {badges,boxes:B,pick};}
+ S.push({h:"Treatment",items:Tr.length?Tr:[{txt:"No change"}]});
+ // Level of care
+ const Lc=[];pick.dispo=L.level;
+ if(i===0)Lc.push({txt:"Triage model estimate (MultiTask, triage data only; illustrative here): admission likely, ICU-level care possible"});
+ Lc.push({txt:`Now: <b>${L.level}</b> (${L.why})`});
+ if(i===4){const L0=levelOfCare(simulate([]),0);const ch=[];if(L.fv>0)ch.push(`${L.fv} mL fluid given`);if(L.onV)ch.push("norepinephrine started");if(lac!==null)ch.push(`lactate ${lac.toFixed(1)}`);ch.push(`MAP ${L0.m} → ${m}`);
+  Lc.push({txt:`At triage: ${L0.level}. Changed because: ${ch.join("; ")}`})}
+ S.push({h:"Level of care",items:Lc});
+ return {badges:[["Probable sepsis",1],[`Shock: ${L.shock}`,0],[L.level,0]],sections:S,pick};}
 
+/* ===================== UI ===================== */
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let S={stage:"start",reviewer:{name:""},step1:[],step2:[],radar:[],rating:null,comment:"",submitted:false};
-let tp=0,tStart=Date.now();
+const fresh=()=>({stage:"start",reviewer:{name:""},step1:[],step2:[],radar:[],disagree:[],draft:{},rating:null,comment:"",submitted:false,ret:null});
+let S=fresh(),tp=0,tStart=Date.now();
 const app=document.getElementById("app"),statusEl=document.getElementById("status");
-
-function rail(){const steps=[["1","Read the triage packet and decide"],["2","Your orders are carried out; update your plan"],["3","Same patient with RADAR: keep or change each decision"],["4","Compare and submit"]];
- const cur={start:0,step1:1,step2:3,summary:4,done:5}[S.stage];const idx=S.stage==="step1"?(tp===0?1:2):cur;
+function rail(){const steps=[["1","Read the triage packet and place orders"],["2","Your orders are carried out; update your plan"],["3","Same patient with RADAR's card"],["4","Compare and submit"]];
+ const cur={start:0,tutorial:0,step1:1,step2:3,summary:4,done:5}[S.stage];const idx=S.stage==="step1"?(tp===0?1:2):cur;
  document.getElementById("rail").innerHTML=steps.map(([n,t],i)=>`<div class="${i+1===idx?"now":(i+1<idx?"done":"")}"><b>Step ${n}</b>${t}</div>`).join("");}
 function tlHtml(){return `<div class="tl">${TP.map((t,i)=>`<span class="${i===tp?"on":(i<tp?"past":"")}">${t}</span>`).join("")}</div>`;}
+function toolbar(){return `<div class="toolbar"><button type="button" id="tb-save">Save progress</button> <button type="button" id="tb-tut">Open the tutorial</button></div>`}
+function bindToolbar(){const s=app.querySelector("#tb-save"),u=app.querySelector("#tb-tut");
+ if(s)s.onclick=()=>{saveDraft();save(true)};
+ if(u)u.onclick=()=>{saveDraft();S.ret={stage:S.stage,tp};S.stage="tutorial";S.tutPage=0;save();render();scrollTo(0,0)};}
 function chartHtml(sim){const now=TPH[tp],prev=tp>0?TPH[tp-1]:-1;const isNew=t=>tp>0&&t>prev&&t<=now;
  let h=`<h2>${esc(CASE.title)}</h2><p class="small muted adapted">Simulated patient built from an adapted real ED visit: your orders are carried out with usual ED delays, tests return only if ordered, and vital signs respond to treatment (model described at the bottom).</p><h3>Triage</h3><ul>${CASE.triage.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
- h+=`<h3>History</h3><ul>${CASE.problems.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p class="small"><b>Home medications:</b> ${esc(CASE.homeMeds.join("; "))}</p><p class="small"><b>Baseline labs.</b> ${esc(CASE.baseline)}</p>`;
+ h+=`<h3>History</h3><ul>${CASE.problems.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p class="small"><b>Home medications:</b> ${esc(CASE.homeMeds.join("; "))}</p><p class="small"><b>Baseline.</b> ${esc(CASE.baseline)}</p>`;
  const vs=VT.filter(t=>t<=now).map(sim.vital);
- h+=`<h3>Vital signs</h3><div class="scroll"><table class="vt"><tr><th>Time</th><th>T °C</th><th>HR</th><th>RR</th><th>SpO₂</th><th>BP</th><th>MAP</th><th>Fluids in</th><th>Vasopressor</th></tr>${vs.map(v=>`<tr class="${isNew(v.t)?"new":""}"><td>${v.t.toFixed(1)} h</td><td>${v.T||"–"}</td><td>${v.hr}</td><td>${v.rr}</td><td>${v.spo2}%</td><td>${v.bp}</td><td><b class="${v.map<65?"lowmap":""}">${v.map}</b></td><td>${v.fluid?v.fluid+" mL":"0"}</td><td>${v.ne?"norepinephrine "+v.ne.toFixed(2)+" µg/kg/min":"none"}</td></tr>`).join("")}</table></div>`;
+ h+=`<h3>Vital signs</h3><div class="scroll"><table class="vt"><tr><th>Time</th><th>T °C</th><th>HR</th><th>RR</th><th>SpO₂</th><th>BP</th><th>MAP</th><th>Fluids in</th><th>Vasopressor</th></tr>${vs.map(v=>`<tr class="${isNew(v.t)?"new":""}"><td>${v.t.toFixed(1)} h</td><td>${v.T||"–"}</td><td>${v.hr}</td><td>${v.rr}</td><td>${v.spo2}%</td><td>${v.bp}</td><td><b class="${v.map<65?"lowmap":""}">${v.map}</b></td><td>${v.fluid?v.fluid+" mL":"0"}</td><td>${v.ne?"norepinephrine "+v.ne.toFixed(2)+" µg/kg/min":"none"}</td></tr>`).join("")}</table></div><p class="small muted">Repeat readings after triage use an appropriately sized cuff.</p>`;
  const ps=sim.results.filter(p=>p.at<=now).sort((a,b)=>a.at-b.at);
  h+=`<h3>Results so far</h3>`+(ps.length?ps.map(({at,name,items})=>{const n=isNew(at),ab=items.filter(i=>i[1]).length;
   return `<details class="pn ${n?"new":""}" open><summary><span class="tag">${n?"NEW · ":""}${at.toFixed(1)} h</span><b>${esc(name)}</b>${items.length>2?` <span class="small muted">${items.length} results${ab?" · "+ab+" abnormal":""}</span>`:""}</summary><div class="pv">${items.map(([s,a])=>`<span class="${a?"ab":""}">${esc(s)}</span>`).join("")}</div></details>`}).join(""):`<p class="muted">None yet: tests appear here once you order them and they return.</p>`);
- const evs=sim.events.filter(e=>e.at<=now).sort((a,b)=>a.at-b.at);const pend=sim.events.filter(e=>e.at>now).sort((a,b)=>a.at-b.at);
- h+=`<h3>Done by the team (your orders)</h3>`+(evs.length?`<ul>${evs.map(e=>`<li class="${isNew(e.at)?"new":""}">${e.at.toFixed(1)} h · ${esc(e.txt)}</li>`).join("")}</ul>`:`<p class="muted small">Nothing yet${tp===0?": your orders at T0 are carried out after you save.":"."}</p>`);
+ const evs=sim.events.filter(e=>e.at<=now).sort((a,b)=>a.at-b.at),pend=sim.events.filter(e=>e.at>now).sort((a,b)=>a.at-b.at);
+ h+=`<h3>Done by the team (your orders)</h3>`+(evs.length?`<ul>${evs.map(e=>`<li class="${isNew(e.at)?"new":""}">${e.at.toFixed(1)} h · ${esc(e.txt)}</li>`).join("")}</ul>`:`<p class="muted small">Nothing yet${tp===0?": your T0 orders are carried out after you save.":"."}</p>`);
  if(pend.length)h+=`<p class="small muted">Ordered, not yet done: ${pend.map(e=>esc(e.txt)+" ("+e.at.toFixed(1)+" h)").join("; ")}</p>`;
  return h;}
-function hint(k){return HINT[k]?`<div class="small muted hint">${esc(HINT[k])}</div>`:(["cultures","lactate","ua","cxr","ecg"].includes(k)?"":"")}
-function formHtml(prefill,opts={}){return `<p class="small muted">${esc(HINT.when)}</p><table class="form">${DECISIONS.map(([k,l,os])=>{const v=prefill[k];const rp=opts.radar?opts.radar[k]:undefined;const base=opts.base?opts.base[k]:undefined;
-  return `<tr id="row-${k}" class="${opts.base&&v!==base?"changed":""}"><td>${l}${hint(k)}</td><td><div class="opts">${os.map(o=>`<label style="--oc:var(--o-${OC[o]||"grey"})" class="${rp===o?"radarpick":""}"><input type="radio" name="${k}" value="${esc(o)}" ${v===o?"checked":""}>${esc(o)}</label>`).join("")}</div>${opts.base?`<div class="reason" ${v!==base?"":"hidden"}><input type="text" id="why-${k}" placeholder="Why did you change this? (required)" value="${esc((opts.reasons||{})[k]||"")}"></div>`:""}</td></tr>`}).join("")}
-  <tr><td>How sure are you?</td><td><div class="opts">${[1,2,3,4,5].map(n=>`<label style="--oc:var(--o-blue)"><input type="radio" name="conf" value="${n}" ${prefill.conf==n?"checked":""}>${n}</label>`).join("")}</div><div class="small muted">1 = guessing · 5 = certain</div></td></tr></table><label class="other">Other orders or diagnoses you would consider<textarea id="other" placeholder="Anything not listed above">${esc(prefill.other||"")}</textarea></label>`;}
-function readForm(){const o={};DECISIONS.forEach(([k])=>{const r=app.querySelector(`input[name="${k}"]:checked`);if(r)o[k]=r.value});const c=app.querySelector('input[name="conf"]:checked');if(c)o.conf=+c.value;o.other=(app.querySelector("#other")?.value||"").trim();return o;}
-const MODEL_NOTE=`<details class="small muted" style="margin-top:10px"><summary>How the simulated patient behaves</summary><p>Without treatment MAP drifts down about 1.5 mmHg per hour and lactate rises slowly. A 30 mL/kg crystalloid bolus raises MAP by about 3 mmHg (partial response); each further 500 mL adds about 1. Norepinephrine is titrated by the nurse to MAP 66–68. Lactate falls once MAP is ≥ 65 after fluids or a vasopressor. Orders are carried out with usual ED delays (for example antibiotics about 35 minutes after a “within 1 h” order; blood tests return about 1 hour after they are drawn). Antibiotics do not change vital signs within 6 hours. The model gives realistic information over time; it is not used to score outcomes.</p></details>`;
-function prefillFrom(prev){const p={...prev};delete p.conf;delete p.other;delete p.seconds;delete p.reasons;return p}
+const MODEL_NOTE=`<details class="small muted" style="margin-top:10px"><summary>How the simulated patient behaves</summary><p>Without treatment MAP drifts down about 1.5 mmHg per hour and lactate rises slowly. A 30 mL/kg crystalloid bolus raises MAP by about 3 mmHg (partial response); each further 500 mL adds about 1. Norepinephrine is titrated by the nurse to MAP 66–68. Lactate falls once MAP is ≥ 65 after fluids or a vasopressor. Orders are carried out with usual ED delays (antibiotics about 35 minutes after a “within 1 h” order; blood tests return about 1 hour after they are drawn). Antibiotics do not change vital signs within 6 hours. The model gives realistic information over time; it is not used to score outcomes.</p></details>`;
+// auto "done" from the chart (B3)
+function autoState(sim){const now=TPH[tp],a={};TESTKEYS.forEach(k=>{const o=sim.orders[k];if(o&&o.done<=now)a[k]={v:"already done",note:`done at ${o.done.toFixed(1)} h`};else if(o)a[k]={note:`ordered, due ${o.done.toFixed(1)} h`}});
+ if(sim.abx!==null&&sim.abx<=now)a.abx={v:"already given",note:`given at ${sim.abx.toFixed(1)} h`};
+ const fv=sim.fluidVol(now);if(fv>0)a.fluids={note:`${fv} mL given so far`};if(sim.onVaso(now))a.vaso={note:`running: ${sim.vital(now).ne.toFixed(2)} µg/kg/min`};return a;}
+function formHtml(prefill,opts={}){const auto=opts.auto||{};let grp="";
+ return `<p class="small muted">Tests: <b>now</b> = at triage or initial assessment; <b>before ED disposition</b> = any time before the patient leaves the ED; <b>already done</b> is filled in for you when the chart shows it.</p><table class="form">${DECISIONS.map(([k,l,os,g])=>{const A=auto[k]||{};const v=A.v||prefill[k];const rp=opts.radar?opts.radar[k]:undefined;const base=opts.base?opts.base[k]:undefined;const lock=!!A.v;
+  const head=g!==grp?(grp=g,`<tr class="grp"><td colspan="2">${g}</td></tr>`):"";
+  return head+`<tr id="row-${k}" class="${opts.base&&v!==base?"changed":""}"><td>${esc(l)}${HINT[k]?`<div class="small muted hint">${esc(HINT[k])}</div>`:""}${A.note?`<div class="small autonote">${esc(A.note)}</div>`:""}</td><td><div class="opts">${os.map(o=>`<label style="--oc:var(--o-${OC[o]||"grey"})" class="${rp===o?"radarpick":""} ${lock&&o!==A.v?"dis":""}"><input type="radio" name="${k}" value="${esc(o)}" ${v===o?"checked":""} ${lock&&o!==A.v?"disabled":""}>${esc(o)}</label>`).join("")}</div>${opts.base?`<div class="reason" ${v!==base?"":"hidden"}><input type="text" id="why-${k}" placeholder="Why did you change this from your own run? (required)" value="${esc((opts.reasons||{})[k]||"")}"></div>`:""}</td></tr>`}).join("")}
+  <tr class="grp"><td colspan="2">Your confidence</td></tr><tr id="row-conf"><td>How sure are you about this plan?</td><td><div class="opts">${[1,2,3,4,5].map(n=>`<label style="--oc:var(--o-blue)"><input type="radio" name="conf" value="${n}" ${prefill.conf==n?"checked":""}>${n}</label>`).join("")}</div><div class="small muted">1 = guessing · 5 = certain</div></td></tr></table><label class="other">Other orders or diagnoses you would consider<textarea id="other" placeholder="Anything not listed above">${esc(prefill.other||"")}</textarea></label>`;}
+function readForm(){const o={};KEYS.forEach(k=>{const r=app.querySelector(`input[name="${k}"]:checked`);if(r)o[k]=r.value});const c=app.querySelector('input[name="conf"]:checked');if(c)o.conf=+c.value;o.other=(app.querySelector("#other")?.value||"").trim();const dg=app.querySelector("#disagree");if(dg)o.disagree=dg.value.trim();return o;}
+function saveDraft(){if(S.stage==="step1"||S.stage==="step2"){const f=readForm();const w={};KEYS.forEach(k=>{const e=app.querySelector("#why-"+k);if(e&&e.value)w[k]=e.value});f.reasons=w;S.draft[S.stage+":"+tp]=f}}
+function showMissing(list){app.querySelectorAll("tr.missing").forEach(r=>r.classList.remove("missing"));
+ const e=app.querySelector("#e");e.innerHTML=`Still needed before you can go on: ${list.map(([id,l])=>`<a href="#" data-go="${id}">${esc(l)}</a>`).join(", ")}.`;
+ list.forEach(([id])=>{const r=app.querySelector("#row-"+id)||app.querySelector("#"+id);if(r)r.classList.add("missing")});
+ e.querySelectorAll("a").forEach(a=>a.onclick=ev=>{ev.preventDefault();const r=app.querySelector("#row-"+a.dataset.go)||app.querySelector("#"+a.dataset.go);if(r){r.scrollIntoView({behavior:"smooth",block:"center"})}});
+ const first=app.querySelector("#row-"+list[0][0])||app.querySelector("#"+list[0][0]);if(first)first.scrollIntoView({behavior:"smooth",block:"center"});}
+function prefillFrom(prev){const p={...prev};delete p.conf;delete p.other;delete p.seconds;delete p.reasons;delete p.disagree;return p}
+function cardHtml(R){const conf=c=>c?`<span class="conf conf-${c}">confidence: ${c}</span>`:"";
+ return `<div class="panel radar"><h3 style="margin-top:0">RADAR card · ${TP[tp]}</h3><div>${R.badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(t)}</span>`).join("")}</div>
+ ${R.sections.map(s=>`<h3>${s.h}</h3><ul class="cardlist">${s.items.map(it=>`<li>${it.txt} ${conf(it.conf)}${(it.forr&&it.forr.length)||(it.against&&it.against.length)||(it.more&&it.more.length)?`<div class="ev">${it.forr&&it.forr.length?`<div><b>For:</b> ${it.forr.join("; ")}</div>`:""}${it.against&&it.against.length?`<div><b>Against:</b> ${it.against.join("; ")}</div>`:""}${it.more&&it.more.length?`<div class="more"><b>More data needed:</b> ${it.more.join("; ")}</div>`:""}</div>`:""}</li>`).join("")}</ul>`).join("")}
+ <p class="small muted">The gold ring in the form marks RADAR's suggestion. You do not have to follow it. Confidence levels in this simulated case are illustrative.</p></div>`;}
 
 function render(){rail();document.body.classList.toggle("compact",S.stage!=="start");
  if(S.stage==="start"){app.innerHTML=`<div class="panel"><h2>Before you start</h2>
   <label style="display:block;max-width:420px">Your name<input type="text" id="r-name" value="${esc(S.reviewer.name||"")}" autocomplete="name"></label>
-  <h3>How it works</h3><ol><li>See what is known at triage and place your orders.</li><li>The team carries out your orders. At 0.5, 1, 3 and 6 h you see the new vital signs and any results you ordered, and update your plan.</li><li>Manage the same patient again from triage, now with RADAR's card at each time point. RADAR sees what has been done (fluids, antibiotics, vasopressor, tests) and adjusts. Keep or change each decision; give a reason for every change.</li><li>Compare the two runs and press Finish: your results go to the RADAR team. About 15 minutes.</li></ol><p class="small muted">Until you finish, your answers stay only in this browser.</p>
-  <div class="actions"><span class="err" id="e"></span><button class="primary" id="go">Start with the triage packet</button></div></div>`;
-  app.querySelector("#go").onclick=()=>{S.reviewer={name:app.querySelector("#r-name").value.trim()};
-   if(!S.reviewer.name){app.querySelector("#e").textContent="Enter your name to continue.";return}
-   S.stage="step1";tp=0;tStart=Date.now();save();render();scrollTo(0,0)};return;}
- if(S.stage==="step1"){const sim=simulate(S.step1.slice(0,tp));const pre=S.step1[tp]||prefillFrom(S.step1[tp-1]||{});
-  app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">On your own · time point ${tp+1} of 5</span></div>
-  <div class="grid"><div class="panel">${chartHtml(sim)}${MODEL_NOTE}</div><div class="panel"><h2>${tp===0?"What would you order now?":"Your orders have been carried out. Update your plan."}</h2><p class="small muted">${tp===0?"Choose one option per row.":"Your previous answers are filled in; change anything that should change."}</p>${formHtml(pre)}
+  <h3>How it works</h3><ol><li>See what is known at triage and place your orders.</li><li>The team carries out your orders. At 0.5, 1, 3 and 6 h you see new vital signs and any results you ordered, and update your plan.</li><li>Manage the same patient again from triage with RADAR's card at each time point. RADAR shows what it sees, its confidence, the evidence for and against, and what data it still needs.</li><li>Compare the two runs and press Finish: your results go to the RADAR team. About 15 minutes.</li></ol>
+  <p class="small muted">Your answers stay in this browser until you finish. You can save and open the tutorial at any time.</p>
+  <div class="actions"><span class="err" id="e"></span><span><button id="tut">Start with the tutorial (3 minutes)</button> <button class="primary" id="go">Start the review</button></span></div></div>`;
+  const nm=()=>{S.reviewer={name:app.querySelector("#r-name").value.trim()};if(!S.reviewer.name){app.querySelector("#e").textContent="Enter your name to continue.";return false}return true};
+  app.querySelector("#go").onclick=()=>{if(!nm())return;S.stage="step1";tp=0;tStart=Date.now();save();render();scrollTo(0,0)};
+  app.querySelector("#tut").onclick=()=>{if(!nm())return;S.ret={stage:"step1",tp:0};S.stage="tutorial";S.tutPage=0;save();render();scrollTo(0,0)};return;}
+ if(S.stage==="tutorial"){renderTutorial();return}
+ if(S.stage==="step1"){const sim=simulate(S.step1.slice(0,tp));const auto=autoState(sim);const pre=S.draft["step1:"+tp]||S.step1[tp]||prefillFrom(S.step1[tp-1]||{});
+  app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">On your own · time point ${tp+1} of 5</span>${toolbar()}</div>
+  <div class="grid"><div class="panel">${chartHtml(sim)}${MODEL_NOTE}</div><div class="panel"><h2>${tp===0?"What would you order now?":"Your orders have been carried out. Update your plan."}</h2><p class="small muted">${tp===0?"Choose one option per row.":"Your previous answers are filled in; change anything that should change."}</p>${formHtml(pre,{auto})}
   <div class="actions"><span class="err" id="e"></span><span>${tp>0?`<button id="back">Back</button> `:""}<button class="primary" id="next">${tp<4?"Save and go to "+TP[tp+1]:"Save and start again with RADAR"}</button></span></div></div></div>`;
-  app.querySelector("#next").onclick=()=>{const f=readForm();const miss=DECISIONS.filter(([k])=>!f[k]).map(([,l])=>l);if(miss.length||!f.conf){app.querySelector("#e").textContent="Still to answer: "+[...miss,...(f.conf?[]:["How sure are you?"])].join(", ");return}
-   f.seconds=Math.round((Date.now()-tStart)/1000);S.step1[tp]=f;S.step1.length=tp+1;tStart=Date.now();if(tp<4){tp++}else{S.stage="step2";tp=0}save();render();scrollTo(0,0)};
-  const b=app.querySelector("#back");if(b)b.onclick=()=>{tp--;render()};return;}
- if(S.stage==="step2"){const sim=simulate(S.step2.slice(0,tp));const R=radarCard(tp,sim);S.radar[tp]={pick:R.pick,boxes:R.boxes.map(([h,it])=>[h,it.map(x=>x.replace(/<[^>]+>/g,""))])};
-  const base=S.step1[tp];const cur=S.step2[tp]||{...prefillFrom(S.step2[tp-1]||base),conf:undefined,other:"",reasons:{}};
-  app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">With RADAR · time point ${tp+1} of 5</span></div>
-  <div class="grid"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="panel radar"><h3 style="margin-top:0">RADAR card · ${TP[tp]}</h3><div>${R.badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(t)}</span>`).join("")}</div>${R.boxes.map(([h,it])=>`<h3>${h}</h3><ul>${it.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("")}</div><div class="panel">${chartHtml(sim)}${MODEL_NOTE}</div></div>
-  <div class="panel"><h2>Keep or change each decision</h2><p class="small muted">Filled in from your plan; <span class="legendkey"></span>marks RADAR's choice. A reason is needed wherever this differs from what you chose on your own at ${TP[tp]}.</p>${formHtml(cur,{base,radar:R.pick,reasons:cur.reasons})}
+  bindToolbar();
+  app.querySelector("#next").onclick=()=>{const f=readForm();const miss=DECISIONS.filter(([k])=>!f[k]).map(([k,l])=>[k,LABEL[k]]);if(!f.conf)miss.push(["conf","How sure are you"]);if(miss.length){showMissing(miss);return}
+   f.seconds=Math.round((Date.now()-tStart)/1000);S.step1[tp]=f;S.step1.length=tp+1;delete S.draft["step1:"+tp];tStart=Date.now();if(tp<4){tp++}else{S.stage="step2";tp=0}save();render();scrollTo(0,0)};
+  const b=app.querySelector("#back");if(b)b.onclick=()=>{saveDraft();tp--;render()};return;}
+ if(S.stage==="step2"){const sim=simulate(S.step2.slice(0,tp));const R=radarCard(tp,sim);const auto=autoState(sim);S.radar[tp]={pick:R.pick,sections:R.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:it.txt.replace(/<[^>]+>/g,"")}))}))};
+  const base=S.step1[tp];const cur=S.draft["step2:"+tp]||S.step2[tp]||{...prefillFrom(S.step2[tp-1]||base),reasons:{}};
+  app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">With RADAR · time point ${tp+1} of 5</span>${toolbar()}</div>
+  <div class="grid"><div style="display:flex;flex-direction:column;gap:16px;min-width:0">${cardHtml(R)}<div class="panel">${chartHtml(sim)}${MODEL_NOTE}</div></div>
+  <div class="panel"><h2>Your plan with RADAR</h2><p class="small muted">Filled in from your plan; <span class="legendkey"></span>marks RADAR's suggestion, which you do not have to follow. A reason is needed only where your answer differs from what you chose on your own at ${TP[tp]}.</p>${formHtml(cur,{base,radar:R.pick,reasons:cur.reasons,auto})}
+  <label class="other" id="dis-wrap">Where do you disagree with RADAR's card at this time point, and why? <span class="small muted">(optional)</span><textarea id="disagree" placeholder="For example: MAP 61 on one automated reading is not shock">${esc(cur.disagree||"")}</textarea></label>
   <div class="actions"><span class="err" id="e"></span><span>${tp>0?`<button id="back">Back</button> `:""}<button class="primary" id="next">${tp<4?"Save and go to "+TP[tp+1]:"Save and compare"}</button></span></div></div></div>`;
-  app.querySelectorAll('.opts input').forEach(inp=>inp.addEventListener("change",()=>{const k=inp.name;if(k==="conf")return;const row=app.querySelector("#row-"+k);const ch=inp.value!==base[k];row.classList.toggle("changed",ch);row.querySelector(".reason").hidden=!ch;}));
-  app.querySelector("#next").onclick=()=>{const f=readForm();f.reasons={};const miss=[];DECISIONS.forEach(([k,l])=>{if(f[k]!==base[k]){const w=(app.querySelector("#why-"+k)?.value||"").trim();if(!w)miss.push(l);f.reasons[k]=w}});
-   const unans=DECISIONS.filter(([k])=>!f[k]).map(([,l])=>l);
-   if(unans.length||miss.length||!f.conf){app.querySelector("#e").textContent=(unans.length?"Still to answer: "+unans.join(", ")+". ":"")+(miss.length?"Add a reason for: "+miss.join(", ")+". ":"")+(f.conf?"":"Rate how sure you are.");return}
-   f.seconds=Math.round((Date.now()-tStart)/1000);S.step2[tp]=f;S.step2.length=tp+1;tStart=Date.now();if(tp<4){tp++}else{S.stage="summary"}save();render();scrollTo(0,0)};
-  const b=app.querySelector("#back");if(b)b.onclick=()=>{tp--;render()};return;}
- if(S.stage==="summary"||S.stage==="done"){const a=simulate(S.step1),b=simulate(S.step2);
-  const fmt=x=>x===null||x===undefined?"—":x.toFixed(1)+" h";
-  const firstMap=s=>{for(const t of VT){if(s.map(t)>=65)return t}return null};
-  const row=(l,real,x,y)=>`<tr><td><b>${l}</b></td><td>${real}</td><td>${x}</td><td class="${x!==y?"chg":""}">${y}</td></tr>`;
-  const ord=(s,k)=>s.orders[k]?fmt(s.orders[k].done):"not ordered";
-  const tl=[row("Antibiotics given","3.5 h",fmt(a.abx),fmt(b.abx)),
-   row("IV fluid bolus started","not recorded",a.bolus?fmt(a.bolus.start):"none",b.bolus?fmt(b.bolus.start):"none"),
-   row("Total fluid by 6 h","not recorded",a.fluidVol(6)+" mL",b.fluidVol(6)+" mL"),
-   row("Norepinephrine started","none recorded",fmt(a.vasoStart),fmt(b.vasoStart)),
-   row("First MAP ≥ 65","3.5 h",fmt(firstMap(a)),fmt(firstMap(b))),
-   row("Blood cultures drawn","by 3 h",ord(a,"cultures"),ord(b,"cultures")),
-   row("Lactate drawn","2.2 h",ord(a,"lactate"),ord(b,"lactate")),
-   row("ECG","0.3 h",ord(a,"ecg"),ord(b,"ecg")),
-   row("Urinalysis","3.7 h",ord(a,"ua"),ord(b,"ua")),
-   row("Chest X-ray","4.3 h",ord(a,"cxr"),ord(b,"cxr")),
-   row("Disposition","not recorded",a.dispo?a.dispo.where+" at "+fmt(a.dispo.at):"not decided",b.dispo?b.dispo.where+" at "+fmt(b.dispo.at):"not decided")].join("");
-  let nch=0;const rows=DECISIONS.map(([k,l])=>{const c=TP.map((t,i)=>S.step1[i][k]!==S.step2[i][k]?t:null).filter(Boolean);if(c.length)nch++;return `<tr><td><b>${l}</b></td><td>${esc(S.step1[4][k])}</td><td class="${S.step1[4][k]!==S.step2[4][k]?"chg":""}">${esc(S.step2[4][k])}</td><td>${esc((S.radar[4]||{pick:{}}).pick[k]||"—")}</td><td>${c.length?"differed at "+c.join(", "):"—"}</td></tr>`}).join("");
-  const sum=x=>x.reduce((p,y)=>p+(y?.seconds||0),0);
-  app.innerHTML=`<div class="panel"><h2>${S.stage==="done"?"Submitted. Thank you.":"Compare, then submit"}</h2>
-  <h3>What was done, and when</h3><p class="small muted">The real record is the visit the example was adapted from; the other two columns are your two runs of the simulated patient.</p>
-  <div class="scroll"><table class="sum"><tr><th>Event</th><th>Real record</th><th>On your own</th><th>With RADAR</th></tr>${tl}</table></div>
-  <h3>Your decisions at 6 h</h3><p class="muted small">${nch} of ${DECISIONS.length} decisions differed at some time point between your two runs.</p>
-  <div class="scroll"><table class="sum"><tr><th>Decision</th><th>On your own</th><th>With RADAR</th><th>RADAR</th><th>When it differed</th></tr>${rows}
-  <tr><td><b>Time taken</b></td><td>${Math.round(sum(S.step1)/6)/10} min</td><td>${Math.round(sum(S.step2)/6)/10} min</td><td></td><td></td></tr></table></div>
-  <h3>How useful was the RADAR card?</h3><div class="opts">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="rating" value="${n}" ${S.rating==n?"checked":""} ${S.stage==="done"?"disabled":""}>${n}</label>`).join("")}</div><div class="small muted">1 = not useful · 5 = very useful</div>
-  <h3>Anything RADAR or the simulation got wrong, or should show differently?</h3><textarea id="cm" ${S.stage==="done"?"disabled":""}>${esc(S.comment)}</textarea>
-  <div class="actions" style="margin-top:12px"><span class="err" id="e"></span>${S.stage==="done"?`<span class="muted">${S.sent?`Thank you, ${esc(S.reviewer.name)}. Your results were sent to the RADAR team (${TEAM_EMAIL}).`:`Thank you, ${esc(S.reviewer.name)}. Please email the results file to ${TEAM_EMAIL}.`}</span><span>${S.sent?"":`<a class="btnlink" href="${mailtoHref()}">Open email to ${TEAM_EMAIL}</a> `}<button id="dl">Download results file</button></span>`:`<span><button id="back">Back to 6 h</button> <button class="primary" id="sub">Finish and send results</button></span>`}</div></div>`;
-  if(S.stage==="done"){app.querySelector("#dl").onclick=download}
-  if(S.stage==="summary"){app.querySelector("#back").onclick=()=>{S.stage="step2";tp=4;render()};
-   app.querySelector("#sub").onclick=async()=>{const r=app.querySelector('input[name="rating"]:checked');if(!r){app.querySelector("#e").textContent="Rate the RADAR card first.";return}
-    S.rating=+r.value;S.comment=app.querySelector("#cm").value;S.stage="done";S.submitted=true;S.submittedAt=new Date().toISOString();S.sent=await sendResults();if(!S.sent)download();await save();render();scrollTo(0,0)}}
-  return;}
+  bindToolbar();
+  app.querySelectorAll('.opts input').forEach(inp=>inp.addEventListener("change",()=>{const k=inp.name;if(k==="conf")return;const row=app.querySelector("#row-"+k);const ch=inp.value!==base[k];row.classList.toggle("changed",ch);const rs=row.querySelector(".reason");if(rs)rs.hidden=!ch;}));
+  app.querySelector("#next").onclick=()=>{const f=readForm();f.reasons={};const miss=[];DECISIONS.forEach(([k])=>{if(!f[k]){miss.push([k,LABEL[k]]);return}if(f[k]!==base[k]){const w=(app.querySelector("#why-"+k)?.value||"").trim();if(!w)miss.push([k,"reason for "+LABEL[k]]);f.reasons[k]=w}});
+   if(!f.conf)miss.push(["conf","How sure are you"]);if(miss.length){showMissing(miss);return}
+   f.seconds=Math.round((Date.now()-tStart)/1000);S.step2[tp]=f;S.step2.length=tp+1;delete S.draft["step2:"+tp];tStart=Date.now();if(tp<4){tp++}else{S.stage="summary"}save();render();scrollTo(0,0)};
+  const b=app.querySelector("#back");if(b)b.onclick=()=>{saveDraft();tp--;render()};return;}
+ if(S.stage==="summary"||S.stage==="done"){renderSummary();return}
 }
+function renderSummary(){const a=simulate(S.step1),b=simulate(S.step2);
+ const fmt=x=>x===null||x===undefined?"—":x.toFixed(1)+" h";
+ const firstMap=s=>{for(const t of VT){if(t>0&&s.map(t)>=65)return t}return null};
+ const row=(l,real,x,y)=>`<tr><td><b>${l}</b></td><td>${real}</td><td>${x}</td><td class="${x!==y?"chg":""}">${y}</td></tr>`;
+ const ord=(s,k)=>s.orders[k]?fmt(s.orders[k].done):"not ordered";
+ const REAL={cultures:"by 3 h",lactate:"2.2 h",cbc:"2.4 h",bmp:"3.2 h",lft:"3.2 h",coag:"5.2 h",vbg:"4.8 h",ua:"3.7 h",cxr:"4.3 h",ecg:"0.3 h"};
+ const tl=[row("Antibiotics given","3.5 h",fmt(a.abx),fmt(b.abx)),
+  row("IV fluid bolus started","not recorded",a.bolus?fmt(a.bolus.start):"none",b.bolus?fmt(b.bolus.start):"none"),
+  row("Total fluid by 6 h","not recorded",a.fluidVol(6)+" mL",b.fluidVol(6)+" mL"),
+  row("Norepinephrine started","none recorded",fmt(a.vasoStart),fmt(b.vasoStart)),
+  row("First repeat MAP ≥ 65","3.5 h",fmt(firstMap(a)),fmt(firstMap(b))),
+  ...TESTS.map(([k,l])=>row(l.split(":")[0],REAL[k],ord(a,k),ord(b,k))),
+  row("Level of care requested","not recorded",a.dispo?a.dispo.where+" at "+fmt(a.dispo.at):"not decided",b.dispo?b.dispo.where+" at "+fmt(b.dispo.at):"not decided")].join("");
+ let nch=0;const rows=DECISIONS.map(([k,l])=>{const c=TP.map((t,i)=>S.step1[i][k]!==S.step2[i][k]?t:null).filter(Boolean);if(c.length)nch++;return `<tr><td><b>${esc(LABEL[k])}</b></td><td>${esc(S.step1[4][k])}</td><td class="${S.step1[4][k]!==S.step2[4][k]?"chg":""}">${esc(S.step2[4][k])}</td><td>${esc((S.radar[4]||{pick:{}}).pick[k]||"—")}</td><td>${c.length?"differed at "+c.join(", "):"—"}</td></tr>`}).join("");
+ const dis=S.step2.map((f,i)=>f&&f.disagree?`<li><b>${TP[i]}:</b> ${esc(f.disagree)}</li>`:"").join("");
+ const sum=x=>x.reduce((p,y)=>p+(y?.seconds||0),0);
+ app.innerHTML=`<div class="panel"><h2>${S.stage==="done"?"Submitted. Thank you.":"Compare, then submit"}</h2>
+ <h3>What was done, and when</h3><p class="small muted">The real record is the visit the example was adapted from; the other two columns are your two runs of the simulated patient.</p>
+ <div class="scroll"><table class="sum"><tr><th>Event</th><th>Real record</th><th>On your own</th><th>With RADAR</th></tr>${tl}</table></div>
+ <h3>Your decisions at 6 h</h3><p class="muted small">${nch} of ${DECISIONS.length} decisions differed at some time point between your two runs.</p>
+ <div class="scroll"><table class="sum"><tr><th>Decision</th><th>On your own</th><th>With RADAR</th><th>RADAR</th><th>When it differed</th></tr>${rows}
+ <tr><td><b>Time taken</b></td><td>${Math.round(sum(S.step1)/6)/10} min</td><td>${Math.round(sum(S.step2)/6)/10} min</td><td></td><td></td></tr></table></div>
+ ${dis?`<h3>Where you disagreed with RADAR</h3><ul>${dis}</ul>`:""}
+ <h3>How useful was the RADAR card?</h3><div class="opts" id="row-rating">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="rating" value="${n}" ${S.rating==n?"checked":""} ${S.stage==="done"?"disabled":""}>${n}</label>`).join("")}</div><div class="small muted">1 = not useful · 5 = very useful</div>
+ <h3>Anything RADAR or the simulation got wrong, or should show differently?</h3><textarea id="cm" ${S.stage==="done"?"disabled":""}>${esc(S.comment)}</textarea>
+ <div class="actions" style="margin-top:12px"><span class="err" id="e"></span>${S.stage==="done"?`<span class="muted">${S.sent?`Thank you, ${esc(S.reviewer.name)}. Your results were sent to the RADAR team (${TEAM_EMAIL}).`:`Thank you, ${esc(S.reviewer.name)}. Please email the results file to ${TEAM_EMAIL}.`}</span><span>${S.sent?"":`<a class="btnlink" href="${mailtoHref()}">Open email to ${TEAM_EMAIL}</a> `}<button id="dl">Download results file</button></span>`:`<span><button id="back">Back to 6 h</button> <button class="primary" id="sub">Finish and send results</button></span>`}</div></div>`;
+ if(S.stage==="done"){app.querySelector("#dl").onclick=download}
+ if(S.stage==="summary"){app.querySelector("#back").onclick=()=>{S.stage="step2";tp=4;render()};
+  app.querySelector("#sub").onclick=async()=>{const r=app.querySelector('input[name="rating"]:checked');if(!r){showMissing([["rating","How useful was the RADAR card"]]);return}
+   S.rating=+r.value;S.comment=app.querySelector("#cm").value;S.stage="done";S.submitted=true;S.submittedAt=new Date().toISOString();S.sent=await sendResults();if(!S.sent)download();await save();render();scrollTo(0,0)}}}
+
+/* ===================== Tutorial ===================== */
+const TUT=[
+ {h:"1 · What you will do",b:`<p>You manage one simulated emergency-department patient <b>twice</b>: first on your own, then from triage again with RADAR's card. There are five time points: T0 (triage), 0.5, 1, 3 and 6 hours.</p><p>At each time point you see the chart on the left and your plan on the right. When you save, the team <b>carries out your orders</b>: fluids run, antibiotics are given, tests are drawn and return later, and the patient's vital signs respond.</p><p>Nothing here affects real patients. The case is adapted from a real visit with changed details.</p>`},
+ {h:"2 · Reading the chart",b:`<ul><li><b>Vital signs</b>: every row shows BP with <b>MAP</b>, total fluid given and any vasopressor with its dose. New rows are shaded blue.</li><li><b>Results so far</b>: a test appears only if you ordered it, at the time it would return (for example lactate about 25 minutes after it is drawn).</li><li><b>Done by the team</b>: what was carried out and when. “Ordered, not yet done” lists what is still pending.</li><li><b>How the simulated patient behaves</b> (bottom of the chart) explains the assumptions.</li></ul>`},
+ {h:"3 · Your plan: what each option means",b:`<ul><li><b>Tests</b>: <i>now</i> = at triage or initial assessment; <i>before ED disposition</i> = any time before the patient leaves the ED; <i>not needed</i>; <i>already done</i> is filled in for you once the chart shows the test was done.</li><li><b>Shock</b>: <i>possible: need more data</i> when you would repeat the blood pressure or wait for lactate before deciding.</li><li><b>Antibiotics</b>: <i>decide after more information</i> if it depends on what else you find.</li><li><b>IV fluid bolus</b>: the first “give” is 30 mL/kg over 1 hour; after that each “give” is another 500 mL.</li><li><b>Level of care</b>: the level the patient needs (ICU-level care, monitored bed, general ward, observation, discharge), not a named unit. <i>not yet decided</i> is always available.</li><li><b>How sure are you</b> (1–5) is needed on every screen. If a row is missing, the page tells you which one and takes you to it.</li></ul>`},
+ {h:"4 · RADAR's card (second run)",b:`<ul><li><b>What RADAR sees now</b>: the data it used, including your fluids, antibiotics and vasopressor.</li><li>Each suggestion shows a <b>confidence</b> (low, moderate, high), the evidence <b>for</b> and <b>against</b>, and <b>more data needed</b> when the evidence is not enough.</li><li>The <b>gold ring</b> in your form marks RADAR's suggestion. You do <b>not</b> have to choose it.</li><li>If your answer differs from your own first run at the same time point, give a short reason. A box on every screen lets you say where you disagree with RADAR.</li></ul>`},
+ {h:"5 · Practice (not recorded)",practice:true,b:`<p>A 45-year-old woman with a sore throat for 2 days. T 38.1 °C, HR 92, BP 128/80 (MAP 96), RR 16, SpO₂ 99%. Choose one option per row, then press <b>Check</b>.</p>`},
+];
+function renderTutorial(){const i=S.tutPage||0,P=TUT[i];
+ let practice="";if(P.practice){practice=`<table class="form"><tr id="row-p1"><td>Lactate</td><td><div class="opts">${WHEN.slice(0,3).map(o=>`<label style="--oc:var(--o-${OC[o]})"><input type="radio" name="p1" value="${o}">${o}</label>`).join("")}</div></td></tr>
+  <tr id="row-p2"><td>Antibiotics</td><td><div class="opts">${["within 1 h","within 3 h","decide after more information","not indicated"].map(o=>`<label style="--oc:var(--o-${OC[o]})" class="${o==="decide after more information"?"radarpick":""}"><input type="radio" name="p2" value="${o}">${o}</label>`).join("")}</div><div class="small muted">The gold ring is an example of a RADAR suggestion; you may choose anything.</div></td></tr>
+  <tr id="row-p3"><td>Level of care</td><td><div class="opts">${["not yet decided","discharge","observation","general ward"].map(o=>`<label style="--oc:var(--o-${OC[o]})"><input type="radio" name="p3" value="${o}">${o}</label>`).join("")}</div></td></tr>
+  <tr id="row-pc"><td>How sure are you?</td><td><div class="opts">${[1,2,3,4,5].map(n=>`<label style="--oc:var(--o-blue)"><input type="radio" name="pc" value="${n}">${n}</label>`).join("")}</div></td></tr></table><p id="pfb" class="small"></p>`}
+ app.innerHTML=`<div class="panel tut"><div class="actions"><span class="small muted">Tutorial · page ${i+1} of ${TUT.length}</span><span>${TUT.map((t,j)=>`<button type="button" class="dot ${j===i?"on":""}" data-p="${j}" aria-label="Page ${j+1}">${j+1}</button>`).join("")}</span></div>
+ <h2>${P.h}</h2>${P.b}${practice}
+ <div class="actions"><span class="err" id="e"></span><span>${i>0?`<button id="tprev">Back</button> `:""}${P.practice?`<button id="tcheck">Check</button> `:""}${i<TUT.length-1?`<button class="primary" id="tnext">Next</button>`:`<button class="primary" id="tdone">${S.ret&&S.ret.stage!=="step1"||S.step1.length?"Return to where I was":"Start the review"}</button>`}</span></div></div>`;
+ app.querySelectorAll(".dot").forEach(d=>d.onclick=()=>{S.tutPage=+d.dataset.p;render()});
+ const go=id=>app.querySelector(id);
+ if(go("#tprev"))go("#tprev").onclick=()=>{S.tutPage=i-1;render()};
+ if(go("#tnext"))go("#tnext").onclick=()=>{S.tutPage=i+1;render();scrollTo(0,0)};
+ if(go("#tcheck"))go("#tcheck").onclick=()=>{const miss=[];[["p1","Lactate"],["p2","Antibiotics"],["p3","Level of care"],["pc","How sure are you"]].forEach(([n,l])=>{if(!app.querySelector(`input[name="${n}"]:checked`))miss.push([n,l])});
+  if(miss.length){showMissing(miss);return}app.querySelector("#e").textContent="";app.querySelector("#pfb").innerHTML="Done. In the review every row works the same way, and the page tells you if anything is still missing. Press the button below to continue."};
+ if(go("#tdone"))go("#tdone").onclick=()=>{const r=S.ret||{stage:"step1",tp:0};S.stage=r.stage;tp=r.tp;S.ret=null;if(S.stage==="step1"&&!S.step1.length)tStart=Date.now();save();render();scrollTo(0,0)};}
+
+/* ===================== Saving and sending ===================== */
 const KEY="radar-review-"+CASE.id;
 const SEND_URL="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
 const TEAM_EMAIL="jin00330@umn.edu";
 function payload(){const ev=s=>{const x=simulate(s);return {events:x.events,results:x.results.map(r=>({name:r.name,at:r.at})),vitals:VT.map(x.vital)}};
- return {tool:"RADAR clinician review",version:"sim-1",case:CASE.id,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:{own:ev(S.step1),withRadar:ev(S.step2)}};}
+ return {tool:"RADAR clinician review",version:"sim-2",case:CASE.id,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:{own:ev(S.step1),withRadar:ev(S.step2)}};}
 async function sendResults(){if(!SEND_URL)return false;try{await fetch(SEND_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload())});return true}catch(e){return false}}
 function mailtoHref(){const p=payload();const lines=[`RADAR clinician review - ${p.reviewer.name}`,`Case: ${p.case}`,`Finished: ${p.submittedAt||p.sentAt}`,"","Please attach the downloaded results file (RADAR_review_*.json) to this email."];return `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent("RADAR review - "+p.reviewer.name)}&body=${encodeURIComponent(lines.join("\n"))}`;}
-async function save(){try{localStorage.setItem(KEY,JSON.stringify(S));statusEl.textContent="Saved in this browser "+new Date().toLocaleTimeString();}catch(e){statusEl.textContent="This browser cannot keep answers; please finish in one sitting."}}
+async function save(loud){try{localStorage.setItem(KEY,JSON.stringify({...S,tpNow:tp}));statusEl.textContent=(loud?"Progress saved, including unsaved choices on this screen. ":"Saved in this browser ")+new Date().toLocaleTimeString();}catch(e){statusEl.textContent="This browser cannot keep answers; please finish in one sitting."}}
 function download(){const data=payload();const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});const a=document.createElement("a");
  const nm=(S.reviewer.name||"reviewer").replace(/[^A-Za-z0-9]+/g,"_");a.href=URL.createObjectURL(blob);a.download=`RADAR_review_${nm}_${CASE.id}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);}
 const RS=document.getElementById("restart");
 function restartUI(){RS.innerHTML=`<button type="button" id="rs-btn">Start over</button>`;RS.querySelector("#rs-btn").onclick=()=>{
  RS.innerHTML=`<span class="small">Clear all your answers and start again?</span> <button type="button" id="rs-no">Cancel</button> <button type="button" class="primary" id="rs-yes">Yes, start over</button>`;
  RS.querySelector("#rs-no").onclick=restartUI;
- RS.querySelector("#rs-yes").onclick=()=>{S={stage:"start",reviewer:{name:""},step1:[],step2:[],radar:[],rating:null,comment:"",submitted:false};tp=0;try{localStorage.removeItem(KEY)}catch(e){};restartUI();render();scrollTo(0,0);statusEl.textContent="Started a new review.";};};}
+ RS.querySelector("#rs-yes").onclick=()=>{S=fresh();tp=0;try{localStorage.removeItem(KEY)}catch(e){};restartUI();render();scrollTo(0,0);statusEl.textContent="Started a new review.";};};}
 restartUI();
-try{const v=localStorage.getItem(KEY);if(v){S={...S,...JSON.parse(v)};if(S.stage==="step1")tp=Math.min(S.step1.length,4);if(S.stage==="step2")tp=Math.min(S.step2.length,4);statusEl.textContent="Picked up where you left off.";}}catch(e){}
+try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);S={...S,...o};tp=o.tpNow||0;if(S.stage==="step1")tp=Math.min(tp,S.step1.length,4);if(S.stage==="step2")tp=Math.min(tp,S.step2.length,4);statusEl.textContent="Picked up where you left off.";}}catch(e){}
 render();
 </script>
 

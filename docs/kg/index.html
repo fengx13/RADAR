@@ -136,6 +136,46 @@ svg:focus,svg *:focus{outline:none}
   </div>
   <div class="stats"><div><b>129</b><span>SSC 2026 statements</span></div><div><b>422</b><span>graph nodes</span></div><div><b>522</b><span>links</span></div><div><b>22</b><span>RADAR decisions</span></div></div>
 </header>
+<section class="kgcheck" id="kgcheck">
+  <details open>
+    <summary><b>What this page is for</b> · and the only 3 points we ask you to check</summary>
+    <p>This page shows how RADAR's guideline knowledge was built: each guideline statement was parsed into conditions and actions, linked into one graph, and every RADAR decision was given a frozen list of statements it may cite. You do not need to review the whole graph. Explore it if you want to see where a RADAR citation comes from.</p>
+    <p><b>We ask you to check only these 3 places where another guideline differs from SSC 2026 or Sepsis-3.</b> Pick A (keep RADAR as it is) or B for each, then press Send.</p>
+    <div class="kgq" id="kgq"></div>
+    <label class="kgname">Your name <input type="text" id="kg-name" autocomplete="name"></label>
+    <div class="kgact"><span id="kg-msg" class="kgmsg"></span><button type="button" id="kg-send">Send my 3 answers</button></div>
+  </details>
+</section>
+<style>
+.kgcheck{margin:0 0 12px}.kgcheck details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.kgcheck summary{cursor:pointer}.kgq .q b,.kgq .q{font-style:normal}.kgq .q{border-top:1px solid var(--line);padding:10px 0}.kgq .q:first-child{border-top:0}
+.kgq .opt{font-style:normal;font-weight:400;display:block;margin:4px 0;padding:6px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14px}
+.kgq .opt:has(input:checked){border-color:var(--gold,#d4a017);box-shadow:0 0 0 1px var(--gold,#d4a017)}.kgq input[type=radio]{margin-right:6px}
+.kgq textarea{width:100%;min-height:40px;margin-top:4px}.kgname input{max-width:320px;margin-left:6px}
+.kgact{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}.kgmsg{font-size:14px}.kgq .miss{box-shadow:inset 3px 0 0 #b3261e;padding-left:8px}
+</style>
+<script>
+(function(){
+const Q=[
+ {id:"tx2",node:"Act · initial IV fluid (TX2)",a:"Keep: SSC 2026 statement 10 only — at least 30 mL/kg IV crystalloid within the first 3 h for sepsis-induced hypoperfusion or septic shock. NICE 250 mL bolus guidance is not linked.",b:"Also link NICE NG253 1.8.6–1.8.9: an initial 250 mL bolus over 10–15 min, further 250 mL boluses up to 1,000 mL with reassessment after each, then senior review."},
+ {id:"w1",node:"Assay · blood cultures (W1)",a:"Keep: SSC 2026 statement 7 only — blood cultures as soon as possible for possible, probable or definite sepsis. ATS/IDSA CAP 2019 Q2.2 is not linked.",b:"Also link ATS/IDSA CAP 2019 Q2.2 (conditional against routine blood cultures in hospitalised non-severe pneumonia), so the node can recommend against cultures in non-severe pneumonia without suspected sepsis."},
+ {id:"r2",node:"Recognize · organ dysfunction (R2)",a:"Keep: Sepsis-3 (SOFA-1, JAMA 2016) as the definition — an acute change in total SOFA ≥ 2; SOFA-2 (JAMA 2025) shown as supporting information.",b:"Use SOFA-2 as the primary organ-dysfunction criterion and keep SOFA-1 as supporting."}];
+const box=document.getElementById("kgq");
+box.innerHTML=Q.map((q,i)=>`<div class="q" id="q-${q.id}"><b>${i+1}. ${q.node}</b>
+ <label class="opt"><input type="radio" name="${q.id}" value="A">A (current RADAR): ${q.a}</label>
+ <label class="opt"><input type="radio" name="${q.id}" value="B">B: ${q.b}</label>
+ <textarea id="c-${q.id}" placeholder="Comment (optional)"></textarea></div>`).join("");
+const URL_="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
+document.getElementById("kg-send").onclick=async()=>{const msg=document.getElementById("kg-msg");document.querySelectorAll(".kgq .q").forEach(x=>x.classList.remove("miss"));
+ const name=document.getElementById("kg-name").value.trim();const ans={};const miss=[];
+ Q.forEach(q=>{const r=document.querySelector(`input[name="${q.id}"]:checked`);if(!r)miss.push(q);else ans[q.id]={choice:r.value,comment:document.getElementById("c-"+q.id).value.trim()}});
+ if(!name){msg.textContent="Please enter your name.";document.getElementById("kg-name").focus();return}
+ if(miss.length){msg.textContent="Still to answer: "+miss.map(q=>q.node).join(", ")+".";miss.forEach(q=>document.getElementById("q-"+q.id).classList.add("miss"));document.getElementById("q-"+miss[0].id).scrollIntoView({behavior:"smooth",block:"center"});return}
+ const body={tool:"RADAR guideline graph check",case:"kg-conflicts-3",reviewer:{name},submittedAt:new Date().toISOString(),answers:ans,comment:Object.entries(ans).map(([k,v])=>k+":"+v.choice).join(" ")};
+ try{await fetch(URL_,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});msg.textContent="Sent. Thank you, "+name+".";}catch(e){msg.textContent="Could not send. Please email your answers to jin00330@umn.edu."}};
+})();
+</script>
+
 <div class="bar">
   <label for="rsel">RADAR decision</label>
   <select id="rsel"></select>

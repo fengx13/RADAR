@@ -492,7 +492,7 @@ const fresh=()=>({stage:"start",reviewer:{name:""},order:shuffle(CASES.map(c=>c.
 let S=fresh(),tp=0,tStart=Date.now();setCase(S.order[0]);
 const app=document.getElementById("app"),statusEl=document.getElementById("status");
 function rail(){const steps=[["1","Read the triage packet and place orders"],["2","Your orders are carried out; update your plan"],["3","Same patient with RADAR's card"],["4","Compare; next patient; submit at the end"]];
- const cur={start:0,tutorial:0,step1:1,step2:3,summary:4,final:5,done:5}[S.stage];const idx=S.stage==="step1"?(tp===0?1:2):cur;
+ const cur={start:0,tutorial:0,step1:1,step2:3,summary:4,final:5,"multi-intro":5,multi:5,done:5}[S.stage];const idx=S.stage==="step1"?(tp===0?1:2):cur;
  document.getElementById("rail").innerHTML=(["step1","step2","summary"].includes(S.stage)?`<div class="now"><b>Patient ${S.ci+1} of ${S.order.length}</b>${esc(CASE.title)}</div>`:"")+steps.map(([n,t],i)=>`<div class="${i+1===idx?"now":(i+1<idx?"done":"")}"><b>Step ${n}</b>${t}</div>`).join("");}
 function tlHtml(){return `<div class="tl">${TP.map((t,i)=>`<span class="${i===tp?"on":(i<tp?"past":"")}">${t}</span>`).join("")}</div>`;}
 function toolbar(){return `<div class="toolbar"><button type="button" id="tb-save">Save progress</button> <button type="button" id="tb-tut">Open the tutorial</button></div>`}
@@ -566,6 +566,8 @@ function render(){rail();document.body.classList.toggle("compact",S.stage!=="sta
    f.seconds=Math.round((Date.now()-tStart)/1000);S.step2[tp]=f;S.step2.length=tp+1;delete S.draft["step2:"+tp];tStart=Date.now();if(tp<4){tp++}else{S.stage="summary"}save();render();scrollTo(0,0)};
   const b=app.querySelector("#back");if(b)b.onclick=()=>{saveDraft();tp--;render()};return;}
  if(S.stage==="summary"){renderSummary();return}
+ if(S.stage==="multi-intro"){renderMultiIntro();return}
+ if(S.stage==="multi"){renderMulti();return}
  if(S.stage==="final"||S.stage==="done"){renderFinal();return}
 }
 function renderSummary(){const a=simulate(S.step1),b=simulate(S.step2);
@@ -603,14 +605,67 @@ function renderSummary(){const a=simulate(S.step1),b=simulate(S.step2);
 function renderFinal(){const done=S.stage==="done";
  const list=S.order.map((id,i)=>{const c=byId(id),x=S.cases[id]||{};return `<tr><td>${i+1}</td><td><b>${esc(c.title)}</b><div class="small muted">${c.source==="adapted"?"adapted from a real visit":"fictional"}</div></td><td>${esc(x.dx||"—")}</td><td>${esc(c.truth)}</td></tr>`}).join("");
  app.innerHTML=`<div class="panel"><h2>${done?"Submitted. Thank you.":"Final questions"}</h2>
- <h3>The five patients</h3><p class="small muted">Some of the patients did not have sepsis: they were included to see whether RADAR, and the review, can tell sepsis apart from conditions that look like it.</p>
- <div class="scroll"><table class="sum"><tr><th>#</th><th>Patient</th><th>Your diagnosis</th><th>What the case was built as</th></tr>${list}</table></div>
+ ${done?`<h3>The five patients</h3><p class="small muted">Some of the patients did not have sepsis: they were included to see whether RADAR, and the review, can tell sepsis apart from conditions that look like it.</p>
+ <div class="scroll"><table class="sum"><tr><th>#</th><th>Patient</th><th>Your diagnosis</th><th>What the case was built as</th></tr>${list}</table></div>`:""}
+ ${done?"":`<h3>Optional: busy-shift level</h3>${S.multi&&S.multi.done?`<p class="small">Completed: ${S.multi.log.filter(x=>x.action==="saved").length} patient updates, ${S.multi.log.filter(x=>x.action==="opened").length} times a patient was opened.</p>`:`<p class="small">Three patients at once on one clock, with a time limit at each time point (about 15 minutes). You can skip it.</p><button id="mintro">Try the busy-shift level</button>`}`}
  <h3>Overall, how useful was the RADAR card?</h3><div class="opts" id="row-rating">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="rating" value="${n}" ${S.rating==n?"checked":""} ${done?"disabled":""}>${n}</label>`).join("")}</div><div class="small muted">1 = not useful · 5 = very useful</div>
  <h3>Anything else RADAR or the simulation got wrong, or should show differently?</h3><textarea id="cm" ${done?"disabled":""}>${esc(S.comment)}</textarea>
  <div class="actions" style="margin-top:12px"><span class="err" id="e"></span>${done?`<span class="muted">${S.sent?`Thank you, ${esc(S.reviewer.name)}. Your results were sent to the RADAR team (${TEAM_EMAIL}).`:`Thank you, ${esc(S.reviewer.name)}. Please email the results file to ${TEAM_EMAIL}.`}</span><span>${S.sent?"":`<a class="btnlink" href="${mailtoHref()}">Open email to ${TEAM_EMAIL}</a> `}<button id="dl">Download results file</button></span>`:`<span><button class="primary" id="sub">Finish and send results</button></span>`}</div></div>`;
  if(done){app.querySelector("#dl").onclick=download;return}
+ const mi=app.querySelector("#mintro");if(mi)mi.onclick=()=>{S.rating=(app.querySelector('input[name="rating"]:checked')||{}).value||S.rating;S.comment=app.querySelector("#cm").value;S.stage="multi-intro";save();render();scrollTo(0,0)};
  app.querySelector("#sub").onclick=async()=>{const r=app.querySelector('input[name="rating"]:checked');if(!r){showMissing([["rating","How useful was the RADAR card"]]);return}
   S.rating=+r.value;S.comment=app.querySelector("#cm").value;S.stage="done";S.submitted=true;S.submittedAt=new Date().toISOString();S.sent=await sendResults();if(!S.sent)download();await save();render();scrollTo(0,0)}}
+/* ===================== Busy-shift level (optional, step 4) =====================
+   Mike's suggestion: several patients at once, the reviewer chooses which to see next; some patients have
+   RADAR's card and some do not. Three patients share one clock; each time point has a time limit, after which
+   the clock moves on and any patient not updated keeps the previous plan. Every opening, save and
+   switch is logged with a timestamp. */
+const MULTI_N=3,MULTI_LIMIT=180;   // patients, seconds per time point
+document.head.insertAdjacentHTML("beforeend",`<style>
+.mgrid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px}@media (max-width:900px){.mgrid{grid-template-columns:minmax(0,1fr)}}
+.plist{display:flex;flex-direction:column;gap:10px}.pitem{text-align:left;border:1px solid var(--line,#ccc);border-radius:10px;padding:10px;background:var(--panel,#fff);cursor:pointer;font:inherit;color:inherit}
+.pitem.on{outline:2px solid var(--accent,#7a0019)}.pitem .st{font-size:12.5px}.pitem .ok{color:var(--o-green,#2e7d32)}.pitem .todo{color:var(--o-red,#b00020)}
+.clock{font-variant-numeric:tabular-nums;font-weight:600}.clock.low{color:var(--o-red,#b00020)}
+.subgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px}@media (max-width:1200px){.subgrid{grid-template-columns:minmax(0,1fr)}}
+</style>`);
+function multiStart(){const ids=shuffle(S.order).slice(0,MULTI_N),arms=shuffle([true,false,Math.random()<.5]);
+ S.multi={ids,radar:Object.fromEntries(ids.map((id,i)=>[id,arms[i]])),tp:0,plans:Object.fromEntries(ids.map(id=>[id,[]])),saved:{},active:null,
+  log:[],tpStart:Date.now(),openedAt:null,startedAt:new Date().toISOString(),done:false,limitSeconds:MULTI_LIMIT};
+ S.stage="multi";mlog("start");save();render();scrollTo(0,0)}
+function mlog(action,id,extra){const M=S.multi;M.log.push({at:Math.round((Date.now()-Date.parse(M.startedAt))/100)/10,tp:TP[M.tp],action,patient:id||null,...(extra||{})})}
+let multiTimer=null;
+function multiLeft(){const M=S.multi;return Math.max(0,MULTI_LIMIT-Math.round((Date.now()-M.tpStart)/1000))}
+function multiTick(){const el=document.getElementById("mclock");if(!el||S.stage!=="multi"){clearInterval(multiTimer);multiTimer=null;return}
+ const s=multiLeft();el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;el.classList.toggle("low",s<=30);if(s===0)multiAdvance(true)}
+function multiSim(id){const M=S.multi,c=byId(id);setCase(id);return simulate(M.plans[id].slice(0,M.tp),c)}
+function multiAdvance(timeout){const M=S.multi;if(M.active){mlog(timeout?"time ran out while open":"left open when the clock moved",M.active);M.active=null}
+ M.ids.forEach(id=>{if(!M.saved[id+":"+M.tp]){const prev=M.plans[id][M.tp-1]||{};M.plans[id][M.tp]={...prefillFrom(prev),carried:true};mlog("not updated: previous plan kept",id)}});
+ mlog(timeout?"clock moved: time limit":"clock moved by reviewer");
+ if(M.tp<4){M.tp++;M.tpStart=Date.now()}else{M.done=true;M.finishedAt=new Date().toISOString();S.stage="final"}
+ save();render();scrollTo(0,0)}
+function renderMulti(){const M=S.multi;tp=M.tp;const now=TPH[M.tp];
+ const items=M.ids.map((id,i)=>{const sim=multiSim(id),v=sim.vital(now),nw=sim.results.filter(r=>M.tp>0&&r.at>TPH[M.tp-1]&&r.at<=now).length,sv=M.saved[id+":"+M.tp];
+  return `<button type="button" class="pitem ${M.active===id?"on":""}" data-id="${id}"><b>Bed ${i+1}</b> · ${esc(byId(id).title)}<div class="st">MAP <b class="${v.map<65?"lowmap":""}">${v.map}</b> · HR ${v.hr} · SpO₂ ${v.spo2}%${nw?` · <b>${nw} new result${nw>1?"s":""}</b>`:""}</div><div class="st ${sv?"ok":"todo"}">${sv?"Plan saved for "+TP[M.tp]:"Not yet updated for "+TP[M.tp]}</div><div class="st muted">${M.radar[id]?"RADAR card on":"No RADAR card"}</div></button>`}).join("");
+ let main=`<div class="panel"><h2>Choose a patient</h2><p class="small muted">Open a patient on the left, update the plan and save. Patients you do not update before the clock moves keep their previous plan (at T0: no orders). You choose the order.</p></div>`;
+ if(M.active){const id=M.active,sim=multiSim(id),auto=autoState(sim),pre=M.plans[id][M.tp]&&!M.plans[id][M.tp].carried?M.plans[id][M.tp]:prefillFrom(M.plans[id][M.tp-1]||{});
+  const R=M.radar[id]?radarCard(M.tp,sim):null;
+  main=`<div class="subgrid"><div style="display:flex;flex-direction:column;gap:16px;min-width:0">${R?cardHtml(R):""}<div class="panel">${chartHtml(sim)}${modelNote()}</div></div>
+  <div class="panel"><h2>Bed ${M.ids.indexOf(id)+1}: your plan at ${TP[M.tp]}</h2><p class="small muted">Rows you leave empty count as no order. Confidence is optional here.</p>${formHtml(pre,{auto,radar:R?R.pick:undefined})}
+  <div class="actions"><span class="err" id="e"></span><span><button id="mclose">Back to the list without saving</button> <button class="primary" id="msave">Save this patient</button></span></div></div></div>`}
+ const nSaved=M.ids.filter(id=>M.saved[id+":"+M.tp]).length;
+ app.innerHTML=`<div class="actions">${tlHtml()}<span class="small muted">Busy-shift level · ${nSaved} of ${MULTI_N} patients updated · time left at this time point: <span id="mclock" class="clock"></span></span><span><button class="primary" id="madv">${M.tp<4?"Move the clock to "+TP[M.tp+1]:"Finish the busy-shift level"}</button></span></div>
+ <div class="mgrid"><div class="plist">${items}</div><div style="min-width:0">${main}</div></div>`;
+ app.querySelectorAll(".pitem").forEach(b=>b.onclick=()=>{const id=b.dataset.id;if(M.active===id)return;if(M.active)mlog("switched away without saving",M.active);M.active=id;mlog("opened",id);save();render()});
+ app.querySelector("#madv").onclick=()=>multiAdvance(false);
+ const c=app.querySelector("#mclose");if(c)c.onclick=()=>{mlog("closed without saving",M.active);M.active=null;save();render()};
+ const sv=app.querySelector("#msave");if(sv)sv.onclick=()=>{const id=M.active,f=readForm();delete f.disagree;M.plans[id][M.tp]=f;M.saved[id+":"+M.tp]=true;mlog("saved",id,{radarCard:!!M.radar[id]});M.active=null;save();render();scrollTo(0,0)};
+ if(!multiTimer)multiTimer=setInterval(multiTick,1000);multiTick();}
+function renderMultiIntro(){app.innerHTML=`<div class="panel"><h2>Optional: busy-shift level</h2>
+ <p>Three patients arrive at the same time and share one clock (T0, 0.5, 1, 3 and 6 h). At each time point you have <b>${MULTI_LIMIT/60} minutes</b> for all three. You choose which patient to see next; when the time is up the clock moves on, and a patient you did not update keeps the previous plan.</p>
+ <p>Some patients show RADAR's card and some do not (assigned at random). The page records the order in which you open patients, switches, and time spent. About 15 minutes.</p>
+ <p class="small muted">In this version the three patients are drawn from the five you have just managed, so you know them already; the point is how you divide your time, not the diagnosis. New patients will be added for the study.</p>
+ <div class="actions"><span></span><span><button id="mback">Back to the final questions</button> <button class="primary" id="mgo">Start the busy-shift level</button></span></div></div>`;
+ app.querySelector("#mback").onclick=()=>{S.stage="final";render()};app.querySelector("#mgo").onclick=multiStart;}
 
 /* ===================== Tutorial ===================== */
 const TUT=[
@@ -641,7 +696,7 @@ const KEY="radar-review-sim4";
 const SEND_URL="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
 const TEAM_EMAIL="jin00330@umn.edu";
 function payload(){const ev=(s,id)=>{const x=simulate(s,byId(id));return {events:x.events,results:x.results.map(r=>({name:r.name,at:r.at})),vitals:VT.map(x.vital)}};
- return {tool:"RADAR clinician review",version:"sim-5",caseOrder:S.order,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:Object.fromEntries(Object.entries(S.cases).map(([id,x])=>[id,{own:ev(x.step1,id),withRadar:ev(x.step2,id)}]))};}
+ return {tool:"RADAR clinician review",version:"sim-6",caseOrder:S.order,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:Object.fromEntries(Object.entries(S.cases).map(([id,x])=>[id,{own:ev(x.step1,id),withRadar:ev(x.step2,id)}])),busyShift:S.multi?Object.fromEntries(S.multi.ids.map(id=>[id,ev(S.multi.plans[id].map(p=>{const q={...p};delete q.carried;return q}),id)])):null};}
 async function sendResults(){if(!SEND_URL)return false;try{await fetch(SEND_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload())});return true}catch(e){return false}}
 function mailtoHref(){const p=payload();const lines=[`RADAR clinician review - ${p.reviewer.name}`,`Patients completed: ${Object.keys(p.cases).length} of ${p.caseOrder.length}`,`Finished: ${p.submittedAt||p.sentAt}`,"","Please attach the downloaded results file (RADAR_review_*.json) to this email."];return `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent("RADAR review - "+p.reviewer.name)}&body=${encodeURIComponent(lines.join("\n"))}`;}
 async function save(loud){try{localStorage.setItem(KEY,JSON.stringify({...S,tpNow:tp}));statusEl.textContent=(loud?"Progress saved, including unsaved choices on this screen. ":"Saved in this browser ")+new Date().toLocaleTimeString();}catch(e){statusEl.textContent="This browser cannot keep answers; please finish in one sitting."}}

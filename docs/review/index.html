@@ -109,7 +109,7 @@ tr.missing td{background:color-mix(in srgb,var(--o-red) 10%,transparent)}tr.miss
 <script>
 /* ===================== Decisions ===================== */
 const WHEN=["now","before ED disposition","not needed","already done"];
-const TESTS=[["cultures","Blood cultures × 2"],["lactate","Lactate"],["cbc","Complete blood count (CBC)"],["bmp","Basic metabolic panel (BMP): sodium, potassium, chloride, bicarbonate, BUN, creatinine, glucose"],["lft","Liver function tests"],["coag","Coagulation: PT/INR, PTT"],["vbg","Venous blood gas"],["ua","Urinalysis"],["cxr","Chest X-ray"],["ecg","12-lead ECG"]];
+const TESTS=[["cultures","Blood cultures × 2"],["lactate","Lactate"],["cbc","Complete blood count (CBC)"],["bmp","Basic metabolic panel (BMP): sodium, potassium, chloride, bicarbonate, BUN, creatinine, glucose"],["lft","Liver function tests"],["coag","Coagulation: PT/INR, PTT"],["vbg","Venous blood gas"],["ua","Urinalysis"],["cxr","Chest X-ray"],["ecg","12-lead ECG"],["pocus","Bedside cardiac and IVC ultrasound (volume status)"],["aorta","Bedside ultrasound of the abdominal aorta (aneurysm)"],["ctpa","CT pulmonary angiography"]];
 const DECISIONS=[
  ["tier","Sepsis likelihood",["unlikely","possible","probable","definite"],"Assessment"],
  ["shock","Shock or hypoperfusion",["yes","possible: need more data","no"],"Assessment"],
@@ -117,19 +117,19 @@ const DECISIONS=[
  ["abx","Antibiotics",["within 1 h","within 3 h","decide after more information","not indicated","already given"],"Treatment"],
  ["fluids","IV fluid bolus",["give","withhold"],"Treatment"],
  ["vaso","Vasopressor",["start or continue","hold or stop"],"Treatment"],
- ["dispo","Level of care",["not yet decided","discharge","observation","general ward","monitored bed","ICU-level care"],"Level of care"],
+ ["dispo","Level of care",["not yet decided","discharge-level","observation-level","ICU-level care"],"Level of care"],
 ];
 const KEYS=DECISIONS.map(d=>d[0]),TESTKEYS=TESTS.map(t=>t[0]);
 const LABEL=Object.fromEntries(DECISIONS.map(d=>[d[0],d[1].split(":")[0]]));
 const HINT={
  fluids:"First bolus: 30 mL/kg balanced crystalloid (Lactated Ringer's, 2,100 mL for 70 kg) over 1 h. After it, “give” means another 500 mL.",
  vaso:"Norepinephrine via peripheral IV, titrated by the nurse to MAP ≥ 65.",
- dispo:"The level of care the patient needs, not a named unit: units differ between hospitals."};
+ dispo:"The level of care the patient needs, not a named unit (units differ between hospitals). Observation-level = an observation, monitored or ward bed, as your hospital does it."};
 const OC={"unlikely":"green","possible":"amber","probable":"red","definite":"purple","yes":"red","possible: need more data":"amber","no":"green",
  "now":"red","before ED disposition":"amber","not needed":"grey","already done":"blue","within 1 h":"red","within 3 h":"amber","decide after more information":"teal","not indicated":"grey","already given":"blue",
- "give":"blue","withhold":"grey","start or continue":"red","hold or stop":"grey","not yet decided":"grey","discharge":"green","observation":"teal","general ward":"amber","monitored bed":"purple","ICU-level care":"red"};
+ "give":"blue","withhold":"grey","start or continue":"red","hold or stop":"grey","not yet decided":"grey","discharge-level":"green","observation-level":"amber","ICU-level care":"red"};
 const TP=["T0","0.5 h","1 h","3 h","6 h"],TPH=[0,0.5,1,3,6];
-const CASE={id:"example-1-sim2",title:"79-year-old man · near-fainting at home",weight:70,
+const CASE={id:"example-1-sim3",title:"79-year-old man · near-fainting at home",weight:70,
  triage:["Arrived by ambulance · ESI 2","T 35.9 °C · HR 94 · RR 18 · SpO₂ 98% on air","BP 98/42 (MAP 61), automated cuff · alert, slow to answer"],
  problems:["Chronic kidney disease (baseline creatinine 2.1 mg/dL)","Prosthetic aortic valve","Ileostomy","Gout","Recurrent urinary infections; bloodstream infection last year (resistant organism)"],
  homeMeds:["Hydrocodone–acetaminophen as needed"],
@@ -141,13 +141,13 @@ const CASE={id:"example-1-sim2",title:"79-year-old man · near-fainting at home"
    Norepinephrine: titrated to MAP 66-68. Lactate falls 0.4 mmol/L per h once MAP >= 65 after fluids or vasopressor.
    Orders are carried out with usual ED delays; tests return only if ordered. */
 const DRAW={now:.2,"before ED disposition":1.5};
-const TURN={cultures:3.0,lactate:.4,cbc:.9,bmp:1.1,lft:1.2,coag:1.0,vbg:.3,ua:.8,cxr:.4,ecg:0};
-const DONE_TXT={cultures:"Blood cultures × 2 drawn",lactate:"Lactate drawn",cbc:"CBC drawn",bmp:"BMP drawn",lft:"Liver function tests drawn",coag:"Coagulation tests drawn",vbg:"Venous blood gas drawn",ua:"Urine sample sent",cxr:"Portable chest X-ray taken",ecg:"12-lead ECG recorded"};
+const TURN={cultures:3.0,lactate:.4,cbc:.9,bmp:1.1,lft:1.2,coag:1.0,vbg:.3,ua:.8,cxr:.4,ecg:0,pocus:0,aorta:0,ctpa:.8};
+const DONE_TXT={cultures:"Blood cultures × 2 drawn",lactate:"Lactate drawn",cbc:"CBC drawn",bmp:"BMP drawn",lft:"Liver function tests drawn",coag:"Coagulation tests drawn",vbg:"Venous blood gas drawn",ua:"Urine sample sent",cxr:"Portable chest X-ray taken",ecg:"12-lead ECG recorded",pocus:"Bedside cardiac and IVC ultrasound done",aorta:"Bedside aortic ultrasound done",ctpa:"CT pulmonary angiography done"};
 const r1=x=>Math.round(x*10)/10;
 function simulate(dec){
  const orders={};let bolus=null,extra=[],vasoStart=null,vasoStop=null,abx=null,dispo=null;
  dec.forEach((d,i)=>{if(!d)return;const t=TPH[i];
-  TESTKEYS.forEach(k=>{const v=d[k];if(orders[k]||DRAW[v]===undefined)return;orders[k]={ordered:t,done:r1(t+(k==="ecg"?.1:k==="cxr"?.4:k==="ua"?.3:DRAW[v]))}});
+  TESTKEYS.forEach(k=>{const v=d[k];if(orders[k]||DRAW[v]===undefined)return;orders[k]={ordered:t,done:r1(t+(k==="ecg"||k==="pocus"||k==="aorta"?.1:k==="cxr"?.4:k==="ua"?.3:k==="ctpa"?Math.max(.6,DRAW[v]):DRAW[v]))}});
   if(!abx&&(d.abx==="within 1 h"||d.abx==="within 3 h"))abx=r1(t+(d.abx==="within 1 h"?.6:2.0));
   if(d.fluids==="give"){if(!bolus)bolus={start:r1(t+.2),end:r1(t+1.2)};else if(t>=bolus.end)extra.push(r1(t+.1));}
   if(d.vaso==="start or continue"&&vasoStart===null)vasoStart=r1(t+.25);
@@ -173,6 +173,10 @@ function simulate(dec){
  if(O("coag"))R("coag",O("coag").done+TURN.coag,"Coagulation",[["INR 1.1",0],["PT 12.1 s",0],["PTT 30 s",0]]);
  if(O("ua"))R("ua",O("ua").done+TURN.ua,"Urinalysis",[["Leukocyte esterase positive",1],["Nitrite positive",1],["WBC >50 /hpf",1],["Protein 300 mg/dL",1]]);
  if(O("cxr"))R("cxr",O("cxr").done+TURN.cxr,"Chest X-ray",[["No acute cardiopulmonary process",0]]);
+ // Added for the review (fictional findings, not from the source record):
+ if(O("pocus"))R("pocus",O("pocus").done,"Bedside cardiac and IVC ultrasound (fictional finding)",[["Hyperdynamic left ventricle, no pericardial effusion",0],["IVC under 1 cm, collapses more than 50% with breathing",1]]);
+ if(O("aorta"))R("aorta",O("aorta").done,"Bedside aortic ultrasound (fictional finding)",[["Abdominal aorta 2.1 cm, no aneurysm",0]]);
+ if(O("ctpa"))R("ctpa",O("ctpa").done+TURN.ctpa,"CT pulmonary angiography (fictional finding)",[["No pulmonary embolism",0]]);
  if(O("cultures"))R("cultures",O("cultures").done+TURN.cultures,"Blood cultures",[["Pending: no growth reported yet",0]]);
  const events=[];
  Object.entries(orders).forEach(([k,o])=>events.push({at:o.done,txt:DONE_TXT[k]}));
@@ -189,22 +193,26 @@ const VT=[0,.5,1,1.5,2,3,4,5,6];
 /* ===================== RADAR card =====================
    Rules after clinician feedback (Nov 2026):
    - Shock: one MAP < 65 = "possible: need more data" (repeat BP with a correct cuff, lactate); "yes" when a repeat MAP is < 65 or lactate >= 2.
-   - Tests: cultures, lactate, CBC, BMP, liver tests, coagulation, urinalysis, chest X-ray and ECG are "now" in a hypotensive patient.
-   - Level of care: a triage estimate first (MultiTask model; illustrative here), then rules: ICU-level care if on a vasopressor,
-     MAP < 65 after 30 mL/kg, or MAP < 65 with lactate >= 4; never ward or discharge while shock is possible or present.
+   - Tests: cultures, lactate, CBC, BMP, liver tests, coagulation, urinalysis, chest X-ray and ECG are "now" in a hypotensive patient;
+     bedside cardiac/IVC ultrasound now with hypotension; aortic ultrasound now at age >= 60 with hypotension and syncope;
+     CT pulmonary angiography before ED disposition unless an infectious source explains the picture (PY-210, PY-214).
+   - Vasopressor: start norepinephrine when two readings in a row are MAP < 65, or MAP < 65 after 30 mL/kg (PY-213).
+   - Level of care (PY-211): discharge-level / observation-level / ICU-level / not yet decided. Rules first: ICU-level if on a
+     vasopressor, MAP < 65 after 30 mL/kg, MAP < 65 with lactate >= 4, or any MAP < 65 (repeat the BP); otherwise the
+     MultiTask triage estimate (illustrative here).
    Confidence levels in this simulated case are set by these rules and are illustrative. */
 function lactNow(sim,t){const r=[...sim.results].filter(x=>(x.k==="lactate"||x.k==="vbg")&&x.at<=t).sort((a,b)=>b.at-a.at)[0];if(!r)return null;return parseFloat(r.items.find(x=>/Lactate/.test(x[0]))[0].replace(/[^0-9.]/g,""))}
 function levelOfCare(sim,t){const v=sim.vital(t),m=v.map,onV=sim.onVaso(t),bolusDone=sim.bolus&&t>=sim.bolus.end,lac=lactNow(sim,t);
  const reps=VT.filter(x=>x>0&&x<=t).map(sim.vital),repLow=reps.length&&reps[reps.length-1].map<65;
  const shock=(repLow||(lac!==null&&lac>=2&&m<65))?"yes":(m<65?"possible: need more data":"no");
- let level,why;
+ const prev=VT.filter(x=>x<t).map(sim.vital).pop(),twoLow=m<65&&prev&&prev.map<65;
+ let level,why,by="rules";
  if(onV){level="ICU-level care";why="on a vasopressor"}
  else if(bolusDone&&m<65){level="ICU-level care";why=`MAP ${m} after 30 mL/kg`}
  else if(m<65&&lac!==null&&lac>=4){level="ICU-level care";why=`MAP ${m} with lactate ${lac.toFixed(1)}`}
- else if(shock!=="no"){level="not yet decided";why=`MAP ${m} < 65: not ward or discharge while shock is possible`}
- else if(lac!==null&&lac>=2){level="monitored bed";why=`MAP ${m} ≥ 65, lactate ${lac.toFixed(1)}`}
- else {level="general ward";why=`MAP ${m} ≥ 65 without a vasopressor`}
- return {level,why,shock,m,lac,onV,bolusDone,fv:v.fluid};}
+ else if(m<65){level="ICU-level care";why=`MAP ${m} < 65: possible shock; repeat the BP with a correctly sized cuff`}
+ else {level="observation-level";why="triage model estimate (illustrative here)";by="triage model"}
+ return {level,why,by,shock,m,lac,onV,bolusDone,twoLow,fv:v.fluid};}
 function radarCard(i,sim){const t=TPH[i],v=sim.vital(t),L=levelOfCare(sim,t),m=L.m,lac=L.lac;
  const done=k=>sim.orders[k]&&sim.orders[k].done<=t,ordered=k=>!!sim.orders[k];
  const pick={};const S=[];
@@ -224,8 +232,12 @@ function radarCard(i,sim){const t=TPH[i],v=sim.vital(t),L=levelOfCare(sim,t),m=L
  else A.push({txt:"Shock: <b>no</b>",conf:"moderate",forr:[`MAP ${m} ≥ 65${L.onV?" on a vasopressor":""}`],against:L.onV?["Needs a vasopressor to hold MAP ≥ 65"]:[],more:[]});
  S.push({h:"Assessment",items:A});
  // Tests
- const T=[];const src={cultures:"SSC #7",lactate:"SSC #8",cbc:"NICE NG253",bmp:"NICE NG253",lft:"NICE NG253",coag:"NICE NG253",vbg:"NICE NG253",ua:"NICE 1.11.2",cxr:"NICE 1.11.2",ecg:"clinician panel: hypotension, rule out ACS"};
- TESTS.forEach(([k,l])=>{if(done(k))pick[k]="already done";else{pick[k]="now";T.push({txt:ordered(k)?`${l.split(":")[0]}: ordered, pending`:`${l.split(":")[0]}: <b>now</b> <span class=src>${src[k]}</span>`})}});
+ const T=[];const src={cultures:"SSC #7",lactate:"SSC #8",cbc:"NICE NG253",bmp:"NICE NG253",lft:"NICE NG253",coag:"NICE NG253",vbg:"NICE NG253",ua:"NICE 1.11.2",cxr:"NICE 1.11.2",ecg:"clinician panel + ED practice: age ≥ 65 with hypotension, near-fainting",pocus:"SSC #49 + clinician panel: hypotension",aorta:"clinician panel: age ≥ 60, hypotension, near-fainting",ctpa:"AHA/ACC PE 2026: PE plausible while no infectious source is confirmed"};
+ const uaPos=sim.results.find(r=>r.k==="ua"&&r.at<=t);
+ TESTS.forEach(([k,l])=>{const nm=l.split(":")[0];if(done(k)){pick[k]="already done";return}
+  if(k==="ctpa"&&uaPos){pick[k]="not needed";T.push({txt:`${nm}: <b>not needed</b> now: the urinalysis gives an infectious source`});return}
+  const when=k==="ctpa"?"before ED disposition":"now";pick[k]=when;
+  T.push({txt:ordered(k)?`${nm}: ordered, pending`:`${nm}: <b>${when}</b> <span class=src>${src[k]}</span>`})});
  if(T.length)S.push({h:"Tests",items:T});
  // Treatment
  const Tr=[];
@@ -235,14 +247,15 @@ function radarCard(i,sim){const t=TPH[i],v=sim.vital(t),L=levelOfCare(sim,t),m=L
  else if(!L.bolusDone){pick.fluids="withhold";Tr.push({txt:`Bolus running (${L.fv} mL so far): reassess MAP when it ends`})}
  else pick.fluids="withhold";
  if(L.onV){pick.vaso="start or continue";Tr.push({txt:"Continue norepinephrine to MAP ≥ 65 <span class=src>SSC #11</span>",conf:"high"})}
+ else if(!L.bolusDone&&L.twoLow){pick.vaso="start or continue";Tr.push({txt:`MAP below 65 on two readings in a row: <b>start norepinephrine</b>${sim.bolus?"":" and give the 30 mL/kg bolus at the same time"} <span class=src>SSC #11 · #12</span>`,conf:"moderate",forr:["Hypotension persists"],against:["SSC suggests a MAP target of 60–65 at age ≥ 65 <span class=src>SSC #14</span>",...(sim.bolus?[]:["No fluid given yet"])],more:["Volume of IV fluid given"]})}
  else if(L.bolusDone&&m<65){pick.vaso="start or continue";Tr.push({txt:`MAP ${m} after 30 mL/kg: <b>start norepinephrine</b> <span class=src>SSC #11 · #12</span>`,conf:"high",forr:["Hypotension persists after the initial bolus"],against:["SSC suggests a MAP target of 60–65 at age ≥ 65 <span class=src>SSC #14</span>"],more:[]})}
- else if(m<65){pick.vaso="hold or stop";Tr.push({txt:"Vasopressor: not yet; give the bolus first, start if MAP stays < 65 after it <span class=src>SSC #11</span>",conf:"moderate"})}
+ else if(m<65){pick.vaso="hold or stop";Tr.push({txt:"Vasopressor: not yet (one low reading); repeat the BP and give the bolus; start if MAP stays < 65 <span class=src>SSC #11</span>",conf:"moderate"})}
  else pick.vaso="hold or stop";
  S.push({h:"Treatment",items:Tr.length?Tr:[{txt:"No change"}]});
  // Level of care
  const Lc=[];pick.dispo=L.level;
- if(i===0)Lc.push({txt:"Triage model estimate (MultiTask, triage data only; illustrative here): admission likely, ICU-level care possible"});
- Lc.push({txt:`Now: <b>${L.level}</b> (${L.why})`});
+ if(i===0)Lc.push({txt:"Triage model estimate (MultiTask, triage data only; illustrative here): observation-level. Rules come first and raise it while MAP < 65."});
+ Lc.push({txt:`Now: <b>${L.level}</b> (${L.why}; decided by ${L.by})`});
  if(i===4){const L0=levelOfCare(simulate([]),0);const ch=[];if(L.fv>0)ch.push(`${L.fv} mL fluid given`);if(L.onV)ch.push("norepinephrine started");if(lac!==null)ch.push(`lactate ${lac.toFixed(1)}`);ch.push(`MAP ${L0.m} → ${m}`);
   Lc.push({txt:`At triage: ${L0.level}. Changed because: ${ch.join("; ")}`})}
  S.push({h:"Level of care",items:Lc});
@@ -334,7 +347,7 @@ function renderSummary(){const a=simulate(S.step1),b=simulate(S.step2);
  const firstMap=s=>{for(const t of VT){if(t>0&&s.map(t)>=65)return t}return null};
  const row=(l,real,x,y)=>`<tr><td><b>${l}</b></td><td>${real}</td><td>${x}</td><td class="${x!==y?"chg":""}">${y}</td></tr>`;
  const ord=(s,k)=>s.orders[k]?fmt(s.orders[k].done):"not ordered";
- const REAL={cultures:"by 3 h",lactate:"2.2 h",cbc:"2.4 h",bmp:"3.2 h",lft:"3.2 h",coag:"5.2 h",vbg:"4.8 h",ua:"3.7 h",cxr:"4.3 h",ecg:"0.3 h"};
+ const REAL={cultures:"by 3 h",lactate:"2.2 h",cbc:"2.4 h",bmp:"3.2 h",lft:"3.2 h",coag:"5.2 h",vbg:"4.8 h",ua:"3.7 h",cxr:"4.3 h",ecg:"0.3 h",pocus:"not recorded",aorta:"not recorded",ctpa:"not recorded"};
  const tl=[row("Antibiotics given","3.5 h",fmt(a.abx),fmt(b.abx)),
   row("IV fluid bolus started","not recorded",a.bolus?fmt(a.bolus.start):"none",b.bolus?fmt(b.bolus.start):"none"),
   row("Total fluid by 6 h","not recorded",a.fluidVol(6)+" mL",b.fluidVol(6)+" mL"),
@@ -364,14 +377,14 @@ function renderSummary(){const a=simulate(S.step1),b=simulate(S.step2);
 const TUT=[
  {h:"1 · What you will do",b:`<p>You manage one simulated emergency-department patient <b>twice</b>: first on your own, then from triage again with RADAR's card. There are five time points: T0 (triage), 0.5, 1, 3 and 6 hours.</p><p>At each time point you see the chart on the left and your plan on the right. When you save, the team <b>carries out your orders</b>: fluids run, antibiotics are given, tests are drawn and return later, and the patient's vital signs respond.</p><p>Nothing here affects real patients. The case is adapted from a real visit with changed details.</p>`},
  {h:"2 · Reading the chart",b:`<ul><li><b>Vital signs</b>: every row shows BP with <b>MAP</b>, total fluid given and any vasopressor with its dose. New rows are shaded blue.</li><li><b>Results so far</b>: a test appears only if you ordered it, at the time it would return (for example lactate about 25 minutes after it is drawn).</li><li><b>Done by the team</b>: what was carried out and when. “Ordered, not yet done” lists what is still pending.</li><li><b>How the simulated patient behaves</b> (bottom of the chart) explains the assumptions.</li></ul>`},
- {h:"3 · Your plan: what each option means",b:`<ul><li><b>Tests</b>: <i>now</i> = at triage or initial assessment; <i>before ED disposition</i> = any time before the patient leaves the ED; <i>not needed</i>; <i>already done</i> is filled in for you once the chart shows the test was done.</li><li><b>Shock</b>: <i>possible: need more data</i> when you would repeat the blood pressure or wait for lactate before deciding.</li><li><b>Antibiotics</b>: <i>decide after more information</i> if it depends on what else you find.</li><li><b>IV fluid bolus</b>: the first “give” is 30 mL/kg over 1 hour; after that each “give” is another 500 mL.</li><li><b>Level of care</b>: the level the patient needs (ICU-level care, monitored bed, general ward, observation, discharge), not a named unit. <i>not yet decided</i> is always available.</li><li><b>How sure are you</b> (1–5) is needed on every screen. If a row is missing, the page tells you which one and takes you to it.</li></ul>`},
+ {h:"3 · Your plan: what each option means",b:`<ul><li><b>Tests</b>: <i>now</i> = at triage or initial assessment; <i>before ED disposition</i> = any time before the patient leaves the ED; <i>not needed</i>; <i>already done</i> is filled in for you once the chart shows the test was done.</li><li><b>Shock</b>: <i>possible: need more data</i> when you would repeat the blood pressure or wait for lactate before deciding.</li><li><b>Antibiotics</b>: <i>decide after more information</i> if it depends on what else you find.</li><li><b>IV fluid bolus</b>: the first “give” is 30 mL/kg over 1 hour; after that each “give” is another 500 mL.</li><li><b>Level of care</b>: the level the patient needs, not a named unit: <i>discharge-level</i>, <i>observation-level</i> (an observation, monitored or ward bed, as your hospital does it) or <i>ICU-level care</i>. <i>not yet decided</i> is always available.</li><li><b>How sure are you</b> (1–5) is needed on every screen. If a row is missing, the page tells you which one and takes you to it.</li></ul>`},
  {h:"4 · RADAR's card (second run)",b:`<ul><li><b>What RADAR sees now</b>: the data it used, including your fluids, antibiotics and vasopressor.</li><li>Each suggestion shows a <b>confidence</b> (low, moderate, high), the evidence <b>for</b> and <b>against</b>, and <b>more data needed</b> when the evidence is not enough.</li><li>The <b>gold ring</b> in your form marks RADAR's suggestion. You do <b>not</b> have to choose it.</li><li>If your answer differs from your own first run at the same time point, give a short reason. A box on every screen lets you say where you disagree with RADAR.</li></ul>`},
  {h:"5 · Practice (not recorded)",practice:true,b:`<p>A 45-year-old woman with a sore throat for 2 days. T 38.1 °C, HR 92, BP 128/80 (MAP 96), RR 16, SpO₂ 99%. Choose one option per row, then press <b>Check</b>.</p>`},
 ];
 function renderTutorial(){const i=S.tutPage||0,P=TUT[i];
  let practice="";if(P.practice){practice=`<table class="form"><tr id="row-p1"><td>Lactate</td><td><div class="opts">${WHEN.slice(0,3).map(o=>`<label style="--oc:var(--o-${OC[o]})"><input type="radio" name="p1" value="${o}">${o}</label>`).join("")}</div></td></tr>
   <tr id="row-p2"><td>Antibiotics</td><td><div class="opts">${["within 1 h","within 3 h","decide after more information","not indicated"].map(o=>`<label style="--oc:var(--o-${OC[o]})" class="${o==="decide after more information"?"radarpick":""}"><input type="radio" name="p2" value="${o}">${o}</label>`).join("")}</div><div class="small muted">The gold ring is an example of a RADAR suggestion; you may choose anything.</div></td></tr>
-  <tr id="row-p3"><td>Level of care</td><td><div class="opts">${["not yet decided","discharge","observation","general ward"].map(o=>`<label style="--oc:var(--o-${OC[o]})"><input type="radio" name="p3" value="${o}">${o}</label>`).join("")}</div></td></tr>
+  <tr id="row-p3"><td>Level of care</td><td><div class="opts">${["not yet decided","discharge-level","observation-level"].map(o=>`<label style="--oc:var(--o-${OC[o]})"><input type="radio" name="p3" value="${o}">${o}</label>`).join("")}</div></td></tr>
   <tr id="row-pc"><td>How sure are you?</td><td><div class="opts">${[1,2,3,4,5].map(n=>`<label style="--oc:var(--o-blue)"><input type="radio" name="pc" value="${n}">${n}</label>`).join("")}</div></td></tr></table><p id="pfb" class="small"></p>`}
  app.innerHTML=`<div class="panel tut"><div class="actions"><span class="small muted">Tutorial · page ${i+1} of ${TUT.length}</span><span>${TUT.map((t,j)=>`<button type="button" class="dot ${j===i?"on":""}" data-p="${j}" aria-label="Page ${j+1}">${j+1}</button>`).join("")}</span></div>
  <h2>${P.h}</h2>${P.b}${practice}
@@ -389,7 +402,7 @@ const KEY="radar-review-"+CASE.id;
 const SEND_URL="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
 const TEAM_EMAIL="jin00330@umn.edu";
 function payload(){const ev=s=>{const x=simulate(s);return {events:x.events,results:x.results.map(r=>({name:r.name,at:r.at})),vitals:VT.map(x.vital)}};
- return {tool:"RADAR clinician review",version:"sim-2",case:CASE.id,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:{own:ev(S.step1),withRadar:ev(S.step2)}};}
+ return {tool:"RADAR clinician review",version:"sim-3",case:CASE.id,sentAt:new Date().toISOString(),...JSON.parse(JSON.stringify(S)),course:{own:ev(S.step1),withRadar:ev(S.step2)}};}
 async function sendResults(){if(!SEND_URL)return false;try{await fetch(SEND_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload())});return true}catch(e){return false}}
 function mailtoHref(){const p=payload();const lines=[`RADAR clinician review - ${p.reviewer.name}`,`Case: ${p.case}`,`Finished: ${p.submittedAt||p.sentAt}`,"","Please attach the downloaded results file (RADAR_review_*.json) to this email."];return `mailto:${TEAM_EMAIL}?subject=${encodeURIComponent("RADAR review - "+p.reviewer.name)}&body=${encodeURIComponent(lines.join("\n"))}`;}
 async function save(loud){try{localStorage.setItem(KEY,JSON.stringify({...S,tpNow:tp}));statusEl.textContent=(loud?"Progress saved, including unsaved choices on this screen. ":"Saved in this browser ")+new Date().toLocaleTimeString();}catch(e){statusEl.textContent="This browser cannot keep answers; please finish in one sitting."}}

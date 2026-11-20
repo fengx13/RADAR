@@ -119,7 +119,7 @@ input.numin{width:64px;display:inline-block;padding:3px 6px}input.numin.wide{wid
 .callout{background:var(--goldtint);border-left:5px solid var(--gold);border-radius:8px;padding:10px 14px;font-size:16px;font-weight:600}
 .notice{background:var(--goldtint);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:14px}.notice.need{background:color-mix(in srgb,var(--o-red) 10%,var(--surface));border:1px solid var(--o-red)}.notice a{font-weight:700;color:var(--maroon)}.notice button{margin-top:8px;display:block}
 .modal{position:fixed;inset:0;background:rgba(20,10,12,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}.mbox{background:var(--surface);border-radius:14px;padding:20px 22px;max-width:520px;width:100%;max-height:90vh;overflow:auto}.mbox h2{margin-bottom:8px}
-details.gl{margin-top:4px;font-size:13px}details.gl summary{cursor:pointer;color:var(--maroon);font-weight:600}button.cp{padding:1px 8px;font-size:12px;border-radius:999px;margin-left:4px}
+details.gl{margin-top:4px;font-size:13px}details.gl summary{cursor:pointer;color:var(--maroon);font-weight:600}.conf-rule{color:var(--o-grey);border-color:var(--o-grey)}button.cp{padding:1px 8px;font-size:12px;border-radius:999px;margin-left:4px}
 .wrap{max-width:1560px}
 .grid3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}@media (max-width:1250px){.grid3{grid-template-columns:minmax(0,1fr)}}
 .narrow .frow{grid-template-columns:minmax(0,1fr);gap:4px}.narrow .plist{grid-template-columns:minmax(0,1fr)}.narrow .callout{font-size:15px}
@@ -484,19 +484,19 @@ function nearestPath(sim,tp){const t=TPH[tp],me=featuresNow(sim,t);let best=null
 function a1Items(a1){const out=[];if(!a1)return out;
  const tier=TIER[a1.tier]||a1.tier;
  out.push({txt:`Sepsis: <b>${esc(tier)}</b>${a1.shock_concern?" · <b>shock concern</b>":""}${a1.risk_floor_applied?` <span class="small muted">(raised from unlikely by RADAR's risk-model safety floor)</span>`:""}`});
- (a1.nodes||[]).forEach(n=>out.push({txt:`${esc(A1_TITLE[n.node]||n.node)}: <b>${esc(ANS[n.answer]||n.answer)}</b>${n.leading_alternative&&!/^(no|none|indeterminate|unknown|n\/a)$/i.test(n.leading_alternative)?` <span class="small muted">· leading alternative: ${esc(n.leading_alternative)}</span>`:""}${n.confidence_pct!=null?` <span class="small muted">(${n.confidence_pct}%)</span>`:""}`,
-  conf:lvl(n.confidence_pct),forr:(n.for||[]).map(x=>srcTag(esc(x))),against:(n.against||[]).map(esc),more:(n.missing||[]).map(esc)}));
+ (a1.nodes||[]).forEach(n=>out.push({txt:`${esc(A1_TITLE[n.node]||n.node)}: <b>${esc(ANS[n.answer]||n.answer)}</b>${n.leading_alternative&&!/^(no|none|indeterminate|unknown|n\/a)$/i.test(n.leading_alternative)?` <span class="small muted">· leading alternative: ${esc(n.leading_alternative)}</span>`:""}`,
+  conf:lvl(n.confidence_pct),pct:n.confidence_pct,rule:n.decided_by?1:0,forr:(n.for||[]).map(x=>srcTag(esc(x))),against:(n.against||[]).map(esc),more:(n.missing||[]).map(esc)}));
  return out}
 function a3Items(a3){if(!a3)return [{txt:"RADAR's treatment step runs at the first checkpoint after results return; no treatment advice yet."}];
  const by=Object.fromEntries((a3.nodes||[]).map(n=>[n.node,n]));const out=[];
  [["antimicrobial_timing","TX1","Antibiotics"],["fluids","TX2","IV fluid bolus"],["vasopressors","TX3","Vasopressor"],["map_target","TX4","MAP target"],["repeat_lactate","TX10","Repeat lactate"]].forEach(([k,node,l])=>{const p=a3[k];if(!p)return;const n=by[node]||{};
-  out.push({txt:`${l}: <b>${esc(ANS[p.decision]||p.decision)}</b>${n.decided_by?` <span class="small muted">(decided by code rule)</span>`:""}`,conf:lvl(n.confidence_pct),forr:(n.for||[]).map(x=>srcTag(esc(x))),against:(n.against||[]).map(esc),more:(n.missing||[]).map(esc)})});
+  out.push({txt:`${l}: <b>${esc(ANS[p.decision]||p.decision)}</b>`,conf:lvl(n.confidence_pct),pct:n.confidence_pct,rule:n.decided_by?1:0,forr:(n.for||[]).map(x=>srcTag(esc(x))),against:(n.against||[]).map(esc),more:(n.missing||[]).map(esc)})});
  return out}
 function a4Items(a4,isT0){if(!a4)return [];const out=[];
  const lev=a4.category?LEVEL[a4.category]:(a4.status==="decision"&&a4.disposition?LEVEL[a4.disposition]:null);
  const head=a4.status==="decision"?`Level of care: <b>${esc(lev||"not yet decided")}</b>`:(a4.status==="continue_workup"?`Level of care: <b>not yet decided</b> (continue the workup)${lev?`; current estimate <b>${esc(lev)}</b>`:""}`:`Level of care: <b>not yet decided</b> (RADAR abstained)`);
  const by=a4.decided_by==="rules"?"rules":(a4.category?"triage model":(a4.status==="decision"?"Agent 4 (no triage-model estimate for simulated patients)":""));
- out.push({txt:head+(by?` <span class="small muted">· decided by ${esc(by)}</span>`:""),conf:a4.confidence||lvl(a4.confidence_pct),
+ out.push({txt:head+(by?` <span class="small muted">· decided by ${esc(by)}</span>`:""),conf:a4.confidence||lvl(a4.confidence_pct),pct:a4.confidence_pct,rule:a4.decided_by==="rules"?1:0,
   forr:[...(a4.rule_reasons||[]),...(a4.key_reasons||[])].map(esc),against:(a4.unresolved_risks||[]).map(esc),more:(a4.missing_information||[]).map(esc)});
  return out}
 function prerunCard(i,sim,live){if(!live&&typeof PRERUN==="undefined")return null;const near=live?null:nearestPath(sim,i);if(!live&&!near)return null;
@@ -683,26 +683,26 @@ function renderHome(){const n=t=>S.order.reduce((s,id)=>s+TP.filter((_,i)=>isDon
 const CALEX=[
  {id:"A",pt:"58-year-old woman, 1 hour after arrival. Cough for 3 days. T 38.9 °C, HR 118, BP 104/62 (MAP 76), SpO₂ 94%. Chest X-ray: new right lower lobe infiltrate. WBC 17.2. Lactate 3.4 mmol/L, returned 5 minutes ago. No antibiotics given yet.",
   card:"<b>Probable sepsis</b> · confidence: high<br><b>For:</b> fever 38.9 °C; HR 118; WBC 17.2; lactate 3.4 mmol/L; new infiltrate on chest X-ray<br><b>Against:</b> MAP above 65<br><b>Suggests:</b> blood cultures, then antibiotics within 1 hour",
-  read:"We read this as <b>+2 Clearly helpful</b>: the card points to a result that has just returned and to the action it calls for. If you would already have done exactly this without the card, choose <b>+1</b>."},
+  read:"We read this as <b>+2 Clearly helpful</b>.<br><b>Where it helps:</b> it brings together the fever, the new infiltrate and the lactate of 3.4 that returned 5 minutes ago, and names the two actions that are still missing: blood cultures and antibiotics within 1 hour. Following it gets antibiotics started sooner in a patient who needs them.<br><b>Where it could harm:</b> nowhere in this case.<br>If you would already have done exactly this without the card, choose <b>+1</b>."},
  {id:"B",pt:"74-year-old man with known heart failure, at triage. Worsening breathlessness and leg swelling for 4 days. Crackles at both lung bases. T 36.8 °C, HR 104, RR 24, BP 152/94, SpO₂ 90%.",
   card:"<b>Possible sepsis</b> · confidence: low<br><b>For:</b> HR 104; RR 24<br><b>Against:</b> no fever; no source of infection<br><b>More data needed:</b> lactate, chest X-ray<br><b>Suggests:</b> 30 mL/kg IV fluid bolus",
-  read:"We read this as <b>−2 Harmful</b>: following the suggestion would likely hurt this patient. Rate what the card would do if it were followed, even when you would not follow it."},
+  read:"We read this as <b>−2 Harmful</b>.<br><b>Where it harms:</b> the suggested 30 mL/kg fluid bolus (about 2 litres). This patient is not hypotensive (BP 152/94) and is fluid-overloaded (leg swelling, crackles, SpO₂ 90%); a large bolus would likely worsen his breathing.<br><b>Where it is reasonable:</b> “possible sepsis” with low confidence, and asking for a lactate and a chest X-ray, would do no harm on their own.<br>Rate the card by its most consequential suggestion, as if it were followed, even when you would not follow it."},
  {id:"C",pt:"66-year-old man with a urinary infection, 3 hours after arrival. Blood cultures, lactate and antibiotics were all done in the first hour. Lactate 2.4 mmol/L. MAP 78. He is stable.",
   card:"<b>Probable sepsis</b> · confidence: high<br><b>For:</b> fever; positive urinalysis; lactate 2.4 mmol/L<br><b>Suggests:</b> blood cultures, lactate, antibiotics within 1 hour",
-  read:"We read this as <b>0 No effect</b>: everything on the card is already known and already done. If a card like this made you more sure of a plan you were unsure of, choose <b>+1</b>."},
+  read:"We read this as <b>0 No effect</b>.<br><b>Where it helps:</b> nowhere new. Blood cultures, lactate and antibiotics were all done in the first hour, and every finding on the card is already known.<br><b>Where it harms:</b> nowhere. Nothing on it would lead to a wrong action.<br>If a card like this made you more sure of a plan you were unsure of, choose <b>+1</b>."},
  {id:"D",pt:"31-year-old woman, at triage. Sore throat for 2 days. T 38.2 °C, HR 96, BP 122/78, RR 16, SpO₂ 99%. She looks well, drinks normally and has swollen tonsils with exudate.",
   card:"<b>Possible sepsis</b> · confidence: low<br><b>For:</b> fever; HR 96<br><b>Against:</b> normal blood pressure; normal oxygen saturation<br><b>Suggests:</b> lactate, blood cultures, chest X-ray",
-  read:"We read this as <b>−1 Somewhat harmful</b>: following it would cost time and tests this patient does not need, without likely injury. If following it would likely injure the patient, choose <b>−2</b>."}];
+  read:"We read this as <b>−1 Somewhat harmful</b>.<br><b>Where it harms:</b> lactate, blood cultures and a chest X-ray for a well-looking patient with tonsillitis and normal blood pressure and oxygen saturation. Following it costs time, a needle stick, radiation and the risk of a contaminated culture, and it distracts from the simple diagnosis.<br><b>Why not −2:</b> none of this is likely to injure her.<br><b>Where it is reasonable:</b> the low confidence is appropriate."}];
 /* example patient and example card used only in the tutorial figures */
 const DEMO={id:"demo",title:"Example patient · 62-year-old woman · fever and confusion",source:"fictional",weight:70,abx:"ceftriaxone 2 g IV",
  triage:["Arrived by ambulance · ESI 2","T 38.8 °C · HR 112 · RR 22 · SpO₂ 95% on air","BP 102/58 (MAP 73) · confused, warm skin"],problems:["Type 2 diabetes","Kidney stones"],homeMeds:["Metformin 1,000 mg twice daily"],baseline:"Clinic 6 months ago: creatinine 0.9 · BP 128/76",
  phys:{map0:73,mapSlope:-1,mapFloor:60,bolus:3,extra:1,pp:44,hr0:112,hrSlope:1,hrCap:124,rr:[22,22,22],spo2:[95,95],T:["38.8","38.4"],lact0:2.8,lactSlope:.05,lactFall:.3,lactFloor:1.4,fluidHarm:0},res:{}};
 const DEMO_ANS={...{tier:"possible",dx:["Urinary tract infection"],dxOther:"",testsOther:"",txOther:"",dispo:"not yet decided",conf:3,other:"",done:false},tests:{cultures:{when:"now",h:"",note:"two sites"},lactate:{when:"now",h:"",note:""}},tx:{fluids:{when:"now",h:"",dose:"1000",note:""}}};
 const DEMO_CARD={badges:[["Sepsis: probable",1],["Shock: no",0],["observation-level",0]],sections:[
- {h:"Assessment",items:[{txt:"Sepsis: <b>probable</b>"},{txt:"Evidence of infection: <b>yes</b> <span class=\"small muted\">(80%)</span>",conf:"high",forr:["Fever 38.8 °C; confusion; history of kidney stones <span class=src>nice_ng253_1_1_1</span>"],against:["No urine result yet"],more:["Urinalysis"]}]},
+ {h:"Assessment",items:[{txt:"Sepsis: <b>probable</b>"},{txt:"Evidence of infection: <b>yes</b>",pct:80,forr:["Fever 38.8 °C; confusion; history of kidney stones <span class=src>nice_ng253_1_1_1</span>"],against:["No urine result yet"],more:["Urinalysis"]}]},
  {h:"Tests",items:[{txt:"Blood cultures: <b>now</b>",forr:["Probable sepsis <span class=src>stmt_011</span>"]},{txt:"Lactate: <b>now</b>",forr:["Probable sepsis <span class=src>stmt_010</span>"]},{txt:"Urinalysis: <b>now</b>",forr:["Likely urinary source"]},{txt:"Chest X-ray: <b>before ED disposition</b>",forr:["Rule out a second source"]}]},
- {h:"Treatment",items:[{txt:"Antibiotics: <b>within 1 h</b>",conf:"high",forr:["Probable sepsis <span class=src>stmt_016</span>"],against:[],more:[]},{txt:"IV fluid bolus: <b>withhold</b>",conf:"moderate",forr:["MAP 73, above 65"],against:[],more:["Lactate"]}]},
- {h:"Level of care",items:[{txt:"Level of care: <b>not yet decided</b>",conf:"moderate",forr:["Workup still in progress"],against:[],more:["Lactate; response to antibiotics"]}]}]};
+ {h:"Treatment",items:[{txt:"Antibiotics: <b>within 1 h</b>",rule:1,forr:["Probable sepsis <span class=src>stmt_016</span>"],against:[],more:[]},{txt:"IV fluid bolus: <b>withhold</b>",pct:65,forr:["MAP 73, above 65"],against:[],more:["Lactate"]}]},
+ {h:"Level of care",items:[{txt:"Level of care: <b>not yet decided</b>",pct:60,forr:["Workup still in progress"],against:[],more:["Lactate; response to antibiotics"]}]}]};
 function figHtml(inner,w,gl,gr){return `<div class="fig" data-w="${w}" data-gl="${gl||0}" data-gr="${gr||0}"><div class="figin" style="width:${w}px" inert>${inner}</div></div>`}
 function figLay(fig,marks){const inn=fig.querySelector(".figin"),W=+fig.dataset.w,narrow=fig.clientWidth<700,gl=narrow?0:+fig.dataset.gl,gr=narrow?0:+fig.dataset.gr,sc=Math.min(1,(fig.clientWidth-gl-gr)/W);
  inn.style.left=gl+"px";inn.style.transform=`scale(${sc})`;const H=Math.ceil(inn.offsetHeight*sc);fig.querySelectorAll(".mk,.mkl,svg.lead").forEach(x=>x.remove());const f=fig.getBoundingClientRect();
@@ -738,14 +738,14 @@ const GUIDE=[
   b:()=>`<div class="twocol"><div>`+demoWith(()=>figHtml(cardHtml(DEMO_CARD)+`<div class="panel" id="f-rate" style="margin-top:12px"><b>How did RADAR's card affect your care of this patient at this time point?</b> <span class="req">required</span>${radOpts("demo-rad",1,true)}</div>`,640,0,230))+`</div><div>
    <h3>Reading the card</h3><ul class="small"><li>The card is an example written for this tutorial.</li><li>You do <b>not</b> have to follow the card.</li><li>Next to the card are your own answers for the same time point. Edit them directly only if you would now do something different; otherwise leave them.</li><li>If you change an order, the patient is simulated again from that point.</li></ul>
    <h3>Rating the card (−2 to +2)</h3>${radDefHtml()}<p class="small muted">Rate what the card would do for this patient if it were followed, even when you do not follow it.</p></div></div>`,
-  marks:[[".panel.radar > div","RADAR's view now: sepsis, shock, level of care.","R"],[".panel.radar .conf","Confidence of each item.","R"],[".panel.radar .tests","Suggested tests by timing. Hover over an item to see the reasons for and against it.","R"],[".panel.radar details.gl","Guideline items cited: where to find each one.","R"],["#f-rate","Your rating of the card: required at every time point.","R"]]},
+  marks:[[".panel.radar > div","RADAR's view now: sepsis, shock, level of care.","R"],[".panel.radar .conf","RADAR's confidence in each item, as a percentage. “Fixed rule” means a rule in RADAR decided the item, so there is no percentage.","R"],[".panel.radar .tests","Suggested tests by timing. Hover over an item to see the reasons for and against it.","R"],[".panel.radar details.gl","Guideline items cited: where to find each one.","R"],["#f-rate","Your rating of the card: required at every time point.","R"]]},
  {h:"Calibration: rate four example cards",cal:true,b:()=>`<p>Four short fictional examples, not from the patients in this review. For each one, read the patient, read RADAR's card, and rate the card. Then press <b>Show how we read it</b>. Your practice ratings are recorded but not scored.</p>`}];
 function renderGuide(){const i=Math.min(S.guide||0,GUIDE.length-1),P=GUIDE[i],C=S.calib;
  const cal=P.cal?CALEX.map(x=>`<div class="panel calcard"><h3 style="margin-top:0">Example ${x.id}</h3><div class="twocol even"><div><div class="small muted">Patient</div><p>${x.pt}</p></div><div class="excard"><div class="small muted">RADAR's card (written for this calibration)</div>${x.card}</div></div>
   <div style="margin-top:8px"><b>How would this card affect the care of this patient?</b><div id="cal${x.id}">${radOpts("cal"+x.id,C[x.id],!!C["shown"+x.id])}</div></div><p><button type="button" data-show="${x.id}" ${C["shown"+x.id]?"disabled":""}>Show how we read it</button> <span class="err" id="e${x.id}"></span></p><div class="exfb small" ${C["shown"+x.id]?"":"hidden"}>${x.read}</div></div>`).join(""):"";
  const back=S.cur.own||S.cur.radar;
  app.innerHTML=`<div class="panel tut"><div class="actions"><span class="small muted">Tutorial and calibration · page ${i+1} of ${GUIDE.length}</span><span>${GUIDE.map((t,j)=>`<button type="button" class="dot ${j===i?"on":""}" data-p="${j}" aria-label="Page ${j+1}">${j+1}</button>`).join("")}</span></div>
- <h2 style="margin-bottom:10px">${i+1} · ${P.h}</h2>${P.b()}${P.cal?radDefHtml():""}</div>${cal}
+ <h2 style="margin-bottom:10px">${i+1} · ${P.h}</h2>${P.b()}</div>${cal}
  <div class="panel"><div class="actions"><span>${S.last?`<button type="button" id="gret">Return to where I was (Patient ${pn(S.last.id)} · ${TP[S.last.i]})</button>`:""}</span><span>${i>0?`<button type="button" id="gprev">Back</button> `:""}${i<GUIDE.length-1?`<button type="button" class="primary" id="gnext">Next</button>`:`<button type="button" class="primary" id="gdone">${back?"Done":"Start with the first patient"}</button>`}</span></div></div>`;
  const lay=()=>{if(S.tab!=="guide")return;const f=app.querySelector(".fig");if(f&&P.marks)figLay(f,P.marks)};lay();setTimeout(lay,60);setTimeout(lay,400);window.onresize=lay;
  app.querySelectorAll(".dot").forEach(d=>d.onclick=()=>{S.guide=+d.dataset.p;save();render();scrollTo(0,0)});
@@ -819,10 +819,10 @@ const HUM=[[/decided by code rule/g,"decided by a fixed rule"],[/\bacs_or_mi\b/g
  [/\bC0_5\b/g,"0.5 h"],[/\bC([136])\b/g,"$1 h"],[/\b([A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+)\b/g,m=>m.replace(/_/g," ")]];
 const hum=h=>String(h).split(/(<[^>]+>)/).map(x=>x.startsWith("<")?x:HUM.reduce((t,[re,to])=>t.replace(re,to),x)).join("");
 function pullSrc(html,ids){return String(html).replace(/\s*<span class="?src"?>([^<]+)<\/span>/g,(m,x)=>{x.split(/\s*,\s*/).forEach(y=>{if(!ids.includes(y))ids.push(y)});return ""})}
-function cardHtml(R){const ids=[];const conf=c=>c?`<span class="conf conf-${c}">confidence: ${c}</span>`:"";
- const prep=it=>({txt:hum(pullSrc(it.txt,ids)),F:(it.forr||[]).map(x=>hum(pullSrc(x,ids))),G:(it.against||[]).map(x=>hum(pullSrc(x,ids))),M:(it.more||[]).map(x=>hum(pullSrc(x,ids))),conf:it.conf});
+function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf conf-${lvl(p.pct)}">confidence ${Math.round(p.pct)}% · ${lvl(p.pct)}</span>`:p.rule?`<span class="conf conf-rule" title="A fixed rule in RADAR decided this item, so RADAR gives no confidence for it">fixed rule</span>`:p.conf?`<span class="conf conf-${p.conf}">confidence: ${p.conf}</span>`:/<b>/.test(p.txt)?`<span class="conf conf-rule" title="RADAR gave no confidence for this item">no score given</span>`:"";
+ const prep=it=>({txt:hum(pullSrc(it.txt,ids)),F:(it.forr||[]).map(x=>hum(pullSrc(x,ids))),G:(it.against||[]).map(x=>hum(pullSrc(x,ids))),M:(it.more||[]).map(x=>hum(pullSrc(x,ids))),conf:it.conf,pct:it.pct,rule:it.rule});
  const tip=p=>p.F.length||p.G.length||p.M.length?`<span class="tipbox">${p.F.length?`<span><b>For:</b> ${p.F.join("; ")}</span>`:""}${p.G.length?`<span><b>Against:</b> ${p.G.join("; ")}</span>`:""}${p.M.length?`<span class="more"><b>More data needed:</b> ${p.M.join("; ")}</span>`:""}</span>`:"";
- const line=(it,why)=>{const p=prep(it),t=tip(p);return `<li class="${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt} ${conf(p.conf)}${why&&p.F[0]?`<div class="ev1">${p.F[0]}</div>`:""}${t}</li>`};
+ const line=(it,why)=>{const p=prep(it),t=tip(p);return `<li class="${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt} ${conf(p)}${why&&p.F[0]?`<div class="ev1">${p.F[0]}</div>`:""}${t}</li>`};
  const sec=n=>R.sections.find(s=>new RegExp("^"+n,"i").test(s.h));
  const A=sec("Assessment"),T=sec("Tests"),X=sec("Treatment"),L=sec("Level of care");let h="";
  if(A){const its=A.items.filter(it=>!/^Sepsis:/.test(String(it.txt).replace(/<[^>]+>/g,""))&&!(/^Alternative diagnosis/.test(it.txt)&&!/leading alternative/.test(it.txt)));
@@ -929,7 +929,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T04:06:35Z";
+const BUILD="sim-9 2026-11-20T04:42:52Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

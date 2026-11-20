@@ -8,6 +8,8 @@ Guideline-grounded multi-agent decision support for the emergency-department sep
 
 **Knowledge graph: https://fengx13.github.io/RADAR/kg/** — the guideline decision graphs the agents walk.
 
+**Clinician review results (team only): https://docs.google.com/spreadsheets/d/19J6xijyiNoPI5qwC7lVNxqYGCETuKumBaO_XHumJDmE/edit?gid=0#gid=0** — the Google Sheet that receives the clinicians' submissions; access is restricted to the study team.
+
 **What it is.** Four agents (Recognize → Assay → Act → Route) answer fixed questions from frozen decision graphs built from SSC 2026 and Sepsis-3; code walks the graphs, binds verbatim guideline quotes and validates every reply. The model never sees future data: each checkpoint (triage, 0.5 / 1 / 3 / 6 h) is replayed with only what was available then.
 
 **Install** `pip install -e .` (Python ≥ 3.10) · **Run the tests** `pytest` (synthetic fixtures only, no API calls) · **Run on your own cases** `radar/scripts/1_build_input.sh` … `4_score.sh`; model key in `.env` as `OPENAI_API_KEY`; inputs and outputs stay outside the repository (`radar/paths.py`).

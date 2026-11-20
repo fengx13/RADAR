@@ -96,7 +96,7 @@ table.defs{border-collapse:collapse;margin:6px 0 10px}table.defs td{padding:4px 
 /* sim-9 */
 .homelink{text-decoration:none}.tabs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;border-bottom:2px solid var(--line);padding-bottom:8px}
 .tab{padding:7px 14px;border-radius:9px 9px 0 0}.tab.on{background:var(--maroon);color:var(--onmaroon);border-color:var(--maroon)}.cnt{font-size:12px;font-weight:600;opacity:.75;margin-left:4px}.grow{flex:1}
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}@media (max-width:800px){.cards{grid-template-columns:minmax(0,1fr)}}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}@media (max-width:800px){.cards{grid-template-columns:minmax(0,1fr)}}
 .card{display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left;padding:18px;border-radius:12px;font-weight:400;line-height:1.45}.card b{font-family:var(--f-display);font-size:20px}.card:hover{border-color:var(--maroon)}
 .cn{display:inline-flex;width:30px;height:30px;border-radius:999px;background:var(--maroon);color:var(--onmaroon);align-items:center;justify-content:center;font-weight:700}.cgo{margin-top:auto;color:var(--maroon);font-weight:700;font-size:14px}
 .shell{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:start}@media (max-width:1000px){.shell{grid-template-columns:minmax(0,1fr)}}
@@ -827,7 +827,7 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
   const rest=S.order.filter(x=>!allDone("radar",x));
   modal(rest.length?`<h2>Patient ${pn(id)} is done with RADAR</h2><p>${rest.length} patient${rest.length>1?"s are":" is"} not yet finished on your own; they open here once they are.</p>`:`<h2>All five patients are done with RADAR</h2><p>Thank you. Press <b>Finish and submit</b> at the top right to send your results.</p>`,rest.length?[{label:"Go to tab 2 · On your own",primary:true,fn:()=>{const x=rest[0];show("own",x,firstOpen("own",x))}}]:[{label:"Close"},{label:"Finish and submit",primary:true,fn:submitDialog}]);render()}}
 
-function render(){renderTabs();document.body.classList.add("compact");
+function render(){renderTabs();document.body.classList.add("compact");statusEl.hidden=S.tab==="home";
  if(S.tab==="guide")renderGuide();else if(S.tab==="own"||S.tab==="radar")renderWork(S.tab);else renderHome()}
 
 /* ===================== Saving and sending ===================== */
@@ -858,11 +858,11 @@ function restartUI(){RS.innerHTML=`<button type="button" id="rs-btn">Start over<
  RS.querySelector("#rs-no").onclick=restartUI;
  RS.querySelector("#rs-yes").onclick=()=>{S=fresh();setCase(S.order[0]);tp=0;try{localStorage.removeItem(KEY)}catch(e){};restartUI();render();scrollTo(0,0);statusEl.textContent="Started a new review."}}}
 restartUI();
-try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.order&&o.order.length===CASES.length&&o.order.every(byId)){S={...S,...o};statusEl.textContent="Picked up where you left off."}}}catch(e){}
+try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.order&&o.order.length===CASES.length&&o.order.every(byId)){S={...S,...o};if(Object.values(S.ans.own).some(L=>L&&L.length))statusEl.textContent="Picked up where you left off."}}}catch(e){}
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T03:28:05Z";
+const BUILD="sim-9 2026-11-20T03:36:32Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

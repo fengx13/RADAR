@@ -860,6 +860,16 @@ function restartUI(){RS.innerHTML=`<button type="button" id="rs-btn">Start over<
 restartUI();
 try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.order&&o.order.length===CASES.length&&o.order.every(byId)){S={...S,...o};statusEl.textContent="Picked up where you left off."}}}catch(e){}
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
+/* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
+   saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
+const BUILD="sim-9 2026-11-20T03:28:05Z";
+async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
+  const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
+  let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}
+  leave();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  try{await fetch(location.href,{cache:"reload"})}catch(e){}
+  location.reload()}catch(e){}}
+checkVersion();
 window.addEventListener("beforeunload",()=>{leave();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}});
 render();
 

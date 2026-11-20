@@ -643,7 +643,7 @@ function modal(html,btns){closeModal();const m=document.createElement("div");m.c
 function closeModal(){const m=document.getElementById("modal");if(m)m.remove()}
 const pn=id=>S.order.indexOf(id)+1;
 function setTab(t){if(t==="guide"&&(S.tab==="own"||S.tab==="radar")&&S.cur[S.tab])S.last={tab:S.tab,id:S.cur[S.tab].id,i:S.cur[S.tab].i};leave();S.nav.push({at:new Date().toISOString(),tab:t});S.tab=t;save();render();scrollTo(0,0)}
-function show(tab,id,i){leave();ensure(tab,id,i);S.cur[tab]={id,i};S.pos=S.pos||{own:{},radar:{}};S.pos[tab][id]=i;S.tab=tab;setCase(id);tp=i;pickOpen={};pendingSkip=false;S.nav.push({at:new Date().toISOString(),tab,patient:id,tp:TP[i]});save();render();scrollTo(0,0)}
+function show(tab,id,i){leave();ensure(tab,id,i);S.cur[tab]={id,i};S.pos=S.pos||{own:{},radar:{}};S.pos[tab][id]=i;if(tab==="radar"){S.seen=S.seen||{};S.seen[id]=true}S.tab=tab;setCase(id);tp=i;pickOpen={};pendingSkip=false;S.nav.push({at:new Date().toISOString(),tab,patient:id,tp:TP[i]});save();render();scrollTo(0,0)}
 
 /* ---------- moving between patients and time points ---------- */
 function go(tab,id,i){
@@ -706,8 +706,8 @@ const DEMO_ANS={...{tier:"possible",dx:["Urinary tract infection"],dxOther:"",te
 const DEMO_CARD={badges:[["Sepsis: probable",1],["Shock: no",0],["observation-level",0]],sections:[
  {h:"Assessment",items:[{txt:"Sepsis: <b>probable</b>"},{txt:"Evidence of infection: <b>yes</b>",pct:80,forr:["Fever 38.8 °C; confusion; history of kidney stones <span class=src>nice_ng253_1_1_1</span>"],against:["No urine result yet"],more:["Urinalysis"]}]},
  {h:"Tests",items:[{txt:"Blood cultures: <b>now</b>",forr:["Probable sepsis <span class=src>stmt_011</span>"]},{txt:"Lactate: <b>now</b>",forr:["Probable sepsis <span class=src>stmt_010</span>"]},{txt:"Urinalysis: <b>now</b>",forr:["Likely urinary source"]},{txt:"Chest X-ray: <b>before ED disposition</b>",forr:["Rule out a second source"]}]},
- {h:"Treatment",items:[{txt:"Antibiotics: <b>within 1 h</b>",rule:1,forr:["Probable sepsis <span class=src>stmt_016</span>"],against:[],more:[]},{txt:"IV fluid bolus: <b>withhold</b>",pct:65,forr:["MAP 73, above 65"],against:[],more:["Lactate"]}]},
- {h:"Level of care",items:[{txt:"Level of care: <b>not yet decided</b>",pct:60,forr:["Workup still in progress"],against:[],more:["Lactate; response to antibiotics"]}]}]};
+ {h:"Treatment",items:[{txt:"Antibiotics: <b>within 1 h</b>",rule:1,forr:["Probable sepsis <span class=src>stmt_016</span>"],against:[],more:[]},{txt:"Repeat lactate: <b>repeat lactate</b>",pct:65,forr:["First lactate above 2 mmol/L"],against:[],more:[]}]},
+ {h:"Level of care",items:[{txt:"Level of care: <b>observation-level</b>",pct:60,forr:["No shock; needs antibiotics and monitoring"],against:[],more:["Lactate; response to antibiotics"]}]}]};
 function figHtml(inner,w,gl,gr){return `<div class="fig" data-w="${w}" data-gl="${gl||0}" data-gr="${gr||0}"><div class="figin" style="width:${w}px" inert>${inner}</div></div>`}
 function figLay(fig,marks){const inn=fig.querySelector(".figin"),W=+fig.dataset.w,narrow=fig.clientWidth<700,gl=narrow?0:+fig.dataset.gl,gr=narrow?0:+fig.dataset.gr,sc=Math.min(1,(fig.clientWidth-gl-gr)/W);
  inn.style.left=gl+"px";inn.style.transform=`scale(${sc})`;const H=Math.ceil(inn.offsetHeight*sc);fig.querySelectorAll(".mk,.mkl,svg.lead").forEach(x=>x.remove());const f=fig.getBoundingClientRect();
@@ -730,7 +730,7 @@ const GUIDE=[
   b:()=>demoWith(sim=>figHtml(`<div class="shell">${demoSide()}<div class="work"><div class="actions"><span><b>Patient 1 of 5</b> · on your own · T0</span>${demoTl()}</div><div class="grid"><div class="panel" id="f-chart">${chartHtml(sim)}</div><div class="panel" id="f-plan"><h2>What would you order now?</h2>${formHtml9(clone(DEMO_ANS),"own",sim)}</div></div></div></div>`,1280,210,230))+
    `<div class="cards two"><div class="card static"><span class="cn">2</span><b>On your own</b><span>At each time point you read the chart and enter your plan. When you save, your orders are carried out: tests return later, treatments are given, and the vital signs respond.</span></div>
    <div class="card static"><span class="cn">3</span><b>With RADAR</b><span>The same patient and time points, now with RADAR's card beside your own answers. Edit your answers only if the card changes your mind, and rate the card. A patient opens here after all five time points are done on your own.</span></div></div>
-   <p class="small muted">Everything is saved as you enter it; you can switch tabs or patients at any time and come back. When you have finished, press <b>Finish and submit</b> at the top right.</p>`,
+   <p class="small muted">Everything is saved as you enter it; a time point turns green when it is saved. You can switch tabs or patients at any time and come back. A saved time point can be changed only before you open RADAR for that patient, and the later time points then have to be done again. When you have finished, press <b>Finish and submit</b> at the top right.</p>`,
   marks:[[".side","Five patients. Click a patient to switch at any time; your place in each one is kept.","L"],[".work .tl","Five time points for the patient you are on, done in order.","R"],["#f-chart","The chart: what is known at this time point. Your orders appear here when they are done.","br"],["#f-plan","Your plan for this time point. It is saved as you enter it.","R"]]},
  {h:"Your plan: what to fill in",
   b:()=>`<div class="twocol"><div>`+demoWith(sim=>figHtml(`<div class="panel" id="f-plan2"><h2>What would you order now?</h2>${formHtml9(clone(DEMO_ANS),"own",sim)}</div>`,640,0,230))+`</div><div>
@@ -743,7 +743,7 @@ const GUIDE=[
   b:()=>`<div class="twocol"><div>`+demoWith(()=>figHtml(cardHtml(DEMO_CARD)+`<div class="panel" id="f-rate" style="margin-top:12px"><b>How did RADAR's card affect your care of this patient at this time point?</b> <span class="req">required</span>${radOpts("demo-rad",1,true)}</div>`,640,0,230))+`</div><div>
    <h3>Reading the card</h3><ul class="small"><li>The card is an example written for this tutorial.</li><li>You do <b>not</b> have to follow the card.</li><li>Next to the card are your own answers for the same time point. Edit them directly only if you would now do something different; otherwise leave them.</li><li>If you change an order, the patient is simulated again from that point.</li></ul>
    <h3>Rating the card (−2 to +2)</h3>${radDefHtml()}<p class="small muted">Rate what the card would do for this patient if it were followed, even when you do not follow it.</p></div></div>`,
-  marks:[[".panel.radar > div","RADAR's view now: sepsis, shock, level of care.","R"],[".panel.radar .conf","RADAR's confidence in each item, as a percentage. “Fixed rule” means a rule in RADAR decided the item, so there is no percentage.","R"],[".panel.radar .tests","Suggested tests by timing. Hover over an item to see the reasons for and against it.","R"],[".panel.radar details.gl","Guideline items cited: where to find each one.","R"],["#f-rate","Your rating of the card: required at every time point.","R"]]},
+  marks:[[".panel.radar > div","RADAR's view now: sepsis, shock, level of care.","R"],[".panel.radar .conf","RADAR's confidence in each item, as a percentage. “Fixed rule” means a rule in RADAR decided the item, so there is no percentage.","R"],[".panel.radar .tests","What RADAR advises doing, with timing. Hover over an item to see the reasons for and against it.","R"],[".panel.radar details.gl","Guideline items cited: where to find each one.","R"],["#f-rate","Your rating of the card: required at every time point.","R"]]},
  {h:"Calibration: rate four example cards",cal:true,b:()=>`<p>Four short fictional examples, not from the patients in this review. For each one, read the patient, read RADAR's card, and rate the card. Then press <b>Show how we read it</b>. Your practice ratings are recorded but not scored.</p>`}];
 function renderGuide(){const i=Math.min(S.guide||0,GUIDE.length-1),P=GUIDE[i],C=S.calib;
  const cal=P.cal?CALEX.map(x=>`<div class="panel calcard"><h3 style="margin-top:0">Example ${x.id}</h3><div class="twocol even"><div><div class="small muted">Patient</div><p>${x.pt}</p></div><div class="excard"><div class="small muted">RADAR's card (written for this calibration)</div>${x.card}</div></div>
@@ -832,13 +832,24 @@ function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf c
  const A=sec("Assessment"),T=sec("Tests"),X=sec("Treatment"),L=sec("Level of care");let h="";
  if(A){const its=A.items.filter(it=>!/^Sepsis:/.test(String(it.txt).replace(/<[^>]+>/g,""))&&!(/^Alternative diagnosis/.test(it.txt)&&!/leading alternative/.test(it.txt)));
   if(its.length)h+=`<h3>Assessment</h3><ul class="cardlist">${its.map(it=>line(it,true)).join("")}</ul>`}
- if(T){const groups={},order=[],rest=[];T.items.forEach(it=>{const m=/^(.*?):\s*<b>(.*?)<\/b>/.exec(it.txt);if(!m){return}const w=m[2].replace(/<[^>]+>/g,"");if(/no RADAR suggestion/i.test(w))return;const p=prep({...it,txt:m[1]});if(!groups[w]){groups[w]=[];order.push(w)}groups[w].push(p)});
-  const rank=w=>({"now":0,"before ED disposition":1,"indeterminate":2,"not needed":3,"already done":4}[w]??2);order.sort((a,b)=>rank(a)-rank(b));
-  if(order.length)h+=`<h3>Tests</h3><div class="tests">${order.map(w=>`<div class="tg"><b>${esc(w)}:</b> ${groups[w].map(p=>{const t=tip(p);return `<span class="tchip ${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt.replace(/\s*\(.*?\)\s*$/,"")}${t}</span>`}).join(" ")}</div>`).join("")}</div>`}
- if(X){const its=X.items.filter(it=>it.conf||(it.forr&&it.forr.length)||/<b>/.test(it.txt));h+=`<h3>Treatment</h3><ul class="cardlist">${(its.length?its:X.items).map(it=>line(it,false)).join("")}</ul>`}
- if(L){const its=L.items.filter(it=>/Level of care|Now:/.test(it.txt));h+=`<h3>Level of care</h3><ul class="cardlist">${(its.length?its.slice(-1):L.items.slice(-1)).map(it=>line(it,false)).join("")}</ul>`}
- return `<div class="panel radar"><h3 style="margin-top:0">RADAR's card at ${TP[tp]}${R.prerun?" · run in advance":R.live?" · live":""}</h3><div>${R.badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(hum(t))}</span>`).join("")}</div>
- <p class="small muted" style="margin:2px 0 0">Hover over an item (or tap it) to see RADAR's reasons.</p>${h}
+ const SKIP=/withhold|hold or stop|\bhold\b|not yet|not indicated|not needed|not applicable|decide after|no change|no treatment advice|neither|bolus running|no radar suggestion/i;
+ const plain=x=>String(x).replace(/<[^>]+>/g,"");
+ if(T){const groups={},order=[];T.items.forEach(it=>{const m=/^(.*?):\s*<b>(.*?)<\/b>(.*)$/.exec(it.txt);if(!m)return;const w=plain(m[2]);if(!/^(now|before ED disposition)$/.test(w)||/\(done\)/.test(plain(m[3])))return;const p=prep({...it,txt:m[1]});if(!groups[w]){groups[w]=[];order.push(w)}groups[w].push(p)});
+  order.sort((a,b)=>(a==="now"?0:1)-(b==="now"?0:1));const GL={"now":"Now","before ED disposition":"Before the patient leaves the ED"};
+  if(order.length)h+=`<h3>Tests</h3><div class="tests">${order.map(w=>`<div class="tg"><b>${GL[w]}:</b> ${groups[w].map(p=>{const t=tip(p);return `<span class="tchip ${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt.replace(/\s*\(.*?\)\s*$/,"")}${t}</span>`}).join(" ")}</div>`).join("")}</div>`}
+ if(X){const W=CASE.weight,txt=X.items.map(it=>plain(it.txt)),mapT=(txt.find(t=>/^MAP target/i.test(t))||"").match(/60\s*[–-]\s*65/)?"60–65":"65";
+  const its=X.items.filter(it=>!SKIP.test(plain(it.txt))&&!/^MAP target/i.test(plain(it.txt))).map(it=>{const t=plain(it.txt);let x=it.txt;
+   if(/^Antibiotics/i.test(t)){const m=/within (1|3) h/i.exec(t);if(m)x=`Antibiotics: <b>give within ${m[1]} hour${m[1]==="1"?"":"s"}</b>`}
+   else if(/IV fluid|crystalloid/i.test(t))x=`IV crystalloid: <b>at least 30 mL/kg (${(30*W).toLocaleString("en-US")} mL for ${W} kg) within the first 3 hours</b>`;
+   else if(/norepinephrine|vasopressor/i.test(t))x=`Norepinephrine: <b>${/continue/i.test(t)?"continue":"start now"}</b>, titrated to MAP ${mapT==="65"?"≥ 65":"60–65"} mm Hg`;
+   else if(/repeat lactate/i.test(t))x=`Lactate: <b>repeat</b>`;
+   return {...it,txt:x}});
+  if(its.length)h+=`<h3>Treatment</h3><ul class="cardlist">${its.map(it=>line(it,false)).join("")}</ul>`}
+ if(L){const it=L.items.filter(x=>/Level of care|Now:/.test(x.txt)).slice(-1)[0]||L.items.slice(-1)[0];
+  if(it&&!/not yet decided/i.test(plain(it.txt)))h+=`<h3>Level of care</h3><ul class="cardlist">${line(it,false)}</ul>`}
+ const badges=R.badges.filter(([t])=>!/not yet decided/i.test(t));
+ return `<div class="panel radar"><h3 style="margin-top:0">RADAR's card at ${TP[tp]}${R.prerun?" · run in advance":R.live?" · live":""}</h3><div>${badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(hum(t))}</span>`).join("")}</div>
+ <p class="small muted" style="margin:2px 0 0">Only what RADAR advises doing is listed. Hover over an item (or tap it) to see RADAR's reasons.</p>${h}
  ${ids.length?`<details class="gl" style="margin-top:10px"><summary>Guideline items cited (${ids.length})</summary><ul>${ids.map(x=>{const G=glLoc(x);return `<li>${esc(G.txt)} <button type="button" class="cp" data-copy="${esc(G.find)}">Copy to search</button>${G.url?` <a href="${G.url}" target="_blank" rel="noopener">Open the guideline</a>`:""}</li>`}).join("")}</ul><span class="small muted">The guideline text is not shown here; use the reference to find it. </span><a href="../kg/" target="_blank" rel="noopener">Open the knowledge graph</a></details>`:""}</div>`}
 const cardRecord=R=>({prerun:R.prerun||null,live:R.live||null,sections:R.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:String(it.txt).replace(/<[^>]+>/g,"")}))}))});
 
@@ -854,15 +865,15 @@ function ehrHtml(){const now=TPH[tp],prev=tp>0?TPH[tp-1]:-1,L=(EHR[CASE.id]||[])
 /* ---------- the two working tabs ---------- */
 function bindCopy(){app.querySelectorAll("button.cp").forEach(b=>b.onclick=async()=>{const t=b.dataset.copy;try{await navigator.clipboard.writeText(t);b.textContent="Copied"}catch(e){b.textContent=t}setTimeout(()=>{b.textContent="Copy to search"},1800)})}
 function sideHtml(tab){return `<nav class="side" aria-label="Patients">${S.order.map((id,n)=>{const c=byId(id),lock=tab==="radar"&&!allDone("own",id),cur=S.cur[tab];
-  return `<div class="pt ${cur&&cur.id===id?"on":""} ${lock?"lock":""}" data-pt="${id}" role="button" tabindex="0" title="Open this patient where you left off"><div class="ptn">Patient ${n+1}${lock?` <span class="small muted">· finish on your own first</span>`:""}</div><div class="ptt small">${esc(c.title)}</div><div class="tps">${TP.map((t,i)=>{const a=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${cur&&cur.id===id&&cur.i===i?"on":""} ${a&&a.done?"done":""} ${a&&a.stale?"stale":""}" title="${a&&a.stale?"An earlier time point changed: please look at this one again":a&&a.done?"Done":"Not done"}">${t}</button>`}).join("")}</div></div>`}).join("")}
-  <p class="small muted">Filled = done. <span class="stalekey">Dashed</span> = an earlier time point changed; please look again.</p></nav>`}
+  return `<div class="pt ${cur&&cur.id===id?"on":""} ${lock?"lock":""}" data-pt="${id}" role="button" tabindex="0" title="Open this patient where you left off"><div class="ptn">Patient ${n+1}${lock?` <span class="small muted">· finish on your own first</span>`:""}</div><div class="ptt small">${esc(c.title)}</div><div class="tps">${TP.map((t,i)=>{const a=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${cur&&cur.id===id&&cur.i===i?"on":""} ${a&&a.done?"done":""} ${a&&(a.stale||a.redo)?"stale":""}" title="${a&&(a.stale||a.redo)?"An earlier time point changed: please do this one again":a&&a.done?"Done":"Not done"}">${t}</button>`}).join("")}</div></div>`}).join("")}
+  <p class="small muted">Green = saved. <span class="stalekey">Dashed</span> = an earlier time point changed; please do it again.</p></nav>`}
 function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setTab("home");return}
  const id=c.id;setCase(id);tp=c.i;const a=ensure(tab,id,tp),dec=decs(tab,id,tp),sim=simFor(tab,id,tp);
  const notes=TP.slice(0,tp).map((t,i)=>{const s=src(tab,id,i);return s?[["Tests",s.testsOther],["Treatment",s.txOther],["Other",s.other]].filter(x=>x[1]&&x[1].trim()).map(x=>`${t} · ${x[0]}: ${esc(x[1])}`):[]}).flat();
  let R=null;if(tab==="radar"){R=liveCard(id,tp,dec,sim)||radarCard(tp,sim);a.card=cardRecord(R)}
  const own=tab==="radar"?A("own",id)[tp]:null;
  app.innerHTML=`<div class="shell">${sideHtml(tab)}<div class="work">
-  <div class="actions"><span><b>Patient ${pn(id)} of 5</b> · ${tabName[tab]} · ${TP[tp]} <span class="small muted">(time point ${tp+1} of 5)</span>${a.stale?` <span class="req">an earlier time point changed: please look again</span>`:""}</span><span class="tl">${TP.map((t,i)=>{const x=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${i===tp?"on":""} ${x&&x.done?"done":""} ${x&&x.stale?"stale":""}">${t}</button>`}).join("")}</span><span class="toolbar"><button type="button" id="tb-guide">Tutorial and score definitions</button></span></div>
+  <div class="actions"><span><b>Patient ${pn(id)} of 5</b> · ${tabName[tab]} · ${TP[tp]} <span class="small muted">(time point ${tp+1} of 5)</span>${a.stale||a.redo?` <span class="req">an earlier time point changed: please save this one again</span>`:""}</span><span class="tl">${TP.map((t,i)=>{const x=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${i===tp?"on":""} ${x&&x.done?"done":""} ${x&&(x.stale||x.redo)?"stale":""}">${t}</button>`}).join("")}</span><span class="toolbar"><button type="button" id="tb-guide">Tutorial and score definitions</button></span></div>
   <div class="${tab==="radar"?"grid3":"grid"}"><div class="panel">${chartHtml(sim)}${notes.length?`<h3>What you wrote earlier</h3><ul class="small">${notes.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}${ehrHtml()}</div>
   ${R?`<div style="min-width:0">${cardHtml(R)}</div>`:""}
   <div class="${tab==="radar"?"narrow":""}" style="display:flex;flex-direction:column;gap:12px;min-width:0">
@@ -872,6 +883,16 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
    <div id="notice"></div>
    <div class="actions" style="margin-top:12px"><span>${tp>0?`<button type="button" id="back">Back to ${TP[tp-1]}</button>`:""}</span><span><button type="button" class="primary" id="next">${tp<4?"Save and go to "+TP[tp+1]:"Save this patient"}</button></span></div></div></div></div></div></div>`;
  const form=app.querySelector("#form");const rer=()=>{const y=scrollY;form.innerHTML=formHtml9(a,tab,sim);app.querySelector("#notice").innerHTML="";scrollTo(0,y)};
+ const locked=tab==="own"&&!!(S.seen&&S.seen[id]);
+ const later=tab==="own"?TP.map((_,k)=>k).filter(k=>k>tp&&isDone("own",id,k)):[];
+ if(locked){form.querySelectorAll("input,textarea").forEach(x=>x.disabled=true);app.querySelectorAll(".panel .other textarea").forEach(x=>x.disabled=true);const nx=app.querySelector("#next");nx.hidden=true;
+  app.querySelector("#notice").innerHTML=`<div class="notice">You have opened RADAR for this patient, so the answers you gave on your own can no longer be changed. Continue with this patient in tab 3.</div>`}
+ else if(a.done&&later.length){let asking=false;const guard=e=>{if(asking){e.preventDefault();e.stopPropagation();return}
+   if(e.type==="keydown"&&(e.key==="Tab"||e.key==="Shift"))return;const t=e.target;if(!t.closest||!t.closest("input,textarea,label,summary"))return;
+   e.preventDefault();e.stopPropagation();asking=true;
+   modal(`<h2>Change a saved time point?</h2><p>You have already saved ${TP[tp]} and ${later.map(k=>TP[k]).join(", ")} for Patient ${pn(id)}. If you change ${TP[tp]}, the patient's course changes, so <b>${later.map(k=>TP[k]).join(", ")}</b> will have to be done again.</p><p class="small muted">Your own answers can be changed only before you open RADAR for this patient.</p>`,
+    [{label:"Keep it as it is",fn:()=>{asking=false}},{label:"Yes, change "+TP[tp],primary:true,fn:()=>{const L=A("own",id);a.done=false;a.redo=true;later.forEach(k=>{L[k].done=false;L[k].redo=true});save();render()}}])};
+  ["mousedown","keydown","click"].forEach(ev=>form.addEventListener(ev,guard,true));app.querySelectorAll(".panel>.other textarea").forEach(x=>["mousedown","keydown"].forEach(ev=>x.addEventListener(ev,guard,true)))}
  bindForm(form,a,rer);bindCopy();
  app.querySelectorAll(".tpb[data-id]").forEach(b=>b.onclick=e=>{e.stopPropagation();go(tab,b.dataset.id,+b.dataset.i)});
  const openPt=p=>{const pid=p.dataset.pt,last=((S.pos||{})[tab]||{})[pid];go(tab,pid,last!==undefined?last:(isDone(tab,pid,0)?firstOpen(tab,pid):0))};
@@ -890,7 +911,7 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
  function finish(){leave();const L=A(tab,id),sig=JSON.stringify(legacy(a));
   if(a.done&&a.sig&&a.sig!==sig)for(let j=tp+1;j<5;j++){if(L[j]&&L[j].done)L[j].stale=true}
   if(tab==="own"&&a.done&&a.sig&&a.sig!==sig){const Rr=A("radar",id);Rr.forEach(x=>{if(x&&x.done)x.stale=true})}
-  a.sig=sig;a.done=true;a.stale=false;delete a.skipped;a.savedAt=new Date().toISOString();a.left=emptyList(a).map(x=>x[1]);
+  a.sig=sig;a.done=true;a.stale=false;delete a.redo;delete a.skipped;a.savedAt=new Date().toISOString();a.left=emptyList(a).map(x=>x[1]);
   if(tab==="radar")a.changed=changedFields(a,own);
   if(tp<4){show(tab,id,tp+1);return}
   const pool=tab==="own"?S.order:S.order.filter(x=>allDone("own",x)),nxt=pool.find(x=>!allDone(tab,x));save();
@@ -934,7 +955,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T04:59:38Z";
+const BUILD="sim-9 2026-11-20T06:26:06Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

@@ -323,7 +323,7 @@ function simulate(dec,c){c=c||CASE;const P=c.phys;
  if(vasoStart!==null)events.push({at:vasoStart,txt:"Norepinephrine started via peripheral IV, titrated to MAP ≥ 65"});
  if(vasoStop!==null)events.push({at:vasoStop,txt:"Norepinephrine stopped"});
  if(dispo)events.push({at:dispo.at,txt:`Bed requested: ${dispo.where}`});
- return {orders,abx,bolus,extra,vasoStart,vasoStop,dispo,vital,map,lact,fluidVol,onVaso,results,events};
+ return {orders,abx,bolus,extra,extraVol:XV,vasoStart,vasoStop,dispo,vital,map,lact,fluidVol,onVaso,results,events};
 }
 const VT=[0,.5,1,1.5,2,3,4,5,6];
 
@@ -533,8 +533,9 @@ function prerunCard(i,sim,live){if(!live&&typeof PRERUN==="undefined")return nul
 const LIVE_URL=(()=>{try{const u=new URLSearchParams(location.search).get("live");if(!u)return null;const x=new URL(u);
  return (x.protocol==="https:"||["localhost","127.0.0.1"].includes(x.hostname))?x.origin:null}catch(e){return null}})();
 const liveJobs={};
+function liveDec(d){const o=Object.fromEntries(KEYS.filter(k=>d&&d[k]).map(k=>[k,d[k]]));if(d&&d._h&&Object.keys(d._h).length)o._h=d._h;if(d&&d._dose&&Object.keys(d._dose).length)o._dose=d._dose;if(d&&d._more)o._more=d._more;return o}
 const liveOn=()=>!!(LIVE_URL&&S.liveCode);
-function liveKey(caseId,tpi,dec){return caseId+"|"+tpi+"|"+JSON.stringify(dec.slice(0,tpi).map(d=>Object.fromEntries(KEYS.filter(k=>d&&d[k]).map(k=>[k,d[k]]))))}
+function liveKey(caseId,tpi,dec){return caseId+"|"+tpi+"|"+JSON.stringify(dec.slice(0,tpi).map(d=>liveDec(d)))}
 function liveCard(caseId,tpi,dec,sim){if(!liveOn())return null;const L=(S.liveCards||{})[liveKey(caseId,tpi,dec)];return L&&L.status==="done"?prerunCard(tpi,sim,L):null}
 async function liveEnsure(caseId,tpi,dec,onDone){if(!liveOn())return;S.liveCards=S.liveCards||{};const key=liveKey(caseId,tpi,dec);const have=S.liveCards[key];
  if(have&&have.status==="done")return;if(liveJobs[key])return;liveJobs[key]=1;
@@ -542,7 +543,7 @@ async function liveEnsure(caseId,tpi,dec,onDone){if(!liveOn())return;S.liveCards
  const note=t=>{const n=document.getElementById("livenote");if(n&&n.dataset.key===key)n.textContent=t};
  const done=q=>{S.liveCards[key]={status:"done",card:q.card,model:q.model,seconds:q.seconds,cost_usd:q.cost_usd,cached:q.cached};save();delete liveJobs[key];onDone&&onDone(key)};
  try{setTimeout(()=>note("Live RADAR is running on your orders (usually 1–2 minutes). The pre-run card is shown meanwhile."),50);
-  const r=await fetch(LIVE_URL+"/run",{method:"POST",headers:H,body:JSON.stringify({case_id:caseId,tp:tpi,decisions:dec.slice(0,tpi).map(d=>Object.fromEntries(KEYS.filter(k=>d&&d[k]).map(k=>[k,d[k]])))})});
+  const r=await fetch(LIVE_URL+"/run",{method:"POST",headers:H,body:JSON.stringify({case_id:caseId,tp:tpi,decisions:dec.slice(0,tpi).map(d=>liveDec(d))})});
   const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);
   if(j.status==="done"){done(j);return}if(j.status==="error")throw new Error(j.error);
   const t0=Date.now();
@@ -578,7 +579,8 @@ function chartHtml(sim){const now=TPH[tp],prev=tp>0?TPH[tp-1]:-1;const isNew=t=>
  if(pend.length)h+=`<h3>In progress (expected time)</h3><ul class="small">${pend.map(e=>`<li>expected ${e.at.toFixed(1)} h · ${esc(e.txt)}</li>`).join("")}</ul>`;
  return h;}
 const modelNote=()=>`<details class="small muted" style="margin-top:10px"><summary>How the simulated patient behaves</summary><p>${esc(CASE.modelNote)} Orders are carried out with usual ED delays (antibiotics about 35 minutes after a “within 1 h” order; blood tests return about 1 hour after they are drawn). Antibiotics do not change vital signs within 6 hours. The model gives realistic information over time; it is not used to score outcomes.</p></details>`;
-/* ===================== UI (sim-9) =====================
+/* ===================== UI ===================== */
+/* sim-9 layout (the line above is the marker the live server's exporter looks for; keep it unchanged)
    Home page with three cards; three tabs (tutorial and calibration / on your own / with RADAR);
    patient list on the left; free movement between patients, time points in order within a patient;
    everything is saved as it is entered; only the confidence score (and, with RADAR, the rating of the card) is required. */
@@ -607,7 +609,10 @@ function legacy(a){if(!a)return null;const d={_h:{},_dose:{}};if(a.tier)d.tier=a
  const x=a.tx||{};
  if(x.abx){const h=x.abx.when==="later"?num(x.abx.h):null;d.abx=h!==null&&h>1?"within 3 h":"within 1 h";if(h!==null)d._h.abx=h}else d.abx="not indicated";
  if(x.fluids){d.fluids="give";const v=num(x.fluids.dose);if(v)d._dose.fluids=v;const h=x.fluids.when==="later"?num(x.fluids.h):null;if(h!==null)d._h.fluids=h}else d.fluids="withhold";
- d.vaso=x.vaso?"start or continue":"hold or stop";return d}
+ d.vaso=x.vaso?"start or continue":"hold or stop";
+ const more={tx:Object.entries(x).filter(([k])=>!["fluids","abx","vaso"].includes(k)).map(([k,v])=>({name:k==="other"?((v.note||"").trim()||"Other treatment"):TXL[k][1],dose:num(v.dose),unit:TXL[k][2],h:v.when==="later"?num(v.h):null,note:k==="other"?"":(v.note||"").trim()})),
+  txOther:(a.txOther||"").trim(),testsOther:(a.testsOther||"").trim(),testNotes:Object.entries(a.tests||{}).filter(([k,v])=>(v.note||"").trim()).map(([k,v])=>TESTL[k]+": "+v.note.trim()).join("; "),other:(a.other||"").trim(),abxNote:x.abx?[(x.abx.note||"").trim(),num(x.abx.dose)!==null?num(x.abx.dose)+" g":""].filter(Boolean).join(" "):""};
+ if(more.tx.length||more.txOther||more.testsOther||more.testNotes||more.other||more.abxNote)d._more=more;return d}
 const src=(tab,id,i)=>tab==="radar"&&isDone("radar",id,i)?A("radar",id)[i]:(isDone("own",id,i)?A("own",id)[i]:null);
 const decs=(tab,id,upto)=>TP.slice(0,upto).map((_,i)=>legacy(src(tab,id,i)));
 const TXDELAY={oxygen:.1,furosemide:.3,heparin:.5,aspirin:.2,antipyretic:.3,benzo:.2,ntg:.3,bronch:.2,hydrocort:.4,other:.5};
@@ -929,7 +934,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T04:42:52Z";
+const BUILD="sim-9 2026-11-20T04:59:38Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

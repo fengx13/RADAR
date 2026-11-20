@@ -635,6 +635,9 @@ function ensure(tab,id,i){const L=A(tab,id);if(L[i])return L[i];
 let saveT=null;
 function saveSoon(){clearTimeout(saveT);saveT=setTimeout(()=>save(),400)}
 function leave(){if((S.tab==="own"||S.tab==="radar")&&S.cur[S.tab]){const c=S.cur[S.tab],a=A(S.tab,c.id)[c.i];if(a)a.seconds=(a.seconds||0)+Math.round((Date.now()-tStart)/1000)}tStart=Date.now()}
+let whyArm=false;
+function partsOf(a){return {"sepsis likelihood":a.tier||"","other diagnoses":JSON.stringify([a.dx||[],a.dxOther||""]),"tests":JSON.stringify([a.tests||{},a.testsOther||""]),"treatment":JSON.stringify([a.tx||{},a.txOther||""]),"level of care":a.dispo||"","notes":a.other||""}}
+function whyText(w){if(!w)return "";const where=TP[w.tp]+(w.tab==="own"?" (on your own)":"");return w.parts&&w.parts.length?`At <b>${where}</b> you changed: <b>${w.parts.join(", ")}</b>.`:`You reopened <b>${where}</b> to change it.`}
 function modal(html,btns){closeModal();const m=document.createElement("div");m.className="modal";m.id="modal";
  m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true">${html}<div class="actions" style="margin-top:14px"><span></span><span>${btns.map((b,j)=>`<button type="button" class="${b.primary?"primary":""}" data-j="${j}">${esc(b.label)}</button>`).join(" ")}</span></div></div>`;
  document.body.appendChild(m);m.querySelectorAll("button[data-j]").forEach(b=>b.onclick=()=>{const f=btns[+b.dataset.j].fn;closeModal();f&&f()});
@@ -643,7 +646,7 @@ function modal(html,btns){closeModal();const m=document.createElement("div");m.c
 function closeModal(){const m=document.getElementById("modal");if(m)m.remove()}
 const pn=id=>S.order.indexOf(id)+1;
 function setTab(t){if(t==="guide"&&(S.tab==="own"||S.tab==="radar")&&S.cur[S.tab])S.last={tab:S.tab,id:S.cur[S.tab].id,i:S.cur[S.tab].i};leave();S.nav.push({at:new Date().toISOString(),tab:t});S.tab=t;save();render();scrollTo(0,0)}
-function show(tab,id,i){leave();ensure(tab,id,i);S.cur[tab]={id,i};S.pos=S.pos||{own:{},radar:{}};S.pos[tab][id]=i;if(tab==="radar"){S.seen=S.seen||{};S.seen[id]=true}S.tab=tab;setCase(id);tp=i;pickOpen={};pendingSkip=false;S.nav.push({at:new Date().toISOString(),tab,patient:id,tp:TP[i]});save();render();scrollTo(0,0)}
+function show(tab,id,i){whyArm=true;leave();ensure(tab,id,i);S.cur[tab]={id,i};S.pos=S.pos||{own:{},radar:{}};S.pos[tab][id]=i;if(tab==="radar"){S.seen=S.seen||{};S.seen[id]=true}S.tab=tab;setCase(id);tp=i;pickOpen={};pendingSkip=false;S.nav.push({at:new Date().toISOString(),tab,patient:id,tp:TP[i]});save();render();scrollTo(0,0)}
 
 /* ---------- moving between patients and time points ---------- */
 function go(tab,id,i){
@@ -824,17 +827,21 @@ const HUM=[[/decided by code rule/g,"decided by a fixed rule"],[/\bacs_or_mi\b/g
  [/\bC0_5\b/g,"0.5 h"],[/\bC([136])\b/g,"$1 h"],[/\b([A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+)\b/g,m=>m.replace(/_/g," ")]];
 const hum=h=>String(h).split(/(<[^>]+>)/).map(x=>x.startsWith("<")?x:HUM.reduce((t,[re,to])=>t.replace(re,to),x)).join("");
 function pullSrc(html,ids){return String(html).replace(/\s*<span class="?src"?>([^<]+)<\/span>/g,(m,x)=>{x.split(/\s*,\s*/).forEach(y=>{if(!ids.includes(y))ids.push(y)});return ""})}
+const RISK={"case-sepsis-urinary__bundle":{"T0":0.8633,"C0_5":0.8439},"case-sepsis-urinary__broad":{"T0":0.8633,"C0_5":0.8439},"case-sepsis-urinary__delayed":{"T0":0.8633,"C1":0.8479},"case-pe__bundle":{"T0":0.8005,"C0_5":0.7704},"case-pe__broad":{"T0":0.8005,"C0_5":0.7397},"case-pe__delayed":{"T0":0.8005,"C1":0.7014},"case-hf__bundle":{"T0":0.2063,"C0_5":0.1666},"case-hf__broad":{"T0":0.2063,"C0_5":0.1468},"case-hf__delayed":{"T0":0.2063,"C1":0.1297},"case-tox__bundle":{"T0":0.2612,"C0_5":0.3729,"C1":0.6333,"C3":0.1885},"case-tox__broad":{"T0":0.2612,"C0_5":0.3568,"C1":0.6333},"case-tox__delayed":{"T0":0.2612,"C1":0.2763,"C3":0.1885},"case-acs__bundle":{"T0":0.8665,"C0_5":0.9053,"C1":0.9166,"C3":0.9231},"case-acs__broad":{"T0":0.8665,"C0_5":0.8988,"C1":0.8625},"case-acs__delayed":{"T0":0.8665,"C1":0.7741,"C3":0.8803}};
+const CPS=["T0","C0_5","C1","C3","C6"];
+function riskOf(R){const m=R.prerun&&RISK[R.prerun.path];if(!m)return null;let v=null;for(const c of CPS){if(m[c]!=null)v=m[c];if(c===R.prerun.checkpoint)break}return v}
 function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf conf-${lvl(p.pct)}">confidence ${Math.round(p.pct)}% · ${lvl(p.pct)}</span>`:p.rule?`<span class="conf conf-rule" title="A fixed rule in RADAR decided this item, so RADAR gives no confidence for it">fixed rule</span>`:p.conf?`<span class="conf conf-${p.conf}">confidence: ${p.conf}</span>`:/<b>/.test(p.txt)?`<span class="conf conf-rule" title="RADAR gave no confidence for this item">no score given</span>`:"";
  const prep=it=>({txt:hum(pullSrc(it.txt,ids)),F:(it.forr||[]).map(x=>hum(pullSrc(x,ids))),G:(it.against||[]).map(x=>hum(pullSrc(x,ids))),M:(it.more||[]).map(x=>hum(pullSrc(x,ids))),conf:it.conf,pct:it.pct,rule:it.rule});
  const tip=p=>p.F.length||p.G.length||p.M.length?`<span class="tipbox">${p.F.length?`<span><b>For:</b> ${p.F.join("; ")}</span>`:""}${p.G.length?`<span><b>Against:</b> ${p.G.join("; ")}</span>`:""}${p.M.length?`<span class="more"><b>More data needed:</b> ${p.M.join("; ")}</span>`:""}</span>`:"";
  const line=(it,why)=>{const p=prep(it),t=tip(p);return `<li class="${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt} ${conf(p)}${why&&p.F[0]?`<div class="ev1">${p.F[0]}</div>`:""}${t}</li>`};
  const sec=n=>R.sections.find(s=>new RegExp("^"+n,"i").test(s.h));
  const A=sec("Assessment"),T=sec("Tests"),X=sec("Treatment"),L=sec("Level of care");let h="";
- if(A){const its=A.items.filter(it=>!/^Sepsis:/.test(String(it.txt).replace(/<[^>]+>/g,""))&&!(/^Alternative diagnosis/.test(it.txt)&&!/leading alternative/.test(it.txt)));
+ if(A){const its=A.items.filter(it=>!/^Sepsis:/.test(String(it.txt).replace(/<[^>]+>/g,""))&&!(/^Alternative diagnosis/.test(it.txt)&&(!/leading alternative/.test(it.txt)||/leading alternative:\s*other/i.test(String(it.txt).replace(/<[^>]+>/g,"")))));
   if(its.length)h+=`<h3>Assessment</h3><ul class="cardlist">${its.map(it=>line(it,true)).join("")}</ul>`}
  const SKIP=/withhold|hold or stop|\bhold\b|not yet|not indicated|not needed|not applicable|decide after|no change|no treatment advice|neither|bolus running|no radar suggestion/i;
  const plain=x=>String(x).replace(/<[^>]+>/g,"");
- if(T){const groups={},order=[];T.items.forEach(it=>{const m=/^(.*?):\s*<b>(.*?)<\/b>(.*)$/.exec(it.txt);if(!m)return;const w=plain(m[2]);if(!/^(now|before ED disposition)$/.test(w)||/\(done\)/.test(plain(m[3])))return;const p=prep({...it,txt:m[1]});if(!groups[w]){groups[w]=[];order.push(w)}groups[w].push(p)});
+ const altM=A?A.items.map(it=>/leading alternative:\s*([^<]*)/.exec(String(it.txt))).find(Boolean):null,altRaw=altM?altM[1].trim():"",altName=altRaw&&!/^other/i.test(altRaw)?hum(altRaw):"";
+ if(T){const groups={},order=[];T.items.forEach(it=>{const m=/^(.*?):\s*<b>(.*?)<\/b>(.*)$/.exec(it.txt);if(!m)return;const w=plain(m[2]);if(!/^(now|before ED disposition)$/.test(w)||/\(done\)/.test(plain(m[3])))return;let nm=m[1];if(/^Testing for an alternative diagnosis/i.test(plain(nm))){if(!altName)return;nm="Testing for "+altName}const p=prep({...it,txt:nm});if(!groups[w]){groups[w]=[];order.push(w)}groups[w].push(p)});
   order.sort((a,b)=>(a==="now"?0:1)-(b==="now"?0:1));const GL={"now":"Now","before ED disposition":"Before the patient leaves the ED"};
   if(order.length)h+=`<h3>Tests</h3><div class="tests">${order.map(w=>`<div class="tg"><b>${GL[w]}:</b> ${groups[w].map(p=>{const t=tip(p);return `<span class="tchip ${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt.replace(/\s*\(.*?\)\s*$/,"")}${t}</span>`}).join(" ")}</div>`).join("")}</div>`}
  if(X){const W=CASE.weight,txt=X.items.map(it=>plain(it.txt)),mapT=(txt.find(t=>/^MAP target/i.test(t))||"").match(/60\s*[–-]\s*65/)?"60–65":"65";
@@ -847,8 +854,10 @@ function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf c
   if(its.length)h+=`<h3>Treatment</h3><ul class="cardlist">${its.map(it=>line(it,false)).join("")}</ul>`}
  if(L){const it=L.items.filter(x=>/Level of care|Now:/.test(x.txt)).slice(-1)[0]||L.items.slice(-1)[0];
   if(it&&!/not yet decided/i.test(plain(it.txt)))h+=`<h3>Level of care</h3><ul class="cardlist">${line(it,false)}</ul>`}
- const badges=R.badges.filter(([t])=>!/not yet decided/i.test(t));
- return `<div class="panel radar"><h3 style="margin-top:0">RADAR's card at ${TP[tp]}${R.prerun?" · run in advance":R.live?" · live":""}</h3><div>${badges.map(([t,f])=>`<span class="badge ${f?"fill":""}">${esc(hum(t))}</span>`).join("")}</div>
+ const bItem=(s,re)=>s?s.items.find(x=>re.test(plain(x.txt))):null,bConf=it=>!it?"":it.pct!=null?`${Math.round(it.pct)}%`:it.rule?"fixed rule":"";
+ const rk=riskOf(R),extra=[rk!=null?`risk model ${Math.round(rk*100)}%`:"",bConf(bItem(A,/^Shock/i)),bConf(L?(L.items.filter(x=>/Level of care|Now:/.test(x.txt)).slice(-1)[0]||null):null)];
+ const badges=R.badges.map((b,i)=>[b[0],b[1],extra[i]||""]).filter(([t])=>!/not yet decided/i.test(t));
+ return `<div class="panel radar"><h3 style="margin-top:0">RADAR's card at ${TP[tp]}${R.prerun?" · run in advance":R.live?" · live":""}</h3><div>${badges.map(([t,f,x])=>`<span class="badge ${f?"fill":""}">${esc(hum(t))}${x?` <span style="font-weight:400">· ${esc(x)}</span>`:""}</span>`).join("")}</div>
  <p class="small muted" style="margin:2px 0 0">Only what RADAR advises doing is listed. Hover over an item (or tap it) to see RADAR's reasons.</p>${h}
  ${ids.length?`<details class="gl" style="margin-top:10px"><summary>Guideline items cited (${ids.length})</summary><ul>${ids.map(x=>{const G=glLoc(x);return `<li>${esc(G.txt)} <button type="button" class="cp" data-copy="${esc(G.find)}">Copy to search</button>${G.url?` <a href="${G.url}" target="_blank" rel="noopener">Open the guideline</a>`:""}</li>`}).join("")}</ul><span class="small muted">The guideline text is not shown here; use the reference to find it. </span><a href="../kg/" target="_blank" rel="noopener">Open the knowledge graph</a></details>`:""}</div>`}
 const cardRecord=R=>({prerun:R.prerun||null,live:R.live||null,sections:R.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:String(it.txt).replace(/<[^>]+>/g,"")}))}))});
@@ -873,7 +882,7 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
  let R=null;if(tab==="radar"){R=liveCard(id,tp,dec,sim)||radarCard(tp,sim);a.card=cardRecord(R)}
  const own=tab==="radar"?A("own",id)[tp]:null;
  app.innerHTML=`<div class="shell">${sideHtml(tab)}<div class="work">
-  <div class="actions"><span><b>Patient ${pn(id)} of 5</b> · ${tabName[tab]} · ${TP[tp]} <span class="small muted">(time point ${tp+1} of 5)</span>${a.stale||a.redo?` <span class="req">an earlier time point changed: please save this one again</span>`:""}</span><span class="tl">${TP.map((t,i)=>{const x=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${i===tp?"on":""} ${x&&x.done?"done":""} ${x&&(x.stale||x.redo)?"stale":""}">${t}</button>`}).join("")}</span><span class="toolbar"><button type="button" id="tb-guide">Tutorial and score definitions</button></span></div>
+  <div class="actions"><span><b>Patient ${pn(id)} of 5</b> · ${tabName[tab]} · ${TP[tp]} <span class="small muted">(time point ${tp+1} of 5)</span>${a.stale||a.redo?` <span class="req">${a.why?TP[a.why.tp]+" changed"+(a.why.parts&&a.why.parts.length?" ("+a.why.parts.join(", ")+")":""):"an earlier time point changed"}: please save this one again</span>`:""}</span><span class="tl">${TP.map((t,i)=>{const x=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${i===tp?"on":""} ${x&&x.done?"done":""} ${x&&(x.stale||x.redo)?"stale":""}">${t}</button>`}).join("")}</span><span class="toolbar"><button type="button" id="tb-guide">Tutorial and score definitions</button></span></div>
   <div class="${tab==="radar"?"grid3":"grid"}"><div class="panel">${chartHtml(sim)}${notes.length?`<h3>What you wrote earlier</h3><ul class="small">${notes.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}${ehrHtml()}</div>
   ${R?`<div style="min-width:0">${cardHtml(R)}</div>`:""}
   <div class="${tab==="radar"?"narrow":""}" style="display:flex;flex-direction:column;gap:12px;min-width:0">
@@ -891,9 +900,10 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
    if(e.type==="keydown"&&(e.key==="Tab"||e.key==="Shift"))return;const t=e.target;if(!t.closest||!t.closest("input,textarea,label,summary"))return;
    e.preventDefault();e.stopPropagation();asking=true;
    modal(`<h2>Change a saved time point?</h2><p>You have already saved ${TP[tp]} and ${later.map(k=>TP[k]).join(", ")} for Patient ${pn(id)}. If you change ${TP[tp]}, the patient's course changes, so <b>${later.map(k=>TP[k]).join(", ")}</b> will have to be done again.</p><p class="small muted">Your own answers can be changed only before you open RADAR for this patient.</p>`,
-    [{label:"Keep it as it is",fn:()=>{asking=false}},{label:"Yes, change "+TP[tp],primary:true,fn:()=>{const L=A("own",id);a.done=false;a.redo=true;later.forEach(k=>{L[k].done=false;L[k].redo=true});save();render()}}])};
+    [{label:"Keep it as it is",fn:()=>{asking=false}},{label:"Yes, change "+TP[tp],primary:true,fn:()=>{const L=A("own",id);a.done=false;a.redo=true;later.forEach(k=>{L[k].done=false;L[k].redo=true;L[k].why={tp,parts:[]}});save();render()}}])};
   ["mousedown","keydown","click"].forEach(ev=>form.addEventListener(ev,guard,true));app.querySelectorAll(".panel>.other textarea").forEach(x=>["mousedown","keydown"].forEach(ev=>x.addEventListener(ev,guard,true)))}
  bindForm(form,a,rer);bindCopy();
+ if(whyArm){whyArm=false;if(!locked&&(a.stale||a.redo)&&a.why)modal(`<h2>An earlier time point was changed</h2><p>${whyText(a.why)}</p><p>The patient's course may be different now. Please check <b>${TP[tp]}</b> and save it again.</p>`,[{label:"OK",primary:true,fn:()=>{}}])}
  app.querySelectorAll(".tpb[data-id]").forEach(b=>b.onclick=e=>{e.stopPropagation();go(tab,b.dataset.id,+b.dataset.i)});
  const openPt=p=>{const pid=p.dataset.pt,last=((S.pos||{})[tab]||{})[pid];go(tab,pid,last!==undefined?last:(isDone(tab,pid,0)?firstOpen(tab,pid):0))};
  app.querySelectorAll(".pt[data-pt]").forEach(p=>{p.onclick=e=>{if(e.target.closest(".tpb"))return;openPt(p)};p.onkeydown=e=>{if(e.key==="Enter"&&e.target===p)openPt(p)}});
@@ -909,9 +919,11 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
   if(emp.length&&!pendingSkip){pendingSkip=true;N.innerHTML=`<div class="notice">Left empty: ${emp.map(link).join(", ")}. You can fill them in, or continue without them. <button type="button" id="skipok">Confirm: skip these and continue</button></div>`;wire();N.querySelector("#skipok").onclick=()=>finish();N.scrollIntoView({behavior:"smooth",block:"center"});return}
   finish()};
  function finish(){leave();const L=A(tab,id),sig=JSON.stringify(legacy(a));
-  if(a.done&&a.sig&&a.sig!==sig)for(let j=tp+1;j<5;j++){if(L[j]&&L[j].done)L[j].stale=true}
-  if(tab==="own"&&a.done&&a.sig&&a.sig!==sig){const Rr=A("radar",id);Rr.forEach(x=>{if(x&&x.done)x.stale=true})}
-  a.sig=sig;a.done=true;a.stale=false;delete a.redo;delete a.skipped;a.savedAt=new Date().toISOString();a.left=emptyList(a).map(x=>x[1]);
+  const now=partsOf(a),chgd=!!(a.sig&&a.sig!==sig),parts=a.snap?Object.keys(now).filter(k=>now[k]!==a.snap[k]):[];
+  if(a.done&&chgd)for(let j=tp+1;j<5;j++){if(L[j]&&L[j].done)L[j].stale=true}
+  if(chgd)for(let j=tp+1;j<5;j++){if(L[j]&&(L[j].stale||L[j].redo))L[j].why={tp,parts}}
+  if(tab==="own"&&a.done&&chgd){const Rr=A("radar",id);Rr.forEach(x=>{if(x&&x.done){x.stale=true;x.why={tp,parts,tab:"own"}}})}
+  a.sig=sig;a.snap=now;a.done=true;a.stale=false;delete a.redo;delete a.why;delete a.skipped;a.savedAt=new Date().toISOString();a.left=emptyList(a).map(x=>x[1]);
   if(tab==="radar")a.changed=changedFields(a,own);
   if(tp<4){show(tab,id,tp+1);return}
   const pool=tab==="own"?S.order:S.order.filter(x=>allDone("own",x)),nxt=pool.find(x=>!allDone(tab,x));save();
@@ -955,7 +967,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T06:26:06Z";
+const BUILD="sim-9 2026-11-20T18:25:29Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

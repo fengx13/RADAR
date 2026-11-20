@@ -837,12 +837,15 @@ function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf c
  const sec=n=>R.sections.find(s=>new RegExp("^"+n,"i").test(s.h));
  const A=sec("Assessment"),T=sec("Tests"),X=sec("Treatment"),L=sec("Level of care");let h="";
  if(A){const its=A.items.filter(it=>!/^Sepsis:/.test(String(it.txt).replace(/<[^>]+>/g,""))&&!(/^Alternative diagnosis/.test(it.txt)&&(!/leading alternative/.test(it.txt)||/leading alternative:\s*other/i.test(String(it.txt).replace(/<[^>]+>/g,"")))));
-  if(its.length)h+=`<h3>Assessment</h3><ul class="cardlist">${its.map(it=>line(it,true)).join("")}</ul>`}
+  const REL={"more likely":"more likely than sepsis","equally likely":"as likely as sepsis","less likely":"less likely than sepsis"};
+  const alt=it=>{const t=String(it.txt);if(!/^Alternative diagnosis/.test(t))return it;const nm=(/leading alternative:\s*([^<]*)/.exec(t)||[])[1],rl=(/another diagnosis (more likely|equally likely|less likely)/.exec(t)||[])[1];
+   return nm?{...it,txt:`<b>${esc(hum(nm.trim()).replace(/^./,c=>c.toUpperCase()))}</b>${rl?` <span class="small muted">· ${REL[rl]}</span>`:""}`}:it};
+  if(its.length)h+=`<h3>Assessment</h3><ul class="cardlist">${its.map(it=>line(alt(it),true)).join("")}</ul>`}
  const SKIP=/withhold|hold or stop|\bhold\b|not yet|not indicated|not needed|not applicable|decide after|no change|no treatment advice|neither|bolus running|no radar suggestion/i;
  const plain=x=>String(x).replace(/<[^>]+>/g,"");
  const altM=A?A.items.map(it=>/leading alternative:\s*([^<]*)/.exec(String(it.txt))).find(Boolean):null,altRaw=altM?altM[1].trim():"",altName=altRaw&&!/^other/i.test(altRaw)?hum(altRaw):"";
  if(T){const groups={},order=[];T.items.forEach(it=>{const m=/^(.*?):\s*<b>(.*?)<\/b>(.*)$/.exec(it.txt);if(!m)return;const w=plain(m[2]);if(!/^(now|before ED disposition)$/.test(w)||/\(done\)/.test(plain(m[3])))return;let nm=m[1];if(/^Testing for an alternative diagnosis/i.test(plain(nm))){if(!altName)return;nm="Testing for "+altName}const p=prep({...it,txt:nm});if(!groups[w]){groups[w]=[];order.push(w)}groups[w].push(p)});
-  order.sort((a,b)=>(a==="now"?0:1)-(b==="now"?0:1));const GL={"now":"Now","before ED disposition":"Before the patient leaves the ED"};
+  order.sort((a,b)=>(a==="now"?0:1)-(b==="now"?0:1));const GL={"now":"Recommended now","before ED disposition":"Other tests to consider"};
   if(order.length)h+=`<h3>Tests</h3><div class="tests">${order.map(w=>`<div class="tg"><b>${GL[w]}:</b> ${groups[w].map(p=>{const t=tip(p);return `<span class="tchip ${t?"tipw":""}" ${t?'tabindex="0"':""}>${p.txt.replace(/\s*\(.*?\)\s*$/,"")}${t}</span>`}).join(" ")}</div>`).join("")}</div>`}
  if(X){const W=CASE.weight,txt=X.items.map(it=>plain(it.txt)),mapT=(txt.find(t=>/^MAP target/i.test(t))||"").match(/60\s*[–-]\s*65/)?"60–65":"65";
   const its=X.items.filter(it=>!SKIP.test(plain(it.txt))&&!/^MAP target/i.test(plain(it.txt))).map(it=>{const t=plain(it.txt);let x=it.txt;
@@ -858,6 +861,7 @@ function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf c
  const rk=riskOf(R),extra=[rk!=null?`risk model ${Math.round(rk*100)}%`:"",bConf(bItem(A,/^Shock/i)),bConf(L?(L.items.filter(x=>/Level of care|Now:/.test(x.txt)).slice(-1)[0]||null):null)];
  const badges=R.badges.map((b,i)=>[b[0],b[1],extra[i]||""]).filter(([t])=>!/not yet decided/i.test(t));
  return `<div class="panel radar"><h3 style="margin-top:0">RADAR's card at ${TP[tp]}${R.prerun?" · run in advance":R.live?" · live":""}</h3><div>${badges.map(([t,f,x])=>`<span class="badge ${f?"fill":""}">${esc(hum(t))}${x?` <span style="font-weight:400">· ${esc(x)}</span>`:""}</span>`).join("")}</div>
+${A&&A.items.some(it=>/raised from unlikely/.test(String(it.txt)))?`<p class="small" style="margin:2px 0 4px"><b>Why "possible":</b> RADAR's assessment alone gave "unlikely"${A.items.some(it=>/Evidence of infection:\s*<b>no/.test(String(it.txt)))?" (no evidence of infection, so it asked no further questions)":""}; RADAR's risk model raised the category to "possible".</p>`:""}
  <p class="small muted" style="margin:2px 0 0">Only what RADAR advises doing is listed. Hover over an item (or tap it) to see RADAR's reasons.</p>${h}
  ${ids.length?`<details class="gl" style="margin-top:10px"><summary>Guideline items cited (${ids.length})</summary><ul>${ids.map(x=>{const G=glLoc(x);return `<li>${esc(G.txt)} <button type="button" class="cp" data-copy="${esc(G.find)}">Copy to search</button>${G.url?` <a href="${G.url}" target="_blank" rel="noopener">Open the guideline</a>`:""}</li>`}).join("")}</ul><span class="small muted">The guideline text is not shown here; use the reference to find it. </span><a href="../kg/" target="_blank" rel="noopener">Open the knowledge graph</a></details>`:""}</div>`}
 const cardRecord=R=>({prerun:R.prerun||null,live:R.live||null,sections:R.sections.map(s=>({h:s.h,items:s.items.map(it=>({...it,txt:String(it.txt).replace(/<[^>]+>/g,"")}))}))});
@@ -869,6 +873,13 @@ const EHR={
  "case-hf":[[0,"Triage nurse","Has slept upright in a chair for 4 nights. Weight 82 kg today, 77 kg at the last clinic visit. Dry cough, no sputum."],[0,"Physician examination","Neck veins distended. Crackles to mid-chest on both sides. Pitting edema to the knees. Irregular pulse."],[1,"Nursing","Cannot lie flat; sits upright on the stretcher."],[3,"Nursing","Still breathless when talking."],[6,"Nursing","No new complaints."]],
  "case-tox":[[0,"Police report","Found pacing in the street and shouting. A glass pipe was in his pocket."],[0,"Physician examination","Skin hot and wet. Pupils 7 mm, reactive. Neck supple. No wounds or skin infection. Fine tremor."],[1,"Nursing","Pulls at the monitor leads; needs constant redirection."],[3,"Nursing","Calmer; answers questions and asks for water."],[6,"Nursing","Sleeping, easy to wake, oriented."]],
  "case-acs":[[0,"Triage nurse","Vomited twice at home. Skipped breakfast and her morning insulin. No fever, no urinary symptoms, no cough."],[0,"Physician examination","Skin cool and sweaty. Chest clear. Heart sounds normal. Abdomen soft with mild discomfort in the upper middle part. No leg swelling."],[1,"Nursing","Says her upper stomach feels heavy; nausea continues."],[3,"Nursing","The heavy feeling comes and goes."],[6,"Nursing","No new complaints."]]};
+const MORE={
+"case-sepsis-urinary":[["Allergies","Penicillin (rash)"],["Social history","Lives with his wife. Walks with a walker, manages his own care. Never smoked, no alcohol."],["Previous admission","14 months ago, bloodstream infection."],["Code status","Full code"]],
+"case-acs":[["Allergies","None known"],["Social history","Lives alone, daughter nearby. Independent. Stopped smoking 10 years ago."],["Code status","Full code"]],
+"case-tox":[["Allergies","Unknown"],["Social history","No fixed address. Smokes. No emergency contact on file."],["Code status","Full code"]],
+"case-hf":[["Allergies","None known"],["Social history","Lives with his daughter. Walks slowly with a cane. Stopped smoking 15 years ago (30 pack-years)."],["Code status","Full code"]],
+"case-pe":[["Allergies","None known"],["Social history","Lives with her husband. Does not smoke."],["Code status","Full code"]]};
+function moreHtml(){const L=MORE[CASE.id];if(!L)return "";return `<details class="gl" style="margin-top:10px"><summary>More from the chart (${L.length})</summary><ul>${L.map(([k,v])=>`<li><b>${esc(k)}:</b> ${esc(v)}</li>`).join("")}</ul><span class="small muted">Simulated background, as a clinician would find it in the record.</span></details>`}
 function ehrHtml(){const now=TPH[tp],prev=tp>0?TPH[tp-1]:-1,L=(EHR[CASE.id]||[]).filter(x=>x[0]<=now);if(!L.length)return "";
  return `<h3>Other information in the record</h3><ul class="small">${L.map(([t,w,x])=>`<li class="${tp>0&&t>prev?"new":""}">${t===0?"T0":t.toFixed(1)+" h"} · <b>${esc(w)}:</b> ${esc(x)}</li>`).join("")}</ul>`}
 /* ---------- the two working tabs ---------- */
@@ -883,7 +894,7 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
  const own=tab==="radar"?A("own",id)[tp]:null;
  app.innerHTML=`<div class="shell">${sideHtml(tab)}<div class="work">
   <div class="actions"><span><b>Patient ${pn(id)} of 5</b> · ${tabName[tab]} · ${TP[tp]} <span class="small muted">(time point ${tp+1} of 5)</span>${a.stale||a.redo?` <span class="req">${a.why?TP[a.why.tp]+" changed"+(a.why.parts&&a.why.parts.length?" ("+a.why.parts.join(", ")+")":""):"an earlier time point changed"}: please save this one again</span>`:""}</span><span class="tl">${TP.map((t,i)=>{const x=A(tab,id)[i];return `<button type="button" data-id="${id}" data-i="${i}" class="tpb ${i===tp?"on":""} ${x&&x.done?"done":""} ${x&&(x.stale||x.redo)?"stale":""}">${t}</button>`}).join("")}</span><span class="toolbar"><button type="button" id="tb-guide">Tutorial and score definitions</button></span></div>
-  <div class="${tab==="radar"?"grid3":"grid"}"><div class="panel">${chartHtml(sim)}${notes.length?`<h3>What you wrote earlier</h3><ul class="small">${notes.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}${ehrHtml()}</div>
+  <div class="${tab==="radar"?"grid3":"grid"}"><div class="panel">${chartHtml(sim)}${notes.length?`<h3>What you wrote earlier</h3><ul class="small">${notes.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}${ehrHtml()}${moreHtml()}</div>
   ${R?`<div style="min-width:0">${cardHtml(R)}</div>`:""}
   <div class="${tab==="radar"?"narrow":""}" style="display:flex;flex-direction:column;gap:12px;min-width:0">
    ${tab==="radar"?`<div class="callout">After reading RADAR's card: is there anything here you would now change? These are your own answers at ${TP[tp]}. <b>Edit them directly</b>; leave them if nothing changes.</div>`:""}
@@ -967,7 +978,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T18:25:29Z";
+const BUILD="sim-9 2026-11-20T18:43:13Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

@@ -528,7 +528,7 @@ function prerunCard(i,sim,live){if(!live&&typeof PRERUN==="undefined")return nul
  S.push({h:"Level of care (Agent 4)",items:a4Items(a4,!cp)});
  const lev=a4&&(a4.category?LEVEL[a4.category]:(a4.status==="decision"&&a4.disposition?LEVEL[a4.disposition]:null));
  pick.dispo=a4&&a4.status==="decision"&&lev?lev:"not yet decided";
- return {badges:[[`Sepsis: ${pick.tier||"—"}`,1],[`Shock: ${pick.shock}`,0],[pick.dispo,0]],sections:S,pick,prerun:live?null:{path:near.pid,distance:near.d,checkpoint:cp?cp.id:"T0"},live:live?{checkpoint:cp?cp.id:"T0",seconds:live.seconds||null,cost_usd:live.cost_usd??null,cached:!!live.cached}:null};}
+ return {badges:[[`Sepsis: ${pick.tier||"—"}`,1],[`Shock: ${pick.shock}`,0],[pick.dispo,0]],sections:S,pick,risk:(a1&&a1.risk_score!=null?a1.risk_score:null),prerun:live?null:{path:near.pid,distance:near.d,checkpoint:cp?cp.id:"T0"},live:live?{checkpoint:cp?cp.id:"T0",seconds:live.seconds||null,cost_usd:live.cost_usd??null,cached:!!live.cached}:null};}
 /* ----- Live RADAR (step 5): open the page with ?live=<server URL>; the reviewer enters the access code ----- */
 const LIVE_URL=(()=>{try{const u=new URLSearchParams(location.search).get("live");if(!u)return null;const x=new URL(u);
  return (x.protocol==="https:"||["localhost","127.0.0.1"].includes(x.hostname))?x.origin:null}catch(e){return null}})();
@@ -829,7 +829,7 @@ const hum=h=>String(h).split(/(<[^>]+>)/).map(x=>x.startsWith("<")?x:HUM.reduce(
 function pullSrc(html,ids){return String(html).replace(/\s*<span class="?src"?>([^<]+)<\/span>/g,(m,x)=>{x.split(/\s*,\s*/).forEach(y=>{if(!ids.includes(y))ids.push(y)});return ""})}
 const RISK={"case-sepsis-urinary__bundle":{"T0":0.8633,"C0_5":0.8439},"case-sepsis-urinary__broad":{"T0":0.8633,"C0_5":0.8439},"case-sepsis-urinary__delayed":{"T0":0.8633,"C1":0.8479},"case-pe__bundle":{"T0":0.8005,"C0_5":0.7704},"case-pe__broad":{"T0":0.8005,"C0_5":0.7397},"case-pe__delayed":{"T0":0.8005,"C1":0.7014},"case-hf__bundle":{"T0":0.2063,"C0_5":0.1666},"case-hf__broad":{"T0":0.2063,"C0_5":0.1468},"case-hf__delayed":{"T0":0.2063,"C1":0.1297},"case-tox__bundle":{"T0":0.2612,"C0_5":0.3729,"C1":0.6333,"C3":0.1885},"case-tox__broad":{"T0":0.2612,"C0_5":0.3568,"C1":0.6333},"case-tox__delayed":{"T0":0.2612,"C1":0.2763,"C3":0.1885},"case-acs__bundle":{"T0":0.8665,"C0_5":0.9053,"C1":0.9166,"C3":0.9231},"case-acs__broad":{"T0":0.8665,"C0_5":0.8988,"C1":0.8625},"case-acs__delayed":{"T0":0.8665,"C1":0.7741,"C3":0.8803}};
 const CPS=["T0","C0_5","C1","C3","C6"];
-function riskOf(R){const m=R.prerun&&RISK[R.prerun.path];if(!m)return null;let v=null;for(const c of CPS){if(m[c]!=null)v=m[c];if(c===R.prerun.checkpoint)break}return v}
+function riskOf(R){if(R.risk!=null)return R.risk;const m=R.prerun&&RISK[R.prerun.path];if(!m)return null;let v=null;for(const c of CPS){if(m[c]!=null)v=m[c];if(c===R.prerun.checkpoint)break}return v}
 function cardHtml(R){const ids=[];const conf=p=>p.pct!=null?`<span class="conf conf-${lvl(p.pct)}">confidence ${Math.round(p.pct)}% · ${lvl(p.pct)}</span>`:p.rule?`<span class="conf conf-rule" title="A fixed rule in RADAR decided this item, so RADAR gives no confidence for it">fixed rule</span>`:p.conf?`<span class="conf conf-${p.conf}">confidence: ${p.conf}</span>`:/<b>/.test(p.txt)?`<span class="conf conf-rule" title="RADAR gave no confidence for this item">no score given</span>`:"";
  const prep=it=>({txt:hum(pullSrc(it.txt,ids)),F:(it.forr||[]).map(x=>hum(pullSrc(x,ids))),G:(it.against||[]).map(x=>hum(pullSrc(x,ids))),M:(it.more||[]).map(x=>hum(pullSrc(x,ids))),conf:it.conf,pct:it.pct,rule:it.rule});
  const tip=p=>p.F.length||p.G.length||p.M.length?`<span class="tipbox">${p.F.length?`<span><b>For:</b> ${p.F.join("; ")}</span>`:""}${p.G.length?`<span><b>Against:</b> ${p.G.join("; ")}</span>`:""}${p.M.length?`<span class="more"><b>More data needed:</b> ${p.M.join("; ")}</span>`:""}</span>`:"";
@@ -978,7 +978,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-20T18:43:13Z";
+const BUILD="sim-9 2026-11-23T16:19:27Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

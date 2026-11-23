@@ -611,8 +611,8 @@ function legacy(a){if(!a)return null;const d={_h:{},_dose:{}};if(a.tier)d.tier=a
  if(x.fluids){d.fluids="give";const v=num(x.fluids.dose);if(v)d._dose.fluids=v;const h=x.fluids.when==="later"?num(x.fluids.h):null;if(h!==null)d._h.fluids=h}else d.fluids="withhold";
  d.vaso=x.vaso?"start or continue":"hold or stop";
  const more={tx:Object.entries(x).filter(([k])=>!["fluids","abx","vaso"].includes(k)).map(([k,v])=>({name:k==="other"?((v.note||"").trim()||"Other treatment"):TXL[k][1],dose:num(v.dose),unit:TXL[k][2],h:v.when==="later"?num(v.h):null,note:k==="other"?"":(v.note||"").trim()})),
-  txOther:(a.txOther||"").trim(),testsOther:(a.testsOther||"").trim(),testNotes:Object.entries(a.tests||{}).filter(([k,v])=>(v.note||"").trim()).map(([k,v])=>TESTL[k]+": "+v.note.trim()).join("; "),other:(a.other||"").trim(),abxNote:x.abx?[(x.abx.note||"").trim(),num(x.abx.dose)!==null?num(x.abx.dose)+" g":""].filter(Boolean).join(" "):""};
- if(more.tx.length||more.txOther||more.testsOther||more.testNotes||more.other||more.abxNote)d._more=more;return d}
+  txOther:(a.txOther||"").trim(),testsOther:(a.testsOther||"").trim(),testNotes:Object.entries(a.tests||{}).filter(([k,v])=>(v.note||"").trim()).map(([k,v])=>TESTL[k]+": "+v.note.trim()).join("; "),other:(a.other||"").trim(),dx:(a.dx||[]).filter(x=>x!=="Other"),dxOther:(a.dxOther||"").trim(),abxNote:x.abx?[(x.abx.note||"").trim(),num(x.abx.dose)!==null?num(x.abx.dose)+" g":""].filter(Boolean).join(" "):""};
+ if(more.tx.length||more.txOther||more.testsOther||more.testNotes||more.other||more.abxNote||more.dx.length||more.dxOther)d._more=more;return d}
 const src=(tab,id,i)=>tab==="radar"&&isDone("radar",id,i)?A("radar",id)[i]:(isDone("own",id,i)?A("own",id)[i]:null);
 const decs=(tab,id,upto)=>TP.slice(0,upto).map((_,i)=>legacy(src(tab,id,i)));
 const TXDELAY={oxygen:.1,furosemide:.3,heparin:.5,aspirin:.2,antipyretic:.3,benzo:.2,ntg:.3,bronch:.2,hydrocort:.4,other:.5};
@@ -978,7 +978,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-23T16:55:38Z";
+const BUILD="sim-9 2026-11-23T17:06:33Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}

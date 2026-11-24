@@ -36,7 +36,7 @@ def main():
     a = ap.parse_args()
     base_url = None if a.base_url == "openai" else a.base_url
 
-    # Keys live one level above the repository (P4_RADAR/.env), never inside it:
+    # Keys live one level above the repository (RADAR/.env), never inside it:
     #   OPENAI_API_KEY=...      used when --base-url openai
     #   ANTHROPIC_API_KEY=...   used for Anthropic's OpenAI-compatible endpoint
     # The pipeline itself only reads OPENAI_API_KEY, so the right key is copied into it.

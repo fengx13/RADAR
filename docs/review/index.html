@@ -669,7 +669,7 @@ function openOwnTab(){const c=S.cur.own;if(c){show("own",c.id,c.i);return}const 
 
 /* ---------- header ---------- */
 function renderTabs(){const n=t=>S.order.filter(id=>allDone(t,id)).length;
- tabsEl.innerHTML=`<button type="button" class="tab ${S.tab==="home"?"on":""}" data-t="home">Home</button><button type="button" class="tab ${S.tab==="guide"?"on":""}" data-t="guide">1 · Tutorial and calibration</button><button type="button" class="tab ${S.tab==="own"?"on":""}" data-t="own">2 · On your own <span class="cnt">${n("own")}/5</span></button><button type="button" class="tab ${S.tab==="radar"?"on":""}" data-t="radar">3 · With RADAR <span class="cnt">${n("radar")}/5</span></button><span class="grow"></span><button type="button" class="primary" id="submit" ${S.submitted?"disabled":""}>${S.submitted?"Submitted":"Finish and submit"}</button>`;
+ tabsEl.innerHTML=`<button type="button" class="tab ${S.tab==="home"?"on":""}" data-t="home">Home</button><button type="button" class="tab ${S.tab==="guide"?"on":""}" data-t="guide">1 · Tutorial and calibration</button><button type="button" class="tab ${S.tab==="own"?"on":""}" data-t="own">2 · On your own <span class="cnt">${n("own")}/5</span></button><button type="button" class="tab ${S.tab==="radar"?"on":""}" data-t="radar">3 · With RADAR <span class="cnt">${n("radar")}/5</span></button><span class="grow"></span>${S.nSubmit?`<span class="small muted" id="sub-note">Submitted ${S.nSubmit}× · last ${new Date(S.submittedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</span> `:""}<button type="button" class="primary" id="submit">${S.nSubmit?"Submit again":"Submit"}</button>`;
  tabsEl.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{const t=b.dataset.t;if(t==="own")openOwnTab();else if(t==="radar")openRadarTab();else setTab(t)});
  tabsEl.querySelector("#submit").onclick=submitDialog}
 
@@ -733,7 +733,7 @@ const GUIDE=[
   b:()=>demoWith(sim=>figHtml(`<div class="shell">${demoSide()}<div class="work"><div class="actions"><span><b>Patient 1 of 5</b> · on your own · T0</span>${demoTl()}</div><div class="grid"><div class="panel" id="f-chart">${chartHtml(sim)}</div><div class="panel" id="f-plan"><h2>What would you order now?</h2>${formHtml9(clone(DEMO_ANS),"own",sim)}</div></div></div></div>`,1280,210,230))+
    `<div class="cards two"><div class="card static"><span class="cn">2</span><b>On your own</b><span>At each time point you read the chart and enter your plan. When you save, your orders are carried out: tests return later, treatments are given, and the vital signs respond.</span></div>
    <div class="card static"><span class="cn">3</span><b>With RADAR</b><span>The same patient and time points, now with RADAR's card beside your own answers. Edit your answers only if the card changes your mind, and rate the card. A patient opens here after all five time points are done on your own.</span></div></div>
-   <p class="small muted">Everything is saved as you enter it; a time point turns green when it is saved. You can switch tabs or patients at any time and come back. A saved time point can be changed only before you open RADAR for that patient, and the later time points then have to be done again. When you have finished, press <b>Finish and submit</b> at the top right.</p>`,
+   <p class="small muted">Everything is saved as you enter it; a time point turns green when it is saved. You can switch tabs or patients at any time and come back. A saved time point can be changed only before you open RADAR for that patient, and the later time points then have to be done again. Press <b>Submit</b> at the top right whenever you like: you do not need to finish first, you can submit as many times as you want, and your answers stay here so you can keep going.</p>`,
   marks:[[".side","Five patients. Click a patient to switch at any time; your place in each one is kept.","L"],[".work .tl","Five time points for the patient you are on, done in order.","R"],["#f-chart","The chart: what is known at this time point. Your orders appear here when they are done.","br"],["#f-plan","Your plan for this time point. It is saved as you enter it.","R"]]},
  {h:"Your plan: what to fill in",
   b:()=>`<div class="twocol"><div>`+demoWith(sim=>figHtml(`<div class="panel" id="f-plan2"><h2>What would you order now?</h2>${formHtml9(clone(DEMO_ANS),"own",sim)}</div>`,640,0,230))+`</div><div>
@@ -941,7 +941,7 @@ function renderWork(tab){const c=S.cur[tab];if(!c){tab==="own"?openOwnTab():setT
   if(nxt){modal(`<h2>Patient ${pn(id)} is done ${tabName[tab]}</h2><p>Next: Patient ${pn(nxt)}.${tab==="own"?" This patient is now also open in tab 3 (With RADAR).":""}</p>`,[...(tab==="own"?[{label:"Open this patient with RADAR",fn:()=>{S.cur.radar=null;openRadarTab()}}]:[]),{label:"Go to Patient "+pn(nxt),primary:true,fn:()=>show(tab,nxt,firstOpen(tab,nxt))}]);render();return}
   if(tab==="own"){modal(`<h2>All five patients are done on your own</h2><p>Thank you. The next part is tab 3, the same patients with RADAR's card.</p>`,[{label:"Stay here"},{label:"Open tab 3 · With RADAR",primary:true,fn:openRadarTab}]);render();return}
   const rest=S.order.filter(x=>!allDone("radar",x));
-  modal(rest.length?`<h2>Patient ${pn(id)} is done with RADAR</h2><p>${rest.length} patient${rest.length>1?"s are":" is"} not yet finished on your own; they open here once they are.</p>`:`<h2>All five patients are done with RADAR</h2><p>Thank you. Press <b>Finish and submit</b> at the top right to send your results.</p>`,rest.length?[{label:"Go to tab 2 · On your own",primary:true,fn:()=>{const x=rest[0];show("own",x,firstOpen("own",x))}}]:[{label:"Close"},{label:"Finish and submit",primary:true,fn:submitDialog}]);render()}}
+  modal(rest.length?`<h2>Patient ${pn(id)} is done with RADAR</h2><p>${rest.length} patient${rest.length>1?"s are":" is"} not yet finished on your own; they open here once they are.</p>`:`<h2>All five patients are done with RADAR</h2><p>Thank you. Press <b>Submit</b> at the top right to send your results.</p>`,rest.length?[{label:"Go to tab 2 · On your own",primary:true,fn:()=>{const x=rest[0];show("own",x,firstOpen("own",x))}}]:[{label:"Close"},{label:"Submit",primary:true,fn:submitDialog}]);render()}}
 
 function render(){renderTabs();document.body.classList.add("compact");statusEl.hidden=S.tab==="home";
  if(S.tab==="guide")renderGuide();else if(S.tab==="own"||S.tab==="radar")renderWork(S.tab);else renderHome()}
@@ -950,7 +950,7 @@ function render(){renderTabs();document.body.classList.add("compact");statusEl.h
 const SEND_URL="https://script.google.com/macros/s/AKfycbxA62PI2MjBe_kUB02AY-V1ELp77v9Gk9lly_xnEUPJGjvIZMFb_mO-KuNi1kHagHnW/exec";
 function payload(){const ev=(tab,id)=>{const x=simFor(tab,id,5);return {events:x.events,results:x.results.map(r=>({name:r.name,at:r.at})),vitals:VT.map(x.vital)}};
  const st=JSON.parse(JSON.stringify({...S,liveCode:undefined,liveCards:undefined}));
- return {tool:"RADAR clinician review",version:"sim-9",sentAt:new Date().toISOString(),liveMode:!!LIVE_URL,...st,
+ return {tool:"RADAR clinician review",version:"sim-9",sentAt:new Date().toISOString(),submissionNo:S.nSubmit||1,liveMode:!!LIVE_URL,...st,
   progress:Object.fromEntries(S.order.map(id=>[id,{own:TP.map((_,i)=>isDone("own",id,i)),radar:TP.map((_,i)=>isDone("radar",id,i))}])),
   course:Object.fromEntries(S.order.filter(id=>isDone("own",id,0)).map(id=>[id,{own:ev("own",id),withRadar:allDone("own",id)&&isDone("radar",id,0)?ev("radar",id):null}]))}}
 async function sendResults(){if(!SEND_URL)return false;try{await fetch(SEND_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload())});return true}catch(e){return false}}
@@ -959,15 +959,15 @@ function download(){const data=payload();const blob=new Blob([JSON.stringify(dat
  const nm=(S.reviewer.name||"reviewer").replace(/[^A-Za-z0-9]+/g,"_");a.href=URL.createObjectURL(blob);a.download=`RADAR_review_${nm}_sim9.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function submitDialog(){leave();const cnt=t=>S.order.reduce((s,id)=>s+TP.filter((_,i)=>isDone(t,id,i)).length,0),o=cnt("own"),r=cnt("radar");closeModal();
  const m=document.createElement("div");m.className="modal";m.id="modal";
- m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><h2>Finish and submit</h2><p>Done so far: <b>${o} of 25</b> time points on your own and <b>${r} of 25</b> with RADAR.${o<25||r<25?" You can submit now, or go back and finish first.":""}</p>
+ m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><h2>Submit your results</h2><p>Done so far: <b>${o} of 25</b> time points on your own and <b>${r} of 25</b> with RADAR. You can submit at any time, finished or not, and as many times as you like. Your answers stay here, and we use your latest submission.${S.nSubmit?` (Submitted ${S.nSubmit} time${S.nSubmit>1?"s":""} so far.)`:""}</p>
   <label style="display:block">Your name<input type="text" id="s-name" value="${esc(S.reviewer.name||"")}" autocomplete="name"></label>
   <label class="other">Any other comment for the RADAR team <span class="small muted">(optional)</span><textarea id="s-cm">${esc(S.comment||"")}</textarea></label>
   <p class="err" id="s-e"></p><div class="actions"><span></span><span><button type="button" id="s-no">Go back</button> <button type="button" class="primary" id="s-yes">Submit my results</button></span></div></div>`;
  document.body.appendChild(m);m.querySelector("#s-name").focus();
  m.querySelector("#s-no").onclick=()=>{S.reviewer.name=m.querySelector("#s-name").value.trim();S.comment=m.querySelector("#s-cm").value;save();closeModal()};
  m.querySelector("#s-yes").onclick=async()=>{const nm=m.querySelector("#s-name").value.trim();if(!nm){m.querySelector("#s-e").textContent="Please enter your name.";return}
-  S.reviewer.name=nm;S.comment=m.querySelector("#s-cm").value;S.submitted=true;S.submittedAt=new Date().toISOString();S.sent=await sendResults();if(!S.sent)download();await save();closeModal();
-  modal(`<h2>Thank you</h2><p>${S.sent?"Your results have been sent to the RADAR team.":"Your results could not be sent automatically, so a file was downloaded. Please email it to the RADAR team."}</p><p><button type="button" id="dl">Download a copy of my results</button></p>`,[{label:"Close",primary:true}]);const d=document.getElementById("dl");if(d)d.onclick=download;render()}}
+  S.reviewer.name=nm;S.comment=m.querySelector("#s-cm").value;S.submitted=true;S.nSubmit=(S.nSubmit||(S.submittedAt?1:0))+1;S.submittedAt=new Date().toISOString();S.sent=await sendResults();if(!S.sent)download();await save();closeModal();
+  modal(`<h2>Thank you</h2><p>${S.sent?"Your results have been sent to the RADAR team. Your answers are still here: you can keep working and press Submit again at any time.":"Your results could not be sent automatically, so a file was downloaded. Please email it to the RADAR team."}</p><p><button type="button" id="dl">Download a copy of my results</button></p>`,[{label:"Close",primary:true}]);const d=document.getElementById("dl");if(d)d.onclick=download;render()}}
 const RS=document.getElementById("restart");
 function restartUI(){RS.innerHTML=`<button type="button" id="rs-btn">Start over</button>`;RS.querySelector("#rs-btn").onclick=()=>{
  RS.innerHTML=`<span class="small">Clear all your answers and start again?</span> <button type="button" id="rs-no">Cancel</button> <button type="button" class="primary" id="rs-yes">Yes, start over</button>`;
@@ -978,7 +978,7 @@ try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(o.v===9&&o.
 document.getElementById("home").onclick=e=>{e.preventDefault();setTab("home")};
 /* Automatic update, once each time the page is opened: the page asks the server which build is current (never from cache); if this copy is older it
    saves the answers, refreshes the browser's copy and reloads by itself. One attempt per build, so it cannot loop. */
-const BUILD="sim-9 2026-11-23T17:06:33Z";
+const BUILD="sim-9 2026-11-24T03:10:37Z";
 async function checkVersion(){if(!/^https?:$/.test(location.protocol))return;try{
   const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).build;if(!v||v===BUILD)return;
   let tried=null;try{tried=sessionStorage.getItem("radar-review-reload")}catch(e){}if(tried===v)return;try{sessionStorage.setItem("radar-review-reload",v)}catch(e){}
